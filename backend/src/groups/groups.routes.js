@@ -198,6 +198,20 @@ router.get("/groups/:id/members", requireAuth, async (req, res, next) => {
 router.get("/:id/groups", requireAuth, async (req, res, next) => {
   try {
     const classId = req.params.id;
+    const userId=req.user.id;
+    const enrolled = await db.query(
+      `
+      SELECT 1
+      FROM enrollments
+      WHERE user_id = $1 AND class_id = $2
+      `,
+      [userId, classId],
+    );
+
+    if (enrolled.rowCount === 0) {
+      return res.status(403).json({ message: "Not allowed" });
+    }
+
 
     const result = await db.query(
       `

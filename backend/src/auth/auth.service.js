@@ -1,5 +1,6 @@
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import crypto from "crypto";
 
 const SALT_ROUNDS = 10;
 
@@ -19,4 +20,8 @@ export function generateToken(payload) {
 
 export function verifyToken(token) {
   return jwt.verify(token, process.env.JWT_SECRET);
+}
+
+export function generateOtpCode() {
+  return crypto.randomInt(0, 1000000).toString().padStart(6, "0");
 }

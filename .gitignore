@@ -1,0 +1,35 @@
+# Global dependencies and build output
+node_modules/
+**/node_modules/
+
+# Frontend build artifacts
+frontend/dist/
+
+# Environment files
+*.env
+*.env.local
+*.env.development
+*.env.production
+frontend/.env
+backend/.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Coverage and misc
+coverage/
+dist/
+.tmp/
+.cache/

@@ -159,4 +159,117 @@ router.put("/:id", requireAuth, async (req, res, next) => {
   }
 });
 
+router.get("/:assignmentId/evaluation", requireAuth, async (req, res, next) => {
+  try {
+    const assignmentId = req.params.assignmentId;
+    const userId = req.user.id;
+
+    const assignmentResult = await db.query(
+      `
+      SELECT a.id, a.class_id, a.submission_type
+      FROM assignments a
+      WHERE a.id = $1
+      `,
+      [assignmentId],
+    );
+
+    if (assignmentResult.rowCount === 0) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    const { class_id, submission_type } = assignmentResult.rows[0];
+
+    const enrollmentResult = await db.query(
+      `
+      SELECT role
+      FROM enrollments
+      WHERE user_id = $1 AND class_id = $2
+      `,
+      [userId, class_id],
+    );
+
+    if (enrollmentResult.rowCount === 0) {
+      return res.status(403).json({ message: "Not enrolled in class" });
+    }
+
+    let submissionId;
+
+    // For INDIVIDUAL assignments, find submission by user_id
+    if (submission_type === "INDIVIDUAL") {
+      const submissionResult = await db.query(
+        `
+        SELECT id FROM submissions
+        WHERE assignment_id = $1 AND user_id = $2
+        LIMIT 1
+        `,
+        [assignmentId, userId],
+      );
+
+      if (submissionResult.rowCount === 0) {
+        return res.json(null);
+      }
+
+      submissionId = submissionResult.rows[0].id;
+    }
+    else if (submission_type === "GROUP") {
+      const groupResult = await db.query(
+        `
+        SELECT gm.group_id
+        FROM group_members gm
+        JOIN groups g ON g.id = gm.group_id
+        WHERE gm.user_id = $1 AND g.class_id = $2
+        LIMIT 1
+        `,
+        [userId, class_id],
+      );
+
+      if (groupResult.rowCount === 0) {
+        return res.json(null);
+      }
+
+      const groupId = groupResult.rows[0].group_id;
+
+      const submissionResult = await db.query(
+        `
+        SELECT id FROM submissions
+        WHERE assignment_id = $1 AND group_id = $2
+        LIMIT 1
+        `,
+        [assignmentId, groupId],
+      );
+
+      if (submissionResult.rowCount === 0) {
+        return res.json(null);
+      }
+
+      submissionId = submissionResult.rows[0].id;
+    } else {
+      return res.json(null);
+    }
+
+    // Get evaluation for the submission
+    const evaluationResult = await db.query(
+      `
+      SELECT score, feedback
+      FROM evaluations
+      WHERE submission_id = $1
+      LIMIT 1
+      `,
+      [submissionId],
+    );
+
+    if (evaluationResult.rowCount === 0) {
+      return res.json(null);
+    }
+
+    const evaluation = evaluationResult.rows[0];
+    res.json({
+      score: evaluation.score,
+      feedback: evaluation.feedback,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

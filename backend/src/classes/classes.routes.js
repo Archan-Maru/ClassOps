@@ -75,6 +75,149 @@ router.get("/me", requireAuth, async (req, res, next) => {
   }
 });
 
+router.get("/:id", requireAuth, async (req, res, next) => {
+  try {
+    const classId = req.params.id;
+
+    const result = await db.query(
+      `
+      SELECT
+        c.*,
+        u.username AS teacher_name,
+        e.role AS user_role
+      FROM classes c
+      JOIN users u ON u.id = c.teacher_id
+      LEFT JOIN enrollments e ON e.class_id = c.id AND e.user_id = $2
+      WHERE c.id = $1 AND (e.user_id IS NOT NULL OR c.teacher_id = $2)
+      `,
+      [classId, req.user.id]
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    res.status(200).json({ class: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:id/people", requireAuth, async (req, res, next) => {
+  try {
+    const classId = req.params.id;
+
+    const enrolled = await db.query(
+      `
+      SELECT 1
+      FROM enrollments
+      WHERE class_id = $1 AND user_id = $2
+      `,
+      [classId, req.user.id]
+    );
+
+    if (enrolled.rowCount === 0) {
+      return res.status(403).json({ message: "Not enrolled in this class" });
+    }
+
+    const peopleResult = await db.query(
+      `
+      SELECT
+        u.id,
+        u.username,
+        e.role
+      FROM enrollments e
+      JOIN users u ON u.id = e.user_id
+      WHERE e.class_id = $1
+      ORDER BY e.role DESC, u.username ASC
+      `,
+      [classId]
+    );
+
+    res.status(200).json({ people: peopleResult.rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:id/classwork", requireAuth, async (req, res, next) => {
+  try {
+    const classId = req.params.id;
+
+    const enrolled = await db.query(
+      `
+      SELECT 1
+      FROM enrollments
+      WHERE class_id = $1 AND user_id = $2
+      `,
+      [classId, req.user.id]
+    );
+
+    if (enrolled.rowCount === 0) {
+      return res.status(403).json({ message: "Not enrolled in this class" });
+    }
+
+    const result = await db.query(
+      `
+      SELECT
+        id,
+        class_id,
+        title,
+        description,
+        resource_url,
+        created_at
+      FROM classwork
+      WHERE class_id = $1
+      ORDER BY created_at DESC
+      `,
+      [classId]
+    );
+
+    res.status(200).json({ classwork: result.rows });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/:id/classwork", requireAuth, async (req, res, next) => {
+  try {
+    const classId = req.params.id;
+    const { title, description, resource_url } = req.body;
+
+    if (!title) {
+      return res.status(400).json({ message: "Title is required" });
+    }
+
+    const enrollment = await db.query(
+      `
+      SELECT role
+      FROM enrollments
+      WHERE class_id = $1 AND user_id = $2
+      `,
+      [classId, req.user.id]
+    );
+
+    if (enrollment.rowCount === 0 || enrollment.rows[0].role !== "TEACHER") {
+      return res.status(403).json({ message: "Only teachers can add classwork" });
+    }
+
+    const result = await db.query(
+      `
+      INSERT INTO classwork
+        (class_id, title, description, resource_url, uploaded_by)
+      VALUES
+        ($1, $2, $3, $4, $5)
+      RETURNING id, title, description, resource_url, created_at
+      `,
+      [classId, title, description || null, resource_url || null, req.user.id]
+    );
+
+    res.status(201).json({ classwork: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post("/:id/join", requireAuth, async (req, res, next) => {
   try {
     const userId = req.user.id;
@@ -96,6 +239,60 @@ router.post("/:id/join", requireAuth, async (req, res, next) => {
 
     if (existing.rowCount > 0) {
       return res.status(409).json({ message: "Already enrolled" });
+    }
+
+    await db.query(
+      `INSERT INTO enrollments (user_id, class_id, role)
+       VALUES ($1, $2, 'STUDENT')`,
+      [userId, classId]
+    );
+
+    res.status(201).json({ message: "Joined class successfully" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.post("/join-by-code", requireAuth, async (req, res, next) => {
+  try {
+    const userId = req.user.id;
+    const { code } = req.body;
+
+    if (!code || !code.trim()) {
+      return res.status(400).json({ message: "Class code is required" });
+    }
+
+    const normalizedCode = code.trim().toUpperCase();
+    let classId = null;
+
+    // Parse CLASS-{id} format
+    if (normalizedCode.startsWith("CLASS-")) {
+      const parsed = parseInt(normalizedCode.substring(6), 10);
+      if (!isNaN(parsed) && parsed > 0) {
+        classId = parsed;
+      }
+    }
+
+    if (!classId) {
+      return res.status(400).json({ message: "Invalid class code format" });
+    }
+
+    const classResult = await db.query(
+      `SELECT id FROM classes WHERE id = $1`,
+      [classId]
+    );
+
+    if (classResult.rowCount === 0) {
+      return res.status(404).json({ message: "Class not found" });
+    }
+
+    const existing = await db.query(
+      `SELECT 1 FROM enrollments WHERE user_id = $1 AND class_id = $2`,
+      [userId, classId]
+    );
+
+    if (existing.rowCount > 0) {
+      return res.status(409).json({ message: "Already enrolled in this class" });
     }
 
     await db.query(

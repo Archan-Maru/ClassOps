@@ -11,9 +11,9 @@ function AuthLayout({ title, subtitle, children, footer }) {
             <h2>All your classes. One simple platform.</h2>
             <p>
               ClassOps helps you manage enrollments, assignments, submissions,
-              grading, and groups from a single, secure dashboard. Stay
-              organized, reduce manual work, and keep teachers and students
-              aligned with real-time updates.
+              grading, and groups in one secure place. Stay organized, reduce
+              manual work, and keep teachers and students aligned with
+              real-time updates.
             </p>
           </div>
         </section>

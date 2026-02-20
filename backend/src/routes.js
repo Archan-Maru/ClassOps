@@ -12,9 +12,10 @@ router.use("/auth", authRoutes);
 
 router.use("/classes", classRoutes);
 router.use("/classes", assignmentsRoutes);
+router.use("/assignments", assignmentsRoutes);
 router.use("/classes", groupsRoutes);
 router.use("/", groupsRoutes);
-router.use("/assignments", submissionsRoutes);
-router.use("/submissions", evaluationsRoutes);
+router.use("/submissions", submissionsRoutes);
+router.use("/evaluations", evaluationsRoutes);
 
 export default router;

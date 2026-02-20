@@ -44,6 +44,49 @@ router.post("/:id/groups", requireAuth, async (req, res, next) => {
   }
 });
 
+router.get("/:id/available-students", requireAuth, async (req, res, next) => {
+  try {
+    const classId = req.params.id;
+    const requesterId = req.user.id;
+
+    const teacherCheck = await db.query(
+      `
+      SELECT role
+      FROM enrollments
+      WHERE user_id = $1 AND class_id = $2
+      `,
+      [requesterId, classId],
+    );
+
+    if (teacherCheck.rowCount === 0 || teacherCheck.rows[0].role !== "TEACHER") {
+      return res.status(403).json({ message: "Only teachers can view available students" });
+    }
+
+    const result = await db.query(
+      `
+      SELECT u.id, u.username
+      FROM enrollments e
+      JOIN users u ON u.id = e.user_id
+      WHERE e.class_id = $1
+        AND e.role = 'STUDENT'
+        AND NOT EXISTS (
+          SELECT 1
+          FROM group_members gm
+          JOIN groups g ON g.id = gm.group_id
+          WHERE g.class_id = e.class_id
+            AND gm.user_id = e.user_id
+        )
+      ORDER BY u.username ASC
+      `,
+      [classId],
+    );
+
+    return res.status(200).json({ students: result.rows });
+  } catch (err) {
+    return next(err);
+  }
+});
+
 router.post("/groups/:id/members", requireAuth, async (req, res, next) => {
   try {
     const groupId = req.params.id;
@@ -85,12 +128,27 @@ router.post("/groups/:id/members", requireAuth, async (req, res, next) => {
       SELECT 1
       FROM enrollments
       WHERE user_id = $1 AND class_id = $2
+        AND role = 'STUDENT'
       `,
       [user_id, classId],
     );
 
     if (studentEnroll.rowCount === 0) {
-      return res.status(400).json({ message: "User not enrolled in class" });
+      return res.status(400).json({ message: "User is not a student in this class" });
+    }
+
+    const alreadyInGroup = await db.query(
+      `
+      SELECT 1
+      FROM group_members gm
+      JOIN groups g ON g.id = gm.group_id
+      WHERE g.class_id = $1 AND gm.user_id = $2
+      `,
+      [classId, user_id],
+    );
+
+    if (alreadyInGroup.rowCount > 0) {
+      return res.status(409).json({ message: "Student is already in a group" });
     }
 
     await db.query(

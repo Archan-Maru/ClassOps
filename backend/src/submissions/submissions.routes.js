@@ -243,7 +243,7 @@ router.get("/:id/submissions", requireAuth, async (req, res, next) => {
   }
 });
 
-router.put("/submissions/:id", requireAuth, async (req, res, next) => {
+router.put("/:id", requireAuth, async (req, res, next) => {
   try {
     const submissionId = req.params.id;
     const userId = req.user.id;
@@ -304,7 +304,7 @@ router.put("/submissions/:id", requireAuth, async (req, res, next) => {
   }
 });
 
-router.delete("/submissions/:id", requireAuth, async (req, res, next) => {
+router.delete("/:id", requireAuth, async (req, res, next) => {
   try {
     const submissionId = req.params.id;
     const userId = req.user.id;
@@ -357,6 +357,188 @@ router.delete("/submissions/:id", requireAuth, async (req, res, next) => {
     );
 
     res.status(200).json({ message: "Submission deleted" });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
+  try {
+    const assignmentId = req.params.assignmentId;
+    const userId = req.user.id;
+
+    const assignmentResult = await db.query(
+      `
+      SELECT a.id, a.class_id, a.submission_type
+      FROM assignments a
+      WHERE a.id = $1
+      `,
+      [assignmentId],
+    );
+
+    if (assignmentResult.rowCount === 0) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    const { class_id, submission_type } = assignmentResult.rows[0];
+
+    const enrollmentResult = await db.query(
+      `
+      SELECT role
+      FROM enrollments
+      WHERE user_id = $1 AND class_id = $2
+      `,
+      [userId, class_id],
+    );
+
+    if (enrollmentResult.rowCount === 0) {
+      return res.status(403).json({ message: "Not enrolled in class" });
+    }
+
+    if (submission_type === "INDIVIDUAL") {
+      const submissionResult = await db.query(
+        `
+        SELECT id, content_url, content_text, submitted_at
+        FROM submissions
+        WHERE assignment_id = $1 AND user_id = $2
+        LIMIT 1
+        `,
+        [assignmentId, userId],
+      );
+
+      if (submissionResult.rowCount === 0) {
+        return res.json({
+          exists: false,
+          content: null,
+          submitted_at: null,
+        });
+      }
+
+      const submission = submissionResult.rows[0];
+      return res.json({
+        exists: true,
+        id: submission.id,
+        content: submission.content_url || submission.content_text,
+        submitted_at: submission.submitted_at,
+      });
+    }
+
+    if (submission_type === "GROUP") {
+      const groupResult = await db.query(
+        `
+        SELECT gm.group_id
+        FROM group_members gm
+        JOIN groups g ON g.id = gm.group_id
+        WHERE gm.user_id = $1 AND g.class_id = $2
+        LIMIT 1
+        `,
+        [userId, class_id],
+      );
+
+      if (groupResult.rowCount === 0) {
+        return res.json({
+          exists: false,
+          content: null,
+          submitted_at: null,
+        });
+      }
+
+      const groupId = groupResult.rows[0].group_id;
+
+      const submissionResult = await db.query(
+        `
+        SELECT id, content_url, content_text, submitted_at
+        FROM submissions
+        WHERE assignment_id = $1 AND group_id = $2
+        LIMIT 1
+        `,
+        [assignmentId, groupId],
+      );
+
+      if (submissionResult.rowCount === 0) {
+        return res.json({
+          exists: false,
+          content: null,
+          submitted_at: null,
+        });
+      }
+
+      const submission = submissionResult.rows[0];
+      return res.json({
+        exists: true,
+        id: submission.id,
+        content: submission.content_url || submission.content_text,
+        submitted_at: submission.submitted_at,
+      });
+    }
+
+    return res.json({
+      exists: false,
+      content: null,
+      submitted_at: null,
+    });
+  } catch (err) {
+    next(err);
+  }
+});
+
+router.get("/:assignmentId/submissions", requireAuth, async (req, res, next) => {
+  try {
+    const assignmentId = req.params.assignmentId;
+    const userId = req.user.id;
+    const { sortBy = "latest" } = req.query;
+
+    const assignmentResult = await db.query(
+      `
+      SELECT a.id, a.class_id
+      FROM assignments a
+      WHERE a.id = $1
+      `,
+      [assignmentId],
+    );
+
+    if (assignmentResult.rowCount === 0) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    const classId = assignmentResult.rows[0].class_id;
+
+    const enrollmentResult = await db.query(
+      `
+      SELECT role
+      FROM enrollments
+      WHERE user_id = $1 AND class_id = $2
+      `,
+      [userId, classId],
+    );
+
+    if (enrollmentResult.rowCount === 0 || enrollmentResult.rows[0].role !== "TEACHER") {
+      return res.status(403).json({ message: "Only teachers can view submissions" });
+    }
+
+    const orderBy = sortBy === "earliest" ? "ASC" : "DESC";
+    const submissionsResult = await db.query(
+      `
+      SELECT
+        s.id,
+        s.user_id,
+        u.username,
+        s.content_url,
+        s.content_text,
+        s.submitted_at,
+        e.id AS evaluation_id,
+        e.score,
+        e.feedback
+      FROM submissions s
+      JOIN users u ON u.id = s.user_id
+      LEFT JOIN evaluations e ON e.submission_id = s.id
+      WHERE s.assignment_id = $1
+      ORDER BY s.submitted_at ${orderBy}
+      `,
+      [assignmentId],
+    );
+
+    res.json({ submissions: submissionsResult.rows });
   } catch (err) {
     next(err);
   }

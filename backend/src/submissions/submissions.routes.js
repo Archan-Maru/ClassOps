@@ -1,129 +1,150 @@
 import { Router } from "express";
 import { requireAuth } from "../auth/auth.middleware.js";
 import db from "../config/db.js";
+import upload from "../middleware/upload.middleware.js";
+import { uploadBufferToCloudinary } from "../utils/cloudinaryUpload.js";
 
 const router = Router();
 
-router.post("/:id/submissions", requireAuth, async (req, res, next) => {
-  try {
-    const assignmentId = req.params.id;
-    const userId = req.user.id;
-    const { content_url, content_text } = req.body;
+router.post(
+  "/:id/submissions",
+  requireAuth,
+  upload.single("file"),
+  async (req, res, next) => {
+    try {
+      const assignmentId = req.params.id;
+      const userId = req.user.id;
+      const { content_text } = req.body;
+      let content_url = req.body.content_url || null;
 
-    const assignmentResult = await db.query(
-      `
+      if (req.file && req.file.buffer) {
+        try {
+          const uploadResult = await uploadBufferToCloudinary(
+            req.file.buffer,
+            req.file.originalname,
+            `submissions/${assignmentId}`,
+          );
+          content_url = uploadResult.secure_url || content_url;
+        } catch (err) {
+          return next(err);
+        }
+      }
+
+      const assignmentResult = await db.query(
+        `
       SELECT class_id, submission_type
       FROM assignments
       WHERE id = $1
       `,
-      [assignmentId],
-    );
+        [assignmentId],
+      );
 
-    if (assignmentResult.rowCount === 0) {
-      return res.status(404).json({ message: "Assignment not found" });
-    }
+      if (assignmentResult.rowCount === 0) {
+        return res.status(404).json({ message: "Assignment not found" });
+      }
 
-    const { class_id, submission_type } = assignmentResult.rows[0];
+      const { class_id, submission_type } = assignmentResult.rows[0];
 
-    const enrollment = await db.query(
-      `
+      const enrollment = await db.query(
+        `
       SELECT role
       FROM enrollments
       WHERE user_id = $1 AND class_id = $2
       `,
-      [userId, class_id],
-    );
+        [userId, class_id],
+      );
 
-    if (enrollment.rowCount === 0) {
-      return res.status(403).json({ message: "Not enrolled in class" });
-    }
+      if (enrollment.rowCount === 0) {
+        return res.status(403).json({ message: "Not enrolled in class" });
+      }
 
-    if (submission_type === "INDIVIDUAL") {
-      const existing = await db.query(
-        `
+      if (submission_type === "INDIVIDUAL") {
+        const existing = await db.query(
+          `
         SELECT 1
         FROM submissions
         WHERE assignment_id = $1 AND user_id = $2
         `,
-        [assignmentId, userId],
-      );
+          [assignmentId, userId],
+        );
 
-      if (existing.rowCount > 0) {
-        return res.status(409).json({ message: "Already submitted" });
-      }
+        if (existing.rowCount > 0) {
+          return res.status(409).json({ message: "Already submitted" });
+        }
 
-      const result = await db.query(
-        `
+        const result = await db.query(
+          `
         INSERT INTO submissions
           (assignment_id, user_id, content_url, content_text)
         VALUES
           ($1, $2, $3, $4)
         RETURNING id, submitted_at
         `,
-        [assignmentId, userId, content_url || null, content_text || null],
-      );
+          [assignmentId, userId, content_url || null, content_text || null],
+        );
 
-      return res.status(201).json({ submission: result.rows[0] });
-    }
+        return res.status(201).json({ submission: result.rows[0] });
+      }
 
-    if (submission_type === "GROUP") {
-      const groupResult = await db.query(
-        `
+      if (submission_type === "GROUP") {
+        const groupResult = await db.query(
+          `
         SELECT gm.group_id, gm.role
         FROM group_members gm
         JOIN groups g ON g.id = gm.group_id
         WHERE gm.user_id = $1 AND g.class_id = $2
         `,
-        [userId, class_id],
-      );
+          [userId, class_id],
+        );
 
-      if (groupResult.rowCount === 0) {
-        return res.status(403).json({ message: "Not part of any group" });
-      }
+        if (groupResult.rowCount === 0) {
+          return res.status(403).json({ message: "Not part of any group" });
+        }
 
-      const { group_id, role } = groupResult.rows[0];
+        const { group_id, role } = groupResult.rows[0];
 
-      if (role !== "LEADER") {
-        return res
-          .status(403)
-          .json({ message: "Only group leader can submit" });
-      }
+        if (role !== "LEADER") {
+          return res
+            .status(403)
+            .json({ message: "Only group leader can submit" });
+        }
 
-      const existing = await db.query(
-        `
+        const existing = await db.query(
+          `
         SELECT 1
         FROM submissions
         WHERE assignment_id = $1 AND group_id = $2
         `,
-        [assignmentId, group_id],
-      );
+          [assignmentId, group_id],
+        );
 
-      if (existing.rowCount > 0) {
-        return res.status(409).json({ message: "Already submitted" });
-      }
+        if (existing.rowCount > 0) {
+          return res.status(409).json({ message: "Already submitted" });
+        }
 
-      const result = await db.query(
-        `
+        const result = await db.query(
+          `
         INSERT INTO submissions
           (assignment_id, group_id, content_url, content_text)
         VALUES
           ($1, $2, $3, $4)
         RETURNING id, submitted_at
         `,
-        [assignmentId, group_id, content_url || null, content_text || null],
-      );
+          [assignmentId, group_id, content_url || null, content_text || null],
+        );
 
-      return res.status(201).json({
-        submission: result.rows[0],
-        message: "Submitted for entire group",
-      });
+        return res.status(201).json({
+          submission: result.rows[0],
+          message: "Submitted for entire group",
+        });
+      }
+
+      return res.status(400).json({ message: "Invalid submission type" });
+    } catch (err) {
+      next(err);
     }
-
-    return res.status(400).json({ message: "Invalid submission type" });
-  } catch (err) {
-    next(err);
-  }
-});
+  },
+);
 
 router.get("/:id/submission/me", requireAuth, async (req, res, next) => {
   try {
@@ -243,11 +264,25 @@ router.get("/:id/submissions", requireAuth, async (req, res, next) => {
   }
 });
 
-router.put("/:id", requireAuth, async (req, res, next) => {
+router.put("/:id", requireAuth, upload.single("file"), async (req, res, next) => {
   try {
     const submissionId = req.params.id;
     const userId = req.user.id;
-    const { content_url, content_text } = req.body;
+    const { content_text } = req.body;
+    let content_url = req.body.content_url || null;
+
+    if (req.file && req.file.buffer) {
+      try {
+        const uploadResult = await uploadBufferToCloudinary(
+          req.file.buffer,
+          req.file.originalname,
+          `submissions/${submissionId}`,
+        );
+        content_url = uploadResult.secure_url || content_url;
+      } catch (err) {
+        return next(err);
+      }
+    }
 
     const submissionResult = await db.query(
       `
@@ -482,43 +517,51 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
   }
 });
 
-router.get("/:assignmentId/submissions", requireAuth, async (req, res, next) => {
-  try {
-    const assignmentId = req.params.assignmentId;
-    const userId = req.user.id;
-    const { sortBy = "latest" } = req.query;
+router.get(
+  "/:assignmentId/submissions",
+  requireAuth,
+  async (req, res, next) => {
+    try {
+      const assignmentId = req.params.assignmentId;
+      const userId = req.user.id;
+      const { sortBy = "latest" } = req.query;
 
-    const assignmentResult = await db.query(
-      `
+      const assignmentResult = await db.query(
+        `
       SELECT a.id, a.class_id
       FROM assignments a
       WHERE a.id = $1
       `,
-      [assignmentId],
-    );
+        [assignmentId],
+      );
 
-    if (assignmentResult.rowCount === 0) {
-      return res.status(404).json({ message: "Assignment not found" });
-    }
+      if (assignmentResult.rowCount === 0) {
+        return res.status(404).json({ message: "Assignment not found" });
+      }
 
-    const classId = assignmentResult.rows[0].class_id;
+      const classId = assignmentResult.rows[0].class_id;
 
-    const enrollmentResult = await db.query(
-      `
+      const enrollmentResult = await db.query(
+        `
       SELECT role
       FROM enrollments
       WHERE user_id = $1 AND class_id = $2
       `,
-      [userId, classId],
-    );
+        [userId, classId],
+      );
 
-    if (enrollmentResult.rowCount === 0 || enrollmentResult.rows[0].role !== "TEACHER") {
-      return res.status(403).json({ message: "Only teachers can view submissions" });
-    }
+      if (
+        enrollmentResult.rowCount === 0 ||
+        enrollmentResult.rows[0].role !== "TEACHER"
+      ) {
+        return res
+          .status(403)
+          .json({ message: "Only teachers can view submissions" });
+      }
 
-    const orderBy = sortBy === "earliest" ? "ASC" : "DESC";
-    const submissionsResult = await db.query(
-      `
+      const orderBy = sortBy === "earliest" ? "ASC" : "DESC";
+      const submissionsResult = await db.query(
+        `
       SELECT
         s.id,
         s.user_id,
@@ -535,13 +578,14 @@ router.get("/:assignmentId/submissions", requireAuth, async (req, res, next) => 
       WHERE s.assignment_id = $1
       ORDER BY s.submitted_at ${orderBy}
       `,
-      [assignmentId],
-    );
+        [assignmentId],
+      );
 
-    res.json({ submissions: submissionsResult.rows });
-  } catch (err) {
-    next(err);
-  }
-});
+      res.json({ submissions: submissionsResult.rows });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 export default router;

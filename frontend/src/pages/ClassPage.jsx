@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import ClassHeader from "../components/ClassHeader";
 import ClassworkCard from "../components/ClassworkCard";
 import AssignmentCard from "../components/AssignmentCard";
@@ -12,6 +12,28 @@ import PeopleList from "../components/PeopleList";
 import GroupCard from "../components/GroupCard";
 import AppHeader from "../components/AppHeader";
 import api from "../api/api";
+
+function BackToHomeButton() {
+  const navigate = useNavigate();
+
+  return (
+    <button
+      type="button"
+      onClick={() => navigate("/dashboard")}
+      className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-800"
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+        className="h-4 w-4 text-slate-100"
+      >
+        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+      </svg>
+      <span>Home</span>
+    </button>
+  );
+}
 
 const resolveClassCode = (classInfo) => {
   const apiCode =
@@ -34,6 +56,7 @@ const resolveClassCode = (classInfo) => {
 
 function ClassPage() {
   const { id: classId } = useParams();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("classwork");
   const [classData, setClassData] = useState(null);
   const [assignments, setAssignments] = useState([]);
@@ -41,7 +64,8 @@ function ClassPage() {
   const [people, setPeople] = useState([]);
   const [groups, setGroups] = useState([]);
   const [availableStudents, setAvailableStudents] = useState([]);
-  const [loadingAvailableStudents, setLoadingAvailableStudents] = useState(false);
+  const [loadingAvailableStudents, setLoadingAvailableStudents] =
+    useState(false);
   const [userRole, setUserRole] = useState("");
   const [currentUserId, setCurrentUserId] = useState(null);
   const [isCreateAssignmentOpen, setIsCreateAssignmentOpen] = useState(false);
@@ -64,7 +88,9 @@ function ClassPage() {
 
   const refreshAssignments = async () => {
     const res = await api.get(`/classes/${classId}/assignments`);
-    const list = Array.isArray(res.data) ? res.data : res.data?.assignments || [];
+    const list = Array.isArray(res.data)
+      ? res.data
+      : res.data?.assignments || [];
     setAssignments(list);
   };
 
@@ -94,7 +120,9 @@ function ClassPage() {
     const groupsWithMembers = await Promise.all(
       list.map(async (group) => {
         try {
-          const membersRes = await api.get(`/classes/groups/${group.id}/members`);
+          const membersRes = await api.get(
+            `/classes/groups/${group.id}/members`,
+          );
           const members = Array.isArray(membersRes.data)
             ? membersRes.data
             : membersRes.data?.members || [];
@@ -102,7 +130,7 @@ function ClassPage() {
         } catch (err) {
           return { ...group, members: [] };
         }
-      })
+      }),
     );
 
     setGroups(groupsWithMembers);
@@ -118,7 +146,9 @@ function ClassPage() {
     try {
       setLoadingAvailableStudents(true);
       const res = await api.get(`/classes/${classId}/available-students`);
-      const list = Array.isArray(res.data) ? res.data : res.data?.students || [];
+      const list = Array.isArray(res.data)
+        ? res.data
+        : res.data?.students || [];
       setAvailableStudents(list);
     } catch (err) {
       console.warn("Failed to load available students:", err);
@@ -134,7 +164,7 @@ function ClassPage() {
     const fetchClassData = async () => {
       try {
         setLoading(true);
-        
+
         const userRes = await api.get("/auth/me");
         const role = userRes.data?.user?.role || "";
         setUserRole(role);
@@ -201,7 +231,9 @@ function ClassPage() {
 
   const visibleGroups = isTeacher
     ? groups
-    : groups.filter((group) => group.members?.some((member) => member.id === currentUserId));
+    : groups.filter((group) =>
+        group.members?.some((member) => member.id === currentUserId),
+      );
 
   return (
     <>
@@ -212,218 +244,234 @@ function ClassPage() {
           {error && <p className="text-red-400">{error}</p>}
           {!loading && classData && (
             <>
-            <ClassHeader
-              title={classData.title}
-              teacher={classData.teacher}
-              semester={classData.semester}
-              classCode={isTeacher ? classData.code : ""}
-            />
-
-            <div className="mt-6 border-b border-slate-700">
-              <div className="flex gap-6">
+              {/* Back link under the app header (goes to dashboard which lists classes) */}
+              <div className="mb-4">
                 <button
                   type="button"
-                  onClick={() => setActiveTab("classwork")}
-                  className={`px-4 py-3 font-medium ${
-                    activeTab === "classwork"
-                      ? "border-b-2 border-indigo-500 text-slate-100"
-                      : "text-slate-400"
-                  }`}
+                  onClick={() => navigate("/dashboard")}
+                  className="inline-flex items-center gap-2 text-indigo-300 hover:text-indigo-400"
                 >
-                  Classwork
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("assignments")}
-                  className={`px-4 py-3 font-medium ${
-                    activeTab === "assignments"
-                      ? "border-b-2 border-indigo-500 text-slate-100"
-                      : "text-slate-400"
-                  }`}
-                >
-                  Assignments
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("people")}
-                  className={`px-4 py-3 font-medium ${
-                    activeTab === "people"
-                      ? "border-b-2 border-indigo-500 text-slate-100"
-                      : "text-slate-400"
-                  }`}
-                >
-                  People
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setActiveTab("groups")}
-                  className={`px-4 py-3 font-medium ${
-                    activeTab === "groups"
-                      ? "border-b-2 border-indigo-500 text-slate-100"
-                      : "text-slate-400"
-                  }`}
-                >
-                  Groups
+                  <span className="text-lg">←</span>
+                  <span className="text-sm">Back to classes</span>
                 </button>
               </div>
-            </div>
 
-            {activeTab === "classwork" && (
-              <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2 space-y-4">
-                  {isTeacher && (
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => setIsCreateClassworkOpen(true)}
-                        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-                      >
-                        + Add Material
-                      </button>
-                    </div>
-                  )}
-                  {classwork.length > 0 ? (
-                    classwork.map((item) => (
-                      <ClassworkCard
-                        key={item.id}
-                        title={item.title}
-                        description={item.description}
-                        resourceUrl={item.resource_url}
-                        createdAt={item.created_at}
-                      />
-                    ))
-                  ) : (
-                    <p className="text-slate-400">No classwork materials yet</p>
-                  )}
-                </div>
+              <ClassHeader
+                title={classData.title}
+                teacher={classData.teacher}
+                semester={classData.semester}
+                classCode={isTeacher ? classData.code : ""}
+              />
 
-                <div>
-                  <UpcomingPanel assignments={upcomingAssignments} />
-                </div>
-              </div>
-            )}
-
-            {activeTab === "assignments" && (
-              <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                <div className="lg:col-span-2 space-y-4">
-                  {isTeacher && (
-                    <div className="flex justify-end">
-                      <button
-                        type="button"
-                        onClick={() => setIsCreateAssignmentOpen(true)}
-                        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-                      >
-                        + Create Assignment
-                      </button>
-                    </div>
-                  )}
-                  {assignments.length > 0 ? (
-                    assignments.map((assignment) => (
-                      <AssignmentCard
-                        key={assignment.id}
-                        id={assignment.id}
-                        classId={classId}
-                        title={assignment.title}
-                        submissionType={assignment.submission_type}
-                        deadline={assignment.deadline}
-                        status={assignment.status || ""}
-                      />
-                    ))
-                  ) : (
-                    <p className="text-slate-400">No assignments yet</p>
-                  )}
-                </div>
-
-                <div>
-                  <UpcomingPanel assignments={upcomingAssignments} />
+              <div className="mt-6 border-b border-slate-700">
+                <div className="flex gap-6">
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("classwork")}
+                    className={`px-4 py-3 font-medium ${
+                      activeTab === "classwork"
+                        ? "border-b-2 border-indigo-500 text-slate-100"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    Classwork
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("assignments")}
+                    className={`px-4 py-3 font-medium ${
+                      activeTab === "assignments"
+                        ? "border-b-2 border-indigo-500 text-slate-100"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    Assignments
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("people")}
+                    className={`px-4 py-3 font-medium ${
+                      activeTab === "people"
+                        ? "border-b-2 border-indigo-500 text-slate-100"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    People
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab("groups")}
+                    className={`px-4 py-3 font-medium ${
+                      activeTab === "groups"
+                        ? "border-b-2 border-indigo-500 text-slate-100"
+                        : "text-slate-400"
+                    }`}
+                  >
+                    Groups
+                  </button>
                 </div>
               </div>
-            )}
 
-            {activeTab === "people" && (
-              <div className="mt-6">
-                <PeopleList people={people} />
-              </div>
-            )}
-
-            {activeTab === "groups" && (
-              <div className="mt-6 space-y-4">
-                {isTeacher && (
-                  <div className="flex justify-end">
-                    <button
-                      type="button"
-                      onClick={() => setIsCreateGroupOpen(true)}
-                      className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
-                    >
-                      + Create Group
-                    </button>
+              {activeTab === "classwork" && (
+                <div className="mt-6 grid gap-6 lg:grid-cols-3">
+                  <div className="lg:col-span-2 space-y-4">
+                    {isTeacher && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setIsCreateClassworkOpen(true)}
+                          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                        >
+                          + Add Material
+                        </button>
+                      </div>
+                    )}
+                    {classwork.length > 0 ? (
+                      classwork.map((item) => (
+                        <ClassworkCard
+                          key={item.id}
+                          title={item.title}
+                          description={item.description}
+                          resourceUrl={item.resource_url}
+                          createdAt={item.created_at}
+                        />
+                      ))
+                    ) : (
+                      <p className="text-slate-400">
+                        No classwork materials yet
+                      </p>
+                    )}
                   </div>
-                )}
-                {visibleGroups.length > 0 ? (
-                  visibleGroups.map((group) => (
-                    <GroupCard
-                      key={group.id}
-                      group={group}
-                      isTeacher={isTeacher}
-                      onAddMember={handleAddMember}
-                      onRemoveMember={handleRemoveMember}
-                      onAssignLeader={handleAssignLeader}
-                    />
-                  ))
-                ) : (
-                  <p className="text-slate-400">
-                    {isTeacher ? "No groups yet" : "You are not assigned to a group yet"}
-                  </p>
-                )}
-              </div>
-            )}
+
+                  <div>
+                    <UpcomingPanel assignments={upcomingAssignments} />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "assignments" && (
+                <div className="mt-6 grid gap-6 lg:grid-cols-3">
+                  <div className="lg:col-span-2 space-y-4">
+                    {isTeacher && (
+                      <div className="flex justify-end">
+                        <button
+                          type="button"
+                          onClick={() => setIsCreateAssignmentOpen(true)}
+                          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                        >
+                          + Create Assignment
+                        </button>
+                      </div>
+                    )}
+                    {assignments.length > 0 ? (
+                      assignments.map((assignment) => (
+                        <AssignmentCard
+                          key={assignment.id}
+                          id={assignment.id}
+                          classId={classId}
+                          title={assignment.title}
+                          submissionType={assignment.submission_type}
+                          deadline={assignment.deadline}
+                          status={assignment.status || ""}
+                        />
+                      ))
+                    ) : (
+                      <p className="text-slate-400">No assignments yet</p>
+                    )}
+                  </div>
+
+                  <div>
+                    <UpcomingPanel assignments={upcomingAssignments} />
+                  </div>
+                </div>
+              )}
+
+              {activeTab === "people" && (
+                <div className="mt-6">
+                  <PeopleList people={people} />
+                </div>
+              )}
+
+              {activeTab === "groups" && (
+                <div className="mt-6 space-y-4">
+                  {isTeacher && (
+                    <div className="flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setIsCreateGroupOpen(true)}
+                        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                      >
+                        + Create Group
+                      </button>
+                    </div>
+                  )}
+                  {visibleGroups.length > 0 ? (
+                    visibleGroups.map((group) => (
+                      <GroupCard
+                        key={group.id}
+                        group={group}
+                        isTeacher={isTeacher}
+                        onAddMember={handleAddMember}
+                        onRemoveMember={handleRemoveMember}
+                        onAssignLeader={handleAssignLeader}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-slate-400">
+                      {isTeacher
+                        ? "No groups yet"
+                        : "You are not assigned to a group yet"}
+                    </p>
+                  )}
+                </div>
+              )}
             </>
           )}
         </div>
       </div>
       <CreateAssignmentModal
-      isOpen={isCreateAssignmentOpen}
-      onClose={() => setIsCreateAssignmentOpen(false)}
-      onSuccess={() => {
-        setIsCreateAssignmentOpen(false);
-        refreshAssignments();
-      }}
-      classId={classId}
-    />
-    <CreateClassworkModal
-      isOpen={isCreateClassworkOpen}
-      onClose={() => setIsCreateClassworkOpen(false)}
-      onSuccess={() => {
-        setIsCreateClassworkOpen(false);
-        refreshClasswork();
-      }}
-      classId={classId}
-    />
-    <CreateGroupModal
-      isOpen={isCreateGroupOpen}
-      onClose={() => setIsCreateGroupOpen(false)}
-      onSuccess={() => {
-        setIsCreateGroupOpen(false);
-        refreshGroups();
-        refreshAvailableStudents();
-      }}
-      classId={classId}
-      students={availableStudents}
-      loadingStudents={loadingAvailableStudents}
-    />
-    <AddGroupMemberModal
-      isOpen={Boolean(activeGroup)}
-      onClose={() => setActiveGroup(null)}
-      onSuccess={async () => {
-        setActiveGroup(null);
-        await refreshGroups();
-        await refreshAvailableStudents();
-      }}
-      groupId={activeGroup?.id}
-      groupName={activeGroup?.name}
-      students={availableStudents}
-      loadingStudents={loadingAvailableStudents}
-    />
+        isOpen={isCreateAssignmentOpen}
+        onClose={() => setIsCreateAssignmentOpen(false)}
+        onSuccess={() => {
+          setIsCreateAssignmentOpen(false);
+          refreshAssignments();
+        }}
+        classId={classId}
+      />
+      <CreateClassworkModal
+        isOpen={isCreateClassworkOpen}
+        onClose={() => setIsCreateClassworkOpen(false)}
+        onSuccess={() => {
+          setIsCreateClassworkOpen(false);
+          refreshClasswork();
+        }}
+        classId={classId}
+      />
+      <CreateGroupModal
+        isOpen={isCreateGroupOpen}
+        onClose={() => setIsCreateGroupOpen(false)}
+        onSuccess={() => {
+          setIsCreateGroupOpen(false);
+          refreshGroups();
+          refreshAvailableStudents();
+        }}
+        classId={classId}
+        students={availableStudents}
+        loadingStudents={loadingAvailableStudents}
+      />
+      <AddGroupMemberModal
+        isOpen={Boolean(activeGroup)}
+        onClose={() => setActiveGroup(null)}
+        onSuccess={async () => {
+          setActiveGroup(null);
+          await refreshGroups();
+          await refreshAvailableStudents();
+        }}
+        groupId={activeGroup?.id}
+        groupName={activeGroup?.name}
+        students={availableStudents}
+        loadingStudents={loadingAvailableStudents}
+      />
     </>
   );
 }

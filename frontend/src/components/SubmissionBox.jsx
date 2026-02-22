@@ -1,11 +1,18 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import PropTypes from "prop-types";
 import api from "../api/api";
 
-function SubmissionBox({ assignmentId, hasSubmission, initialContent, onSubmissionSuccess, submissionId }) {
+function SubmissionBox({
+  assignmentId,
+  hasSubmission,
+  initialContent,
+  onSubmissionSuccess,
+  submissionId,
+}) {
   const [submission, setSubmission] = useState(initialContent || "");
   const [isEditing, setIsEditing] = useState(!hasSubmission);
-  const [submissionType, setSubmissionType] = useState("text");
+  const [file, setFile] = useState(null);
+  const fileInputRef = useRef(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
   const [error, setError] = useState(null);
@@ -27,44 +34,46 @@ function SubmissionBox({ assignmentId, hasSubmission, initialContent, onSubmissi
   }, [error]);
 
   const handleSubmit = async () => {
-    if (!submission.trim()) {
-      setError("Please enter submission content");
+    if (!file) {
+      setError("Please choose a file to upload");
       return;
     }
+
+    const formData = new FormData();
+    formData.append("file", file);
 
     try {
       setIsLoading(true);
       setError(null);
-      const payload = submissionType === "url" 
-        ? { content_url: submission }
-        : { content_text: submission };
-      
+
       if (submissionId) {
-        await api.put(`/submissions/${submissionId}`, payload);
+        await api.put(`/submissions/${submissionId}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       } else {
-        await api.post(`/assignments/${assignmentId}/submissions`, payload);
+        await api.post(`/assignments/${assignmentId}/submissions`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
       }
 
       setLocalHasSubmission(true);
       setIsEditing(false);
-      if (onSubmissionSuccess) {
-        onSubmissionSuccess();
-      }
+      if (onSubmissionSuccess) onSubmissionSuccess();
     } catch (err) {
-      
+      // handle duplicate submission: fetch existing and try updating
       if (err.response?.status === 409 && !submissionId) {
         try {
-          const submissionRes = await api.get(`/submissions/${assignmentId}/submission`);
-          if (submissionRes.data?.exists && submissionRes.data?.id) {
-            const payload = submissionType === "url" 
-              ? { content_url: submission }
-              : { content_text: submission };
-            await api.put(`/submissions/${submissionRes.data.id}`, payload);
+          const submissionRes = await api.get(
+            `/submissions/${assignmentId}/submission`,
+          );
+          const existingId = submissionRes.data?.id;
+          if (existingId) {
+            await api.put(`/submissions/${existingId}`, formData, {
+              headers: { "Content-Type": "multipart/form-data" },
+            });
             setLocalHasSubmission(true);
             setIsEditing(false);
-            if (onSubmissionSuccess) {
-              onSubmissionSuccess();
-            }
+            if (onSubmissionSuccess) onSubmissionSuccess();
             return;
           }
         } catch (fetchErr) {
@@ -110,7 +119,9 @@ function SubmissionBox({ assignmentId, hasSubmission, initialContent, onSubmissi
   if (!isEditing && localHasSubmission) {
     return (
       <div className="rounded-xl border border-slate-700 bg-slate-800/60 p-5">
-        <h3 className="text-lg font-semibold text-slate-100">Your Submission</h3>
+        <h3 className="text-lg font-semibold text-slate-100">
+          Your Submission
+        </h3>
         <div className="mt-4 rounded-lg border border-slate-600 bg-slate-900/40 p-4">
           <p className="text-slate-300">{submission}</p>
         </div>
@@ -139,50 +150,98 @@ function SubmissionBox({ assignmentId, hasSubmission, initialContent, onSubmissi
     <div className="rounded-xl border border-slate-700 bg-slate-800/60 p-5">
       <h3 className="text-lg font-semibold text-slate-100">Submit Your Work</h3>
 
-      <div className="mt-4 flex gap-4">
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            name="type"
-            value="text"
-            checked={submissionType === "text"}
-            onChange={(e) => setSubmissionType(e.target.value)}
-            className="h-4 w-4"
-          />
-          <span className="text-slate-300">Text</span>
-        </label>
-        <label className="flex items-center gap-2">
-          <input
-            type="radio"
-            name="type"
-            value="url"
-            checked={submissionType === "url"}
-            onChange={(e) => setSubmissionType(e.target.value)}
-            className="h-4 w-4"
-          />
-          <span className="text-slate-300">URL</span>
-        </label>
-      </div>
+      <div className="mt-4">
+        <label className="block text-sm text-slate-300">Add file</label>
 
-      {submissionType === "text" && (
-        <textarea
-          value={submission}
-          onChange={(e) => setSubmission(e.target.value)}
-          placeholder="Enter your submission here..."
-          className="mt-4 w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-slate-100 placeholder-slate-500"
-          rows="6"
-        />
-      )}
-
-      {submissionType === "url" && (
+        {/* Hidden native file input triggered by the dashed dropzone */}
         <input
-          type="url"
-          value={submission}
-          onChange={(e) => setSubmission(e.target.value)}
-          placeholder="https://..."
-          className="mt-4 w-full rounded-lg border border-slate-600 bg-slate-900 px-4 py-3 text-slate-100 placeholder-slate-500"
+          ref={fileInputRef}
+          type="file"
+          onChange={(e) => setFile(e.target.files?.[0] || null)}
+          className="hidden"
         />
-      )}
+
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => fileInputRef.current?.click()}
+          onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
+          onDragOver={(e) => e.preventDefault()}
+          onDrop={(e) => {
+            e.preventDefault();
+            const f = e.dataTransfer?.files?.[0];
+            if (f) setFile(f);
+          }}
+          className="mt-2 w-full cursor-pointer rounded-lg border-2 border-dashed border-slate-600 bg-slate-900/40 px-4 py-3 text-slate-100 hover:border-indigo-500 flex items-center justify-between"
+        >
+          <span className="text-sm text-slate-300">
+            Click to attach a file or drag it here
+          </span>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              fileInputRef.current?.click();
+            }}
+            className="rounded bg-green-600 px-3 py-1 text-white text-sm"
+          >
+            Attach
+          </button>
+        </div>
+
+        {file && (
+          <div className="mt-2 flex items-center gap-2 rounded-md bg-slate-800 px-3 py-1 text-sm text-slate-100">
+            <span className="truncate max-w-xs">{file.name}</span>
+            <button
+              type="button"
+              onClick={() => setFile(null)}
+              className="ml-2 rounded px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 cursor-pointer"
+            >
+              Remove
+            </button>
+          </div>
+        )}
+        {submission && (
+          <div className="mt-3 text-sm text-slate-300">
+            Current:
+            <div className="mt-1">
+              {(() => {
+                const url = submission;
+                const filename = url.split("/").pop().split("?")[0];
+                return (
+                  <div className="flex items-center justify-between gap-4">
+                    <a
+                      className="text-indigo-300 underline inline-flex items-center gap-2"
+                      href={url}
+                      target="_blank"
+                      rel="noreferrer"
+                      aria-label={`Open file ${filename}`}
+                    >
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="h-4 w-4 text-indigo-300"
+                        aria-hidden="true"
+                      >
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <path d="M14 2v6h6" />
+                      </svg>
+                      <span className="truncate">{filename}</span>
+                    </a>
+                    <div className="text-sm text-slate-400">
+                      Submitted by:{" "}
+                      <span className="text-slate-200">
+                        {localHasSubmission ? "You" : "Student"}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })()}
+            </div>
+          </div>
+        )}
+      </div>
 
       {error && (
         <div className="mt-4 rounded-lg bg-red-900/20 p-3 text-sm text-red-300">
@@ -192,7 +251,7 @@ function SubmissionBox({ assignmentId, hasSubmission, initialContent, onSubmissi
       <button
         type="button"
         onClick={handleSubmit}
-        disabled={!submission.trim() || isLoading}
+        disabled={!file || isLoading}
         className="mt-4 w-full rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-slate-100 disabled:opacity-50 hover:bg-green-700"
       >
         {isLoading ? "Submitting..." : "Submit"}
@@ -214,6 +273,6 @@ SubmissionBox.defaultProps = {
   initialContent: "",
   onSubmissionSuccess: null,
   submissionId: null,
-};;
+};
 
 export default SubmissionBox;

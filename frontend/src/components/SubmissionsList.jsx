@@ -127,9 +127,38 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                       <div>
                         <p className="text-sm font-medium text-slate-300">Submission Content</p>
                         <div className="mt-2 rounded-lg bg-slate-900/40 p-3">
-                          <p className="whitespace-pre-wrap text-sm text-slate-300">
-                            {submission.content_url || submission.content_text || "No content"}
-                          </p>
+                          {submission.content_url ? (
+                            (() => {
+                              const url = submission.content_url;
+                              const filename = url.split("/").pop().split("?")[0];
+                              return (
+                                <div className="flex items-center justify-between gap-4">
+                                  <a
+                                    className="text-indigo-300 underline inline-flex items-center gap-2"
+                                    href={url}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    aria-label={`Open file ${filename}`}
+                                  >
+                                    <svg
+                                      xmlns="http://www.w3.org/2000/svg"
+                                      viewBox="0 0 24 24"
+                                      fill="currentColor"
+                                      className="h-4 w-4 text-indigo-300"
+                                      aria-hidden="true"
+                                    >
+                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                                      <path d="M14 2v6h6" />
+                                    </svg>
+                                    <span className="truncate">{filename}</span>
+                                  </a>
+                                  <div className="text-sm text-slate-400">Submitted by: <span className="text-slate-200">{submission.username}</span></div>
+                                </div>
+                              );
+                            })()
+                          ) : (
+                            <p className="whitespace-pre-wrap text-sm text-slate-300">{submission.content_text || "No content"}</p>
+                          )}
                         </div>
                       </div>
                     )}

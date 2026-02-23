@@ -1,6 +1,8 @@
 import { Router } from "express";
+import multer from "multer";
 import { requireAuth } from "../auth/auth.middleware.js";
 import db from "../config/db.js";
+import { uploadBufferToCloudinary } from "../utils/cloudinaryUpload.js";
 
 const router = Router();
 
@@ -8,7 +10,7 @@ router.post("/", requireAuth, async (req, res, next) => {
   try {
     const userResult = await db.query(
       `SELECT id, role FROM users WHERE id = $1`,
-      [req.user.id]
+      [req.user.id],
     );
 
     if (userResult.rowCount === 0) {
@@ -18,7 +20,9 @@ router.post("/", requireAuth, async (req, res, next) => {
     const user = userResult.rows[0];
 
     if (user.role !== "TEACHER") {
-      return res.status(403).json({ message: "Only teachers can create classes" });
+      return res
+        .status(403)
+        .json({ message: "Only teachers can create classes" });
     }
 
     const { title, description } = req.body;
@@ -31,7 +35,7 @@ router.post("/", requireAuth, async (req, res, next) => {
       `INSERT INTO classes (title, description, teacher_id)
        VALUES ($1, $2, $3)
        RETURNING id, title, description, created_at`,
-      [title, description || null, req.user.id]
+      [title, description || null, req.user.id],
     );
 
     const newClass = classResult.rows[0];
@@ -39,12 +43,11 @@ router.post("/", requireAuth, async (req, res, next) => {
     await db.query(
       `INSERT INTO enrollments (user_id, class_id, role)
        VALUES ($1, $2, 'TEACHER')`,
-      [req.user.id, newClass.id]
+      [req.user.id, newClass.id],
     );
 
     res.status(201).json({ class: newClass });
-  } 
-  catch (err) {
+  } catch (err) {
     next(err);
   }
 });
@@ -64,11 +67,11 @@ router.get("/me", requireAuth, async (req, res, next) => {
       WHERE e.user_id = $1
       ORDER BY c.created_at DESC
       `,
-      [req.user.id]
+      [req.user.id],
     );
 
     res.status(200).json({
-      classes: result.rows
+      classes: result.rows,
     });
   } catch (err) {
     next(err);
@@ -90,7 +93,7 @@ router.get("/:id", requireAuth, async (req, res, next) => {
       LEFT JOIN enrollments e ON e.class_id = c.id AND e.user_id = $2
       WHERE c.id = $1 AND (e.user_id IS NOT NULL OR c.teacher_id = $2)
       `,
-      [classId, req.user.id]
+      [classId, req.user.id],
     );
 
     if (result.rowCount === 0) {
@@ -113,7 +116,7 @@ router.get("/:id/people", requireAuth, async (req, res, next) => {
       FROM enrollments
       WHERE class_id = $1 AND user_id = $2
       `,
-      [classId, req.user.id]
+      [classId, req.user.id],
     );
 
     if (enrolled.rowCount === 0) {
@@ -131,7 +134,7 @@ router.get("/:id/people", requireAuth, async (req, res, next) => {
       WHERE e.class_id = $1
       ORDER BY e.role DESC, u.username ASC
       `,
-      [classId]
+      [classId],
     );
 
     res.status(200).json({ people: peopleResult.rows });
@@ -150,7 +153,7 @@ router.get("/:id/classwork", requireAuth, async (req, res, next) => {
       FROM enrollments
       WHERE class_id = $1 AND user_id = $2
       `,
-      [classId, req.user.id]
+      [classId, req.user.id],
     );
 
     if (enrolled.rowCount === 0) {
@@ -170,7 +173,7 @@ router.get("/:id/classwork", requireAuth, async (req, res, next) => {
       WHERE class_id = $1
       ORDER BY created_at DESC
       `,
-      [classId]
+      [classId],
     );
 
     res.status(200).json({ classwork: result.rows });
@@ -179,54 +182,86 @@ router.get("/:id/classwork", requireAuth, async (req, res, next) => {
   }
 });
 
-router.post("/:id/classwork", requireAuth, async (req, res, next) => {
-  try {
-    const classId = req.params.id;
-    const { title, description, resource_url } = req.body;
+const upload = multer({ storage: multer.memoryStorage() });
 
-    if (!title) {
-      return res.status(400).json({ message: "Title is required" });
-    }
+router.post(
+  "/:id/classwork",
+  requireAuth,
+  upload.single("file"),
+  async (req, res, next) => {
+    try {
+      const classId = req.params.id;
+      const { title, description, resource_url } = req.body || {};
 
-    const enrollment = await db.query(
-      `
+      if (!title) {
+        return res.status(400).json({ message: "Title is required" });
+      }
+
+      const enrollment = await db.query(
+        `
       SELECT role
       FROM enrollments
       WHERE class_id = $1 AND user_id = $2
       `,
-      [classId, req.user.id]
-    );
+        [classId, req.user.id],
+      );
 
-    if (enrollment.rowCount === 0 || enrollment.rows[0].role !== "TEACHER") {
-      return res.status(403).json({ message: "Only teachers can add classwork" });
-    }
+      if (enrollment.rowCount === 0 || enrollment.rows[0].role !== "TEACHER") {
+        return res
+          .status(403)
+          .json({ message: "Only teachers can add classwork" });
+      }
 
-    const result = await db.query(
-      `
+      let resourceUrlFinal = resource_url || null;
+
+      // If a file was uploaded, upload it to Cloudinary and use the returned URL
+      if (req.file) {
+        try {
+          const uploadRes = await uploadBufferToCloudinary(
+            req.file.buffer,
+            req.file.originalname,
+            `classes/${classId}`,
+          );
+          resourceUrlFinal =
+            uploadRes.secure_url || uploadRes.url || resourceUrlFinal;
+        } catch (uploadErr) {
+          console.error("Cloudinary upload failed:", uploadErr);
+          // proceed without resource url if upload fails
+        }
+      }
+
+      const result = await db.query(
+        `
       INSERT INTO classwork
         (class_id, title, description, resource_url, uploaded_by)
       VALUES
         ($1, $2, $3, $4, $5)
       RETURNING id, title, description, resource_url, created_at
       `,
-      [classId, title, description || null, resource_url || null, req.user.id]
-    );
+        [
+          classId,
+          title,
+          description || null,
+          resourceUrlFinal || null,
+          req.user.id,
+        ],
+      );
 
-    res.status(201).json({ classwork: result.rows[0] });
-  } catch (err) {
-    next(err);
-  }
-});
+      res.status(201).json({ classwork: result.rows[0] });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.post("/:id/join", requireAuth, async (req, res, next) => {
   try {
     const userId = req.user.id;
     const classId = req.params.id;
 
-    const classResult = await db.query(
-      `SELECT id FROM classes WHERE id = $1`,
-      [classId]
-    );
+    const classResult = await db.query(`SELECT id FROM classes WHERE id = $1`, [
+      classId,
+    ]);
 
     if (classResult.rowCount === 0) {
       return res.status(404).json({ message: "Class not found" });
@@ -234,7 +269,7 @@ router.post("/:id/join", requireAuth, async (req, res, next) => {
 
     const existing = await db.query(
       `SELECT 1 FROM enrollments WHERE user_id = $1 AND class_id = $2`,
-      [userId, classId]
+      [userId, classId],
     );
 
     if (existing.rowCount > 0) {
@@ -244,7 +279,7 @@ router.post("/:id/join", requireAuth, async (req, res, next) => {
     await db.query(
       `INSERT INTO enrollments (user_id, class_id, role)
        VALUES ($1, $2, 'STUDENT')`,
-      [userId, classId]
+      [userId, classId],
     );
 
     res.status(201).json({ message: "Joined class successfully" });
@@ -277,10 +312,9 @@ router.post("/join-by-code", requireAuth, async (req, res, next) => {
       return res.status(400).json({ message: "Invalid class code format" });
     }
 
-    const classResult = await db.query(
-      `SELECT id FROM classes WHERE id = $1`,
-      [classId]
-    );
+    const classResult = await db.query(`SELECT id FROM classes WHERE id = $1`, [
+      classId,
+    ]);
 
     if (classResult.rowCount === 0) {
       return res.status(404).json({ message: "Class not found" });
@@ -288,17 +322,19 @@ router.post("/join-by-code", requireAuth, async (req, res, next) => {
 
     const existing = await db.query(
       `SELECT 1 FROM enrollments WHERE user_id = $1 AND class_id = $2`,
-      [userId, classId]
+      [userId, classId],
     );
 
     if (existing.rowCount > 0) {
-      return res.status(409).json({ message: "Already enrolled in this class" });
+      return res
+        .status(409)
+        .json({ message: "Already enrolled in this class" });
     }
 
     await db.query(
       `INSERT INTO enrollments (user_id, class_id, role)
        VALUES ($1, $2, 'STUDENT')`,
-      [userId, classId]
+      [userId, classId],
     );
 
     res.status(201).json({ message: "Joined class successfully" });
@@ -306,6 +342,5 @@ router.post("/join-by-code", requireAuth, async (req, res, next) => {
     next(err);
   }
 });
-
 
 export default router;

@@ -1,13 +1,16 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
 import api from "../api/api";
 
 function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
   const [sortBy, setSortBy] = useState("latest");
-  const [expandedSubmission, setExpandedSubmission] = useState(null);
   const [gradingSubmissionId, setGradingSubmissionId] = useState(null);
   const [gradingData, setGradingData] = useState({ score: "", feedback: "" });
   const [submitting, setSubmitting] = useState(false);
+  const [usernamesById, setUsernamesById] = useState({});
+
+  const navigate = useNavigate();
 
   // Sort submissions based on selected option
   const sortedSubmissions = useMemo(() => {
@@ -18,7 +21,46 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
     });
   }, [submissions, sortBy]);
 
-  const handleGradeSubmission = async (submissionId) => {
+  // When submissions change, fetch missing usernames by user_id
+  useEffect(() => {
+    const missingIds = Array.from(
+      new Set(
+        submissions
+          .filter((s) => !s.username && s.user_id)
+          .map((s) => s.user_id),
+      ),
+    ).filter((id) => !usernamesById[id]);
+
+    if (missingIds.length === 0) return;
+
+    // Fetch usernames for missing ids
+    const fetchNames = async () => {
+      const newMap = {};
+      await Promise.all(
+        missingIds.map(async (id) => {
+          try {
+            const res = await api.get(`/submissions/user/${id}`);
+            if (res.data?.user?.username) {
+              newMap[id] = res.data.user.username;
+            }
+          } catch (err) {
+            console.error(
+              `Failed to fetch username for user ${id}:`,
+              err?.message || err,
+            );
+          }
+        }),
+      );
+
+      if (Object.keys(newMap).length > 0) {
+        setUsernamesById((prev) => ({ ...prev, ...newMap }));
+      }
+    };
+
+    fetchNames();
+  }, [submissions, usernamesById]);
+
+  const handleGradeSubmission = async (submission) => {
     if (!gradingData.score && !gradingData.feedback) {
       alert("Please enter at least a score or feedback");
       return;
@@ -26,10 +68,18 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
 
     try {
       setSubmitting(true);
-      await api.post(`/evaluations/${submissionId}/evaluations`, {
+
+      const payload = {
         score: gradingData.score ? parseInt(gradingData.score) : null,
         feedback: gradingData.feedback || null,
-      });
+      };
+
+      if (submission.evaluation_id) {
+        await api.put(`/evaluations/${submission.evaluation_id}`, payload);
+      } else {
+        await api.post(`/evaluations/${submission.id}/evaluations`, payload);
+      }
+
       setGradingSubmissionId(null);
       setGradingData({ score: "", feedback: "" });
       onSubmissionsUpdate();
@@ -51,7 +101,9 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <h3 className="text-lg font-semibold text-slate-100">All Submissions</h3>
+        <h3 className="text-lg font-semibold text-slate-100">
+          All Submissions
+        </h3>
         <div className="flex gap-3">
           <label className="text-sm font-medium text-slate-300">Sort by:</label>
           <select
@@ -73,7 +125,6 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
         ) : (
           sortedSubmissions.map((submission) => {
             const status = getSubmissionStatus(submission);
-            const isExpanded = expandedSubmission === submission.id;
             const isGrading = gradingSubmissionId === submission.id;
 
             return (
@@ -84,152 +135,137 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                 <div className="flex items-center justify-between">
                   <div className="flex flex-1 items-center gap-4">
                     <div className="flex-1">
-                      <p className="font-medium text-slate-100">{submission.username}</p>
+                      <p className="font-medium text-slate-100">
+                        {submission.username ||
+                          usernamesById[submission.user_id] ||
+                          submission.user_id ||
+                          "Unknown"}
+                      </p>
                       {submission.submitted_at && (
                         <p className="text-xs text-slate-400">
                           {new Date(submission.submitted_at).toLocaleString()}
                         </p>
                       )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      {status === "graded" && (
-                        <div className="flex items-center gap-1 rounded-lg bg-green-900/20 px-2 py-1">
-                          <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                          <span className="text-xs font-medium text-green-300">Graded</span>
-                        </div>
-                      )}
-                      {status === "submitted" && !isExpanded && (
-                        <div className="flex items-center gap-1 rounded-lg bg-blue-900/20 px-2 py-1">
-                          <div className="h-2 w-2 rounded-full bg-blue-400"></div>
-                          <span className="text-xs font-medium text-blue-300">Submitted</span>
-                        </div>
-                      )}
-                      {status === "not-submitted" && (
-                        <div className="flex items-center gap-1 rounded-lg bg-red-900/20 px-2 py-1">
-                          <div className="h-2 w-2 rounded-full bg-red-400"></div>
-                          <span className="text-xs font-medium text-red-300">Missing</span>
-                        </div>
-                      )}
-                    </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => setExpandedSubmission(isExpanded ? null : submission.id)}
-                    className="ml-4 px-3 py-2 text-sm font-medium text-indigo-400 hover:text-indigo-300"
-                  >
-                    {isExpanded ? "Hide" : "View"}
-                  </button>
+
+                  {submission.submitted_at && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGradingSubmissionId(submission.id);
+                        setGradingData({
+                          score: submission.score?.toString() || "",
+                          feedback: submission.feedback || "",
+                        });
+                      }}
+                      className="ml-4 px-3 py-2 text-sm font-medium text-indigo-400 hover:text-indigo-300"
+                    >
+                      {submission.evaluation_id ? "Edit Grade" : "Grade"}
+                    </button>
+                  )}
                 </div>
 
-                {isExpanded && (
-                  <div className="mt-4 space-y-4 border-t border-slate-700 pt-4">
-                    {submission.submitted_at && (
-                      <div>
-                        <p className="text-sm font-medium text-slate-300">Submission Content</p>
-                        <div className="mt-2 rounded-lg bg-slate-900/40 p-3">
-                          {submission.content_url ? (
-                            (() => {
-                              const url = submission.content_url;
-                              const filename = url.split("/").pop().split("?")[0];
-                              return (
-                                <div className="flex items-center justify-between gap-4">
-                                  <a
-                                    className="text-indigo-300 underline inline-flex items-center gap-2"
-                                    href={url}
-                                    target="_blank"
-                                    rel="noreferrer"
-                                    aria-label={`Open file ${filename}`}
-                                  >
-                                    <svg
-                                      xmlns="http://www.w3.org/2000/svg"
-                                      viewBox="0 0 24 24"
-                                      fill="currentColor"
-                                      className="h-4 w-4 text-indigo-300"
-                                      aria-hidden="true"
-                                    >
-                                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                                      <path d="M14 2v6h6" />
-                                    </svg>
-                                    <span className="truncate">{filename}</span>
-                                  </a>
-                                  <div className="text-sm text-slate-400">Submitted by: <span className="text-slate-200">{submission.username}</span></div>
-                                </div>
-                              );
-                            })()
-                          ) : (
-                            <p className="whitespace-pre-wrap text-sm text-slate-300">{submission.content_text || "No content"}</p>
-                          )}
-                        </div>
-                      </div>
+                <div className="mt-3 flex items-center justify-between text-sm text-slate-300">
+                  <div className="flex items-center gap-2">
+                    {submission.content_url ? (
+                      (() => {
+                        const url = submission.content_url;
+                        const filename = url.split("/").pop().split("?")[0];
+                        return (
+                          <>
+                            <span className="truncate ml-2 text-slate-300">
+                              {filename}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                navigate(`/assignments/${assignmentId}/view`)
+                              }
+                              className="ml-2 text-indigo-400 hover:text-indigo-300 underline"
+                            >
+                              View
+                            </button>
+                          </>
+                        );
+                      })()
+                    ) : (
+                      <span className="text-slate-400">No file attached</span>
                     )}
+                  </div>
 
-                    {submission.evaluation_id && (
-                      <div className="rounded-lg bg-green-900/10 p-3">
-                        <p className="text-sm font-medium text-green-300">Grade: {submission.score}</p>
-                        {submission.feedback && (
-                          <p className="mt-1 text-sm text-green-200">{submission.feedback}</p>
-                        )}
-                      </div>
+                  <div className="text-slate-400">
+                    Submitted by:{" "}
+                    <span className="text-slate-100">
+                      {submission.username ||
+                        usernamesById[submission.user_id] ||
+                        submission.user_id ||
+                        "Unknown"}
+                    </span>
+                  </div>
+                </div>
+
+                {submission.evaluation_id && (
+                  <div className="mt-3 rounded-lg bg-green-900/10 p-3">
+                    <p className="text-sm font-medium text-green-300">
+                      Grade: {submission.score}
+                    </p>
+                    {submission.feedback && (
+                      <p className="mt-1 text-sm text-green-200">
+                        {submission.feedback}
+                      </p>
                     )}
+                  </div>
+                )}
 
-                    {isGrading ? (
-                      <div className="space-y-3 rounded-lg bg-indigo-900/10 p-3">
-                        <input
-                          type="number"
-                          placeholder="Score (e.g., 85)"
-                          value={gradingData.score}
-                          onChange={(e) =>
-                            setGradingData({ ...gradingData, score: e.target.value })
-                          }
-                          className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500"
-                        />
-                        <textarea
-                          placeholder="Feedback"
-                          value={gradingData.feedback}
-                          onChange={(e) =>
-                            setGradingData({ ...gradingData, feedback: e.target.value })
-                          }
-                          rows="3"
-                          className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500"
-                        />
-                        <div className="flex gap-2">
-                          <button
-                            type="button"
-                            onClick={() => handleGradeSubmission(submission.id)}
-                            disabled={submitting}
-                            className="flex-1 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-green-700 disabled:opacity-50"
-                          >
-                            {submitting ? "Saving..." : "Save Grade"}
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setGradingSubmissionId(null);
-                              setGradingData({ score: "", feedback: "" });
-                            }}
-                            className="flex-1 rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm font-medium text-slate-100 hover:border-slate-500"
-                          >
-                            Cancel
-                          </button>
-                        </div>
-                      </div>
-                    ) : submission.submitted_at ? (
+                {isGrading ? (
+                  <div className="mt-3 space-y-3 rounded-lg bg-indigo-900/10 p-3">
+                    <input
+                      type="number"
+                      placeholder="Score (e.g., 85)"
+                      value={gradingData.score}
+                      onChange={(e) =>
+                        setGradingData({
+                          ...gradingData,
+                          score: e.target.value,
+                        })
+                      }
+                      className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500"
+                    />
+                    <textarea
+                      placeholder="Feedback"
+                      value={gradingData.feedback}
+                      onChange={(e) =>
+                        setGradingData({
+                          ...gradingData,
+                          feedback: e.target.value,
+                        })
+                      }
+                      rows="3"
+                      className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleGradeSubmission(submission)}
+                        disabled={submitting}
+                        className="flex-1 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-green-700 disabled:opacity-50"
+                      >
+                        {submitting ? "Saving..." : "Save Grade"}
+                      </button>
                       <button
                         type="button"
                         onClick={() => {
-                          setGradingSubmissionId(submission.id);
-                          setGradingData({
-                            score: submission.score?.toString() || "",
-                            feedback: submission.feedback || "",
-                          });
+                          setGradingSubmissionId(null);
+                          setGradingData({ score: "", feedback: "" });
                         }}
-                        className="w-full rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-indigo-700"
+                        className="flex-1 rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm font-medium text-slate-100 hover:border-slate-500"
                       >
-                        {submission.evaluation_id ? "Edit Grade" : "Grade Submission"}
+                        Cancel
                       </button>
-                    ) : null}
+                    </div>
                   </div>
-                )}
+                ) : null}
               </div>
             );
           })

@@ -6,6 +6,25 @@ import { uploadBufferToCloudinary } from "../utils/cloudinaryUpload.js";
 
 const router = Router();
 
+// Return basic user info (username) by user id so frontend can resolve names
+router.get("/user/:id", requireAuth, async (req, res, next) => {
+  try {
+    const userId = req.params.id;
+    const result = await db.query(
+      `SELECT id, username FROM users WHERE id = $1`,
+      [userId],
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.status(200).json({ user: result.rows[0] });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post(
   "/:id/submissions",
   requireAuth,
@@ -250,10 +269,21 @@ router.get("/:id/submissions", requireAuth, async (req, res, next) => {
 
     const result = await db.query(
       `
-      SELECT *
-      FROM submissions
-      WHERE assignment_id = $1
-      ORDER BY submitted_at DESC
+      SELECT
+        s.id,
+        s.user_id,
+        u.username,
+        s.content_url,
+        s.content_text,
+        s.submitted_at,
+        e.id AS evaluation_id,
+        e.score,
+        e.feedback
+      FROM submissions s
+      LEFT JOIN users u ON u.id = s.user_id
+      LEFT JOIN evaluations e ON e.submission_id = s.id
+      WHERE s.assignment_id = $1
+      ORDER BY s.submitted_at DESC
       `,
       [assignmentId],
     );
@@ -264,65 +294,71 @@ router.get("/:id/submissions", requireAuth, async (req, res, next) => {
   }
 });
 
-router.put("/:id", requireAuth, upload.single("file"), async (req, res, next) => {
-  try {
-    const submissionId = req.params.id;
-    const userId = req.user.id;
-    const { content_text } = req.body;
-    let content_url = req.body.content_url || null;
+router.put(
+  "/:id",
+  requireAuth,
+  upload.single("file"),
+  async (req, res, next) => {
+    try {
+      const submissionId = req.params.id;
+      const userId = req.user.id;
+      const { content_text } = req.body;
+      let content_url = req.body.content_url || null;
 
-    if (req.file && req.file.buffer) {
-      try {
-        const uploadResult = await uploadBufferToCloudinary(
-          req.file.buffer,
-          req.file.originalname,
-          `submissions/${submissionId}`,
-        );
-        content_url = uploadResult.secure_url || content_url;
-      } catch (err) {
-        return next(err);
+      if (req.file && req.file.buffer) {
+        try {
+          const uploadResult = await uploadBufferToCloudinary(
+            req.file.buffer,
+            req.file.originalname,
+            `submissions/${submissionId}`,
+          );
+          content_url = uploadResult.secure_url || content_url;
+        } catch (err) {
+          return next(err);
+        }
       }
-    }
 
-    const submissionResult = await db.query(
-      `
+      const submissionResult = await db.query(
+        `
       SELECT s.user_id, s.group_id, a.class_id, a.submission_type
       FROM submissions s
       JOIN assignments a ON a.id = s.assignment_id
       WHERE s.id = $1
       `,
-      [submissionId],
-    );
+        [submissionId],
+      );
 
-    if (submissionResult.rowCount === 0) {
-      return res.status(404).json({ message: "Submission not found" });
-    }
-
-    const submission = submissionResult.rows[0];
-
-    if (submission.submission_type === "INDIVIDUAL") {
-      if (submission.user_id !== userId) {
-        return res.status(403).json({ message: "Not allowed" });
+      if (submissionResult.rowCount === 0) {
+        return res.status(404).json({ message: "Submission not found" });
       }
-    }
 
-    if (submission.submission_type === "GROUP") {
-      const leaderCheck = await db.query(
-        `
+      const submission = submissionResult.rows[0];
+
+      if (submission.submission_type === "INDIVIDUAL") {
+        if (submission.user_id !== userId) {
+          return res.status(403).json({ message: "Not allowed" });
+        }
+      }
+
+      if (submission.submission_type === "GROUP") {
+        const leaderCheck = await db.query(
+          `
         SELECT 1
         FROM group_members
         WHERE group_id = $1 AND user_id = $2 AND role = 'LEADER'
         `,
-        [submission.group_id, userId],
-      );
+          [submission.group_id, userId],
+        );
 
-      if (leaderCheck.rowCount === 0) {
-        return res.status(403).json({ message: "Only group leader can edit" });
+        if (leaderCheck.rowCount === 0) {
+          return res
+            .status(403)
+            .json({ message: "Only group leader can edit" });
+        }
       }
-    }
 
-    const updated = await db.query(
-      `
+      const updated = await db.query(
+        `
       UPDATE submissions
       SET content_url = $1,
           content_text = $2,
@@ -330,14 +366,15 @@ router.put("/:id", requireAuth, upload.single("file"), async (req, res, next) =>
       WHERE id = $3
       RETURNING id, updated_at
       `,
-      [content_url || null, content_text || null, submissionId],
-    );
+        [content_url || null, content_text || null, submissionId],
+      );
 
-    res.status(200).json({ submission: updated.rows[0] });
-  } catch (err) {
-    next(err);
-  }
-});
+      res.status(200).json({ submission: updated.rows[0] });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
 
 router.delete("/:id", requireAuth, async (req, res, next) => {
   try {

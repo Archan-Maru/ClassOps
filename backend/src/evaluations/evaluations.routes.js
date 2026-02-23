@@ -44,9 +44,9 @@ router.post("/:id/evaluations", requireAuth, async (req, res, next) => {
     const result = await db.query(
       `
       INSERT INTO evaluations
-        (submission_id, evaluator_id, score, feedback, is_ai)
+        (submission_id, evaluator_id, score, feedback)
       VALUES
-        ($1, $2, $3, $4, false)
+        ($1, $2, $3, $4)
       RETURNING id, score, feedback, created_at
       `,
       [submissionId, evaluatorId, score || null, feedback || null],
@@ -98,7 +98,6 @@ router.get("/:id/evaluations", requireAuth, async (req, res, next) => {
         e.id,
         e.score,
         e.feedback,
-        e.is_ai,
         e.created_at,
         u.username AS evaluator_name
       FROM evaluations e
@@ -210,8 +209,7 @@ router.get("/:assignmentId/evaluation", requireAuth, async (req, res, next) => {
       }
 
       submissionId = submissionResult.rows[0].id;
-    }
-    else if (submission_type === "GROUP") {
+    } else if (submission_type === "GROUP") {
       const groupResult = await db.query(
         `
         SELECT gm.group_id

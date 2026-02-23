@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
 import api from "../api/api";
 
@@ -210,11 +211,9 @@ function SubmissionBox({
                 const filename = url.split("/").pop().split("?")[0];
                 return (
                   <div className="flex items-center justify-between gap-4">
-                    <a
+                    <Link
                       className="text-indigo-300 underline inline-flex items-center gap-2"
-                      href={url}
-                      target="_blank"
-                      rel="noreferrer"
+                      to={`/documents/submission-${submissionId}`}
                       aria-label={`Open file ${filename}`}
                     >
                       <svg
@@ -228,7 +227,7 @@ function SubmissionBox({
                         <path d="M14 2v6h6" />
                       </svg>
                       <span className="truncate">{filename}</span>
-                    </a>
+                    </Link>
                     <div className="text-sm text-slate-400">
                       Submitted by:{" "}
                       <span className="text-slate-200">

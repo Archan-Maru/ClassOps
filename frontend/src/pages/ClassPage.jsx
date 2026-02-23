@@ -330,6 +330,7 @@ function ClassPage() {
                       classwork.map((item) => (
                         <ClassworkCard
                           key={item.id}
+                          id={item.id}
                           title={item.title}
                           description={item.description}
                           resourceUrl={item.resource_url}

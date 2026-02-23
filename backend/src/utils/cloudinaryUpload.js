@@ -6,7 +6,10 @@ export async function uploadBufferToCloudinary(
   folder = null,
 ) {
   return new Promise((resolve, reject) => {
-    const options = { resource_type: "auto" };
+    const options = {
+      resource_type: "auto",
+      flags: "attachment:false",
+    };
     if (folder) options.folder = folder;
 
     const stream = cloudinary.uploader.upload_stream(

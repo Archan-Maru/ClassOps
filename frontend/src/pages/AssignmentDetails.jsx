@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import SubmissionBox from "../components/SubmissionBox";
 import SubmissionsList from "../components/SubmissionsList";
 import EvaluationCard from "../components/EvaluationCard";
@@ -36,21 +36,25 @@ function AssignmentDetails() {
   const refreshAssignmentData = async () => {
     try {
       try {
-        const submissionRes = await api.get(`/submissions/${assignmentId}/submission`);
+        const submissionRes = await api.get(
+          `/submissions/${assignmentId}/submission`,
+        );
         setSubmission(submissionRes.data);
       } catch (err) {
         console.error("Error fetching submission:", err);
         setSubmission(null);
       }
-      
+
       try {
-        const evaluationRes = await api.get(`/evaluations/${assignmentId}/evaluation`);
+        const evaluationRes = await api.get(
+          `/evaluations/${assignmentId}/evaluation`,
+        );
         setEvaluation(evaluationRes.data);
       } catch (err) {
         console.error("Error fetching evaluation:", err);
         setEvaluation(null);
       }
-      
+
       if (isTeacher) {
         await fetchSubmissions();
       }
@@ -63,14 +67,18 @@ function AssignmentDetails() {
     const fetchAssignmentData = async () => {
       try {
         setLoading(true);
-        const assignmentRes = await api.get(`/classes/${classId}/assignments/${assignmentId}`);
+        const assignmentRes = await api.get(
+          `/classes/${classId}/assignments/${assignmentId}`,
+        );
         setAssignment(assignmentRes.data);
 
         const classRes = await api.get(`/classes/${classId}`);
         setClassData(classRes.data?.class || null);
 
         try {
-          const submissionRes = await api.get(`/submissions/${assignmentId}/submission`);
+          const submissionRes = await api.get(
+            `/submissions/${assignmentId}/submission`,
+          );
           setSubmission(submissionRes.data);
         } catch (err) {
           console.error("Error fetching submission:", err);
@@ -78,7 +86,9 @@ function AssignmentDetails() {
         }
 
         try {
-          const evaluationRes = await api.get(`/evaluations/${assignmentId}/evaluation`);
+          const evaluationRes = await api.get(
+            `/evaluations/${assignmentId}/evaluation`,
+          );
           setEvaluation(evaluationRes.data);
         } catch {
           setEvaluation(null);
@@ -148,7 +158,9 @@ function AssignmentDetails() {
               {isTeacher ? (
                 <div className="space-y-8">
                   <div>
-                    <h1 className="text-4xl font-bold text-slate-100">{assignment.title}</h1>
+                    <h1 className="text-4xl font-bold text-slate-100">
+                      {assignment.title}
+                    </h1>
                     <div className="mt-3 flex items-center gap-4 text-sm text-slate-400">
                       <span>{classData.teacher_name || "Teacher"}</span>
                       <span>•</span>
@@ -157,16 +169,39 @@ function AssignmentDetails() {
                   </div>
 
                   <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                    <h2 className="text-lg font-semibold text-slate-100">Details</h2>
+                    <h2 className="text-lg font-semibold text-slate-100">
+                      Details
+                    </h2>
                     <div className="mt-4 space-y-4">
                       <div>
-                        <p className="text-sm font-medium text-slate-300">Type</p>
-                        <p className="mt-1 text-slate-400">{assignment.submission_type || "Individual"}</p>
+                        <p className="text-sm font-medium text-slate-300">
+                          Type
+                        </p>
+                        <p className="mt-1 text-slate-400">
+                          {assignment.submission_type || "Individual"}
+                        </p>
                       </div>
                       {assignment.description && (
                         <div>
-                          <p className="text-sm font-medium text-slate-300">Description</p>
-                          <p className="mt-1 text-slate-400">{assignment.description}</p>
+                          <p className="text-sm font-medium text-slate-300">
+                            Description
+                          </p>
+                          <p className="mt-1 text-slate-400">
+                            {assignment.description}
+                          </p>
+                        </div>
+                      )}
+                      {assignment.file_url && (
+                        <div>
+                          <p className="text-sm font-medium text-slate-300">
+                            Attachment
+                          </p>
+                          <Link
+                            to={`/documents/assignment-${assignment.id}`}
+                            className="mt-1 inline-block text-indigo-400 hover:text-indigo-300 underline"
+                          >
+                            View Document
+                          </Link>
                         </div>
                       )}
                     </div>
@@ -186,7 +221,9 @@ function AssignmentDetails() {
                 <div className="grid gap-8 lg:grid-cols-3">
                   <div className="lg:col-span-2 space-y-6">
                     <div>
-                      <h1 className="text-4xl font-bold text-slate-100">{assignment.title}</h1>
+                      <h1 className="text-4xl font-bold text-slate-100">
+                        {assignment.title}
+                      </h1>
                       <div className="mt-3 flex items-center gap-4 text-sm text-slate-400">
                         <span>{classData.teacher_name || "Teacher"}</span>
                         <span>•</span>
@@ -195,16 +232,39 @@ function AssignmentDetails() {
                     </div>
 
                     <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                      <h2 className="text-lg font-semibold text-slate-100">Details</h2>
+                      <h2 className="text-lg font-semibold text-slate-100">
+                        Details
+                      </h2>
                       <div className="mt-4 space-y-4">
                         <div>
-                          <p className="text-sm font-medium text-slate-300">Type</p>
-                          <p className="mt-1 text-slate-400">{assignment.submission_type || "Individual"}</p>
+                          <p className="text-sm font-medium text-slate-300">
+                            Type
+                          </p>
+                          <p className="mt-1 text-slate-400">
+                            {assignment.submission_type || "Individual"}
+                          </p>
                         </div>
                         {assignment.description && (
                           <div>
-                            <p className="text-sm font-medium text-slate-300">Description</p>
-                            <p className="mt-1 text-slate-400">{assignment.description}</p>
+                            <p className="text-sm font-medium text-slate-300">
+                              Description
+                            </p>
+                            <p className="mt-1 text-slate-400">
+                              {assignment.description}
+                            </p>
+                          </div>
+                        )}
+                        {assignment.file_url && (
+                          <div>
+                            <p className="text-sm font-medium text-slate-300">
+                              Attachment
+                            </p>
+                            <Link
+                              to={`/documents/assignment-${assignment.id}`}
+                              className="mt-1 inline-block text-indigo-400 hover:text-indigo-300 underline"
+                            >
+                              View Document
+                            </Link>
                           </div>
                         )}
                       </div>
@@ -223,22 +283,31 @@ function AssignmentDetails() {
 
                   <div className="space-y-6">
                     <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                      <h3 className="text-lg font-semibold text-slate-100">Your work</h3>
+                      <h3 className="text-lg font-semibold text-slate-100">
+                        Your work
+                      </h3>
                       {submission?.exists ? (
                         <div className="mt-4 space-y-2">
                           <div className="flex items-center gap-2 rounded-lg bg-green-900/20 px-3 py-2">
                             <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                            <span className="text-sm font-medium text-green-300">Submitted</span>
+                            <span className="text-sm font-medium text-green-300">
+                              Submitted
+                            </span>
                           </div>
                           <p className="text-xs text-slate-400">
-                            {submission.submitted_at && new Date(submission.submitted_at).toLocaleString()}
+                            {submission.submitted_at &&
+                              new Date(
+                                submission.submitted_at,
+                              ).toLocaleString()}
                           </p>
                         </div>
                       ) : (
                         <div className="mt-4">
                           <div className="flex items-center gap-2 rounded-lg bg-yellow-900/20 px-3 py-2">
                             <div className="h-2 w-2 rounded-full bg-yellow-400"></div>
-                            <span className="text-sm font-medium text-yellow-300">Not submitted</span>
+                            <span className="text-sm font-medium text-yellow-300">
+                              Not submitted
+                            </span>
                           </div>
                         </div>
                       )}
@@ -246,7 +315,10 @@ function AssignmentDetails() {
 
                     {evaluation && (
                       <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                        <EvaluationCard score={evaluation?.score} feedback={evaluation?.feedback} />
+                        <EvaluationCard
+                          score={evaluation?.score}
+                          feedback={evaluation?.feedback}
+                        />
                       </div>
                     )}
                   </div>

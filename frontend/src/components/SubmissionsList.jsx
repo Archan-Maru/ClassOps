@@ -180,7 +180,9 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             <button
                               type="button"
                               onClick={() =>
-                                navigate(`/assignments/${assignmentId}/view`)
+                                navigate(
+                                  `/documents/submission-${submission.id}`,
+                                )
                               }
                               className="ml-2 text-indigo-400 hover:text-indigo-300 underline"
                             >

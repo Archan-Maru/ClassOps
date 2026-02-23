@@ -5,6 +5,7 @@ import assignmentsRoutes from "./assignments/assignments.routes.js";
 import groupsRoutes from "./groups/groups.routes.js";
 import submissionsRoutes from "./submissions/submissions.routes.js";
 import evaluationsRoutes from "./evaluations/evaluations.routes.js";
+import documentsRoutes from "./documents/documents.routes.js";
 
 const router = Router();
 
@@ -17,5 +18,6 @@ router.use("/classes", groupsRoutes);
 router.use("/", groupsRoutes);
 router.use("/submissions", submissionsRoutes);
 router.use("/evaluations", evaluationsRoutes);
+router.use("/documents", documentsRoutes);
 
 export default router;

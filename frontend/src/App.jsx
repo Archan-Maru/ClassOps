@@ -7,6 +7,7 @@ import ResetPassword from "./pages/ResetPassword";
 import Dashboard from "./pages/Dashboard";
 import ClassPage from "./pages/ClassPage";
 import AssignmentDetails from "./pages/AssignmentDetails";
+import DocumentViewer from "./pages/DocumentViewer";
 import "./App.css";
 
 function App() {
@@ -21,7 +22,11 @@ function App() {
         <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/classes/:id" element={<ClassPage />} />
-        <Route path="/classes/:classId/assignments/:assignmentId" element={<AssignmentDetails />} />
+        <Route
+          path="/classes/:classId/assignments/:assignmentId"
+          element={<AssignmentDetails />}
+        />
+        <Route path="/documents/:id" element={<DocumentViewer />} />
       </Routes>
     </BrowserRouter>
   );

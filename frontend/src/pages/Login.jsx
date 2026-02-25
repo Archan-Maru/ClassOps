@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import api from "../api/api";
 import AuthLayout from "../components/AuthLayout";
 
@@ -8,6 +8,8 @@ function Login() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -21,7 +23,7 @@ function Login() {
     try {
       const res = await api.post("/auth/login", form);
       localStorage.setItem("token", res.data.token);
-      navigate("/dashboard");
+      navigate(redirect || "/dashboard");
     } catch (err) {
       setError(err.response?.data?.message || "Login failed");
     } finally {

@@ -26,10 +26,12 @@ export function relativeDeadline(dateString) {
   const d = new Date(dateString);
   if (isNaN(d.getTime())) return "";
 
-  const diffMs = d - now;
-  const diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+  if (d < now) return "Overdue";
 
-  if (diffDays < 0) return "Overdue";
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const deadlineDay = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const diffDays = Math.round((deadlineDay - today) / (1000 * 60 * 60 * 24));
+
   if (diffDays === 0) return "Due today";
   if (diffDays === 1) return "Due tomorrow";
   if (diffDays <= 7) return `Due in ${diffDays} days`;

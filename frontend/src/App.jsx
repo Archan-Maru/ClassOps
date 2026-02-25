@@ -8,6 +8,7 @@ import Dashboard from "./pages/Dashboard";
 import ClassPage from "./pages/ClassPage";
 import AssignmentDetails from "./pages/AssignmentDetails";
 import DocumentViewer from "./pages/DocumentViewer";
+import AcceptInvite from "./pages/AcceptInvite";
 import "./App.css";
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
           element={<AssignmentDetails />}
         />
         <Route path="/documents/:id" element={<DocumentViewer />} />
+        <Route path="/invite/:token" element={<AcceptInvite />} />
       </Routes>
     </BrowserRouter>
   );

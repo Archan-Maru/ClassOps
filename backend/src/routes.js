@@ -6,6 +6,7 @@ import groupsRoutes from "./groups/groups.routes.js";
 import submissionsRoutes from "./submissions/submissions.routes.js";
 import evaluationsRoutes from "./evaluations/evaluations.routes.js";
 import documentsRoutes from "./documents/documents.routes.js";
+import inviteRoutes from "./invites/invites.routes.js";
 
 const router = Router();
 
@@ -19,5 +20,7 @@ router.use("/", groupsRoutes);
 router.use("/submissions", submissionsRoutes);
 router.use("/evaluations", evaluationsRoutes);
 router.use("/documents", documentsRoutes);
+router.use("/classes", inviteRoutes);
+router.use("/", inviteRoutes);
 
 export default router;

@@ -108,3 +108,101 @@ export async function sendPasswordResetEmail(
     throw error;
   }
 }
+
+
+export async function sendDeadlineReminder(email, username, assignmentTitle, className, deadline) {
+  try {
+    const deadlineDate = new Date(deadline);
+    const formatted = deadlineDate.toLocaleString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+
+    const hoursLeft = Math.round((deadlineDate - new Date()) / (1000 * 60 * 60));
+    const timeLabel = hoursLeft <= 1 ? "less than an hour" : `about ${hoursLeft} hours`;
+
+    const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, "");
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `Deadline Reminder: ${assignmentTitle} — ${className}`,
+      html: `
+        <div style="margin:0;padding:24px;background-color:#f4f6f8;font-family:Arial, sans-serif;">
+          <div style="max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e6e9ee;">
+            <div style="padding:24px 28px;background:linear-gradient(135deg,#0f172a,#1f2937);color:#ffffff;">
+              <h1 style="margin:0;font-size:22px;font-weight:600;">ClassOps</h1>
+              <p style="margin:6px 0 0;font-size:13px;opacity:0.85;">Assignment Reminder</p>
+            </div>
+            <div style="padding:28px;">
+              <h2 style="margin:0 0 12px;font-size:20px;color:#0f172a;">Hey ${username}, heads up!</h2>
+              <p style="margin:0 0 8px;font-size:14px;line-height:1.6;color:#334155;">
+                Your assignment <strong>${assignmentTitle}</strong> in <strong>${className}</strong> is due in <strong>${timeLabel}</strong>.
+              </p>
+              <div style="margin:16px 0;padding:12px 16px;border-radius:8px;background-color:#f1f5f9;border:1px solid #e2e8f0;">
+                <p style="margin:0;font-size:13px;color:#64748b;">Deadline</p>
+                <p style="margin:4px 0 0;font-size:16px;font-weight:600;color:#0f172a;">${formatted}</p>
+              </div>
+              <a href="${frontendUrl}/dashboard" style="display:inline-block;background-color:#6366f1;color:#ffffff;padding:12px 20px;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">Open ClassOps</a>
+              <p style="margin:16px 0 0;font-size:12px;color:#94a3b8;">Make sure to submit before the deadline. Good luck!</p>
+            </div>
+            <div style="padding:16px 28px;background-color:#f8fafc;font-size:12px;color:#94a3b8;">
+              <p style="margin:0;">You received this because you're enrolled in ${className}.</p>
+            </div>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error(`Failed to send reminder to ${email}:`, error.message);
+    return false;
+  }
+}
+
+
+export async function sendClassInviteEmail(email, inviterName, className, inviteToken) {
+  try {
+    const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, "");
+    const joinUrl = `${frontendUrl}/invite/${inviteToken}`;
+
+    const mailOptions = {
+      from: process.env.EMAIL_USER,
+      to: email,
+      subject: `You're invited to join ${className} — ClassOps`,
+      html: `
+        <div style="margin:0;padding:24px;background-color:#f4f6f8;font-family:Arial, sans-serif;">
+          <div style="max-width:600px;margin:0 auto;background-color:#ffffff;border-radius:12px;overflow:hidden;border:1px solid #e6e9ee;">
+            <div style="padding:24px 28px;background:linear-gradient(135deg,#0f172a,#1f2937);color:#ffffff;">
+              <h1 style="margin:0;font-size:22px;font-weight:600;">ClassOps</h1>
+              <p style="margin:6px 0 0;font-size:13px;opacity:0.85;">Class Invitation</p>
+            </div>
+            <div style="padding:28px;">
+              <h2 style="margin:0 0 12px;font-size:20px;color:#0f172a;">You've been invited!</h2>
+              <p style="margin:0 0 16px;font-size:14px;line-height:1.6;color:#334155;">
+                <strong>${inviterName}</strong> has invited you to join <strong>${className}</strong> on ClassOps.
+              </p>
+              <a href="${joinUrl}" style="display:inline-block;background-color:#6366f1;color:#ffffff;padding:12px 24px;text-decoration:none;border-radius:8px;font-size:14px;font-weight:600;">Accept Invitation</a>
+              <p style="margin:16px 0 0;font-size:12px;color:#94a3b8;">If you don't have an account yet, you'll be asked to create one first.</p>
+              <p style="margin:12px 0 0;font-size:12px;color:#94a3b8;">Or copy this link: <span style="color:#2563eb;word-break:break-all;">${joinUrl}</span></p>
+            </div>
+            <div style="padding:16px 28px;background-color:#f8fafc;font-size:12px;color:#94a3b8;">
+              <p style="margin:0;">If you weren't expecting this, you can safely ignore it.</p>
+            </div>
+          </div>
+        </div>
+      `,
+    };
+
+    await transporter.sendMail(mailOptions);
+    return true;
+  } catch (error) {
+    console.error(`Failed to send invite to ${email}:`, error.message);
+    return false;
+  }
+}

@@ -9,6 +9,7 @@ import CreateClassworkModal from "../components/CreateClassworkModal";
 import CreateGroupModal from "../components/CreateGroupModal";
 import AddGroupMemberModal from "../components/AddGroupMemberModal";
 import PeopleList from "../components/PeopleList";
+import InviteStudentsModal from "../components/InviteStudentsModal";
 import GroupCard from "../components/GroupCard";
 import AppHeader from "../components/AppHeader";
 import api from "../api/api";
@@ -80,6 +81,7 @@ function ClassPage() {
   const [isCreateAssignmentOpen, setIsCreateAssignmentOpen] = useState(false);
   const [isCreateClassworkOpen, setIsCreateClassworkOpen] = useState(false);
   const [isCreateGroupOpen, setIsCreateGroupOpen] = useState(false);
+  const [isInviteOpen, setIsInviteOpen] = useState(false);
   const [activeGroup, setActiveGroup] = useState(null);
 
   const refreshClassDetails = async () => {
@@ -422,6 +424,20 @@ function ClassPage() {
 
               {activeTab === "people" && (
                 <div className="mt-6">
+                  {isTeacher && (
+                    <div className="mb-4 flex justify-end">
+                      <button
+                        type="button"
+                        onClick={() => setIsInviteOpen(true)}
+                        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+                      >
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                        </svg>
+                        Invite Students
+                      </button>
+                    </div>
+                  )}
                   <PeopleList people={people} />
                 </div>
               )}
@@ -505,6 +521,11 @@ function ClassPage() {
         groupName={activeGroup?.name}
         students={availableStudents}
         loadingStudents={loadingAvailableStudents}
+      />
+      <InviteStudentsModal
+        isOpen={isInviteOpen}
+        onClose={() => setIsInviteOpen(false)}
+        classId={classId}
       />
     </>
   );

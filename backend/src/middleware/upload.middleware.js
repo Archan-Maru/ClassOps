@@ -2,7 +2,7 @@ import multer from "multer";
 
 const storage = multer.memoryStorage();
 
-// moderate default file size limit (20MB)
+// 20MB limit
 const upload = multer({
   storage,
   limits: { fileSize: 20 * 1024 * 1024 },

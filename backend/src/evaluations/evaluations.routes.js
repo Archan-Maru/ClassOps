@@ -193,7 +193,6 @@ router.get("/:assignmentId/evaluation", requireAuth, async (req, res, next) => {
 
     let submissionId;
 
-    // For INDIVIDUAL assignments, find submission by user_id
     if (submission_type === "INDIVIDUAL") {
       const submissionResult = await db.query(
         `
@@ -245,7 +244,6 @@ router.get("/:assignmentId/evaluation", requireAuth, async (req, res, next) => {
       return res.json(null);
     }
 
-    // Get evaluation for the submission
     const evaluationResult = await db.query(
       `
       SELECT score, feedback

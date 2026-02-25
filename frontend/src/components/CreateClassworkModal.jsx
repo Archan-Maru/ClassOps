@@ -20,7 +20,6 @@ function CreateClassworkModal({ isOpen, onClose, onSuccess, classId }) {
       setLoading(true);
       setError(null);
 
-      // If a file is attached, send as multipart/form-data so backend can handle upload.
       if (attachedFile) {
         const formData = new FormData();
         formData.append("title", title.trim());
@@ -31,7 +30,6 @@ function CreateClassworkModal({ isOpen, onClose, onSuccess, classId }) {
           headers: { "Content-Type": "multipart/form-data" },
         });
       } else {
-        // No file attached — keep previous JSON behavior (no resource_url field)
         await api.post(`/classes/${classId}/classwork`, {
           title: title.trim(),
           description: description.trim(),
@@ -97,7 +95,6 @@ function CreateClassworkModal({ isOpen, onClose, onSuccess, classId }) {
               Attach material (optional)
             </label>
             <div className="mt-1">
-              {/* Hidden native file input - triggered by the visible dropzone/button */}
               <input
                 id="classwork-file"
                 ref={fileInputRef}
@@ -106,7 +103,6 @@ function CreateClassworkModal({ isOpen, onClose, onSuccess, classId }) {
                 className="hidden"
               />
 
-              {/* Clickable dashed dropzone that makes it clear where to click */}
               <div
                 role="button"
                 tabIndex={0}

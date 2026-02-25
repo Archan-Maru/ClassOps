@@ -254,6 +254,41 @@ router.post(
   },
 );
 
+router.delete(
+  "/:id/classwork/:classworkId",
+  requireAuth,
+  async (req, res, next) => {
+    try {
+      const { id: classId, classworkId } = req.params;
+      const userId = req.user.id;
+
+      const enrollment = await db.query(
+        `SELECT role FROM enrollments WHERE class_id = $1 AND user_id = $2`,
+        [classId, userId],
+      );
+
+      if (enrollment.rowCount === 0 || enrollment.rows[0].role !== "TEACHER") {
+        return res
+          .status(403)
+          .json({ message: "Only teachers can delete classwork" });
+      }
+
+      const result = await db.query(
+        `DELETE FROM classwork WHERE id = $1 AND class_id = $2 RETURNING id`,
+        [classworkId, classId],
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({ message: "Classwork not found" });
+      }
+
+      res.status(200).json({ message: "Classwork deleted successfully" });
+    } catch (err) {
+      next(err);
+    }
+  },
+);
+
 router.post("/:id/join", requireAuth, async (req, res, next) => {
   try {
     const userId = req.user.id;

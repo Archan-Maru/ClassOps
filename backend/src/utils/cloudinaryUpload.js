@@ -8,7 +8,6 @@ export async function uploadBufferToCloudinary(
   return new Promise((resolve, reject) => {
     const options = {
       resource_type: "auto",
-      flags: "attachment:false",
     };
     if (folder) options.folder = folder;
 

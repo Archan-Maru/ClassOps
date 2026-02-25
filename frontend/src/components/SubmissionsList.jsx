@@ -12,7 +12,6 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
 
   const navigate = useNavigate();
 
-  // Sort submissions based on selected option
   const sortedSubmissions = useMemo(() => {
     return [...submissions].sort((a, b) => {
       const dateA = new Date(a.submitted_at || "1970-01-01");
@@ -21,7 +20,6 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
     });
   }, [submissions, sortBy]);
 
-  // When submissions change, fetch missing usernames by user_id
   useEffect(() => {
     const missingIds = Array.from(
       new Set(
@@ -33,7 +31,6 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
 
     if (missingIds.length === 0) return;
 
-    // Fetch usernames for missing ids
     const fetchNames = async () => {
       const newMap = {};
       await Promise.all(

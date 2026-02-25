@@ -6,7 +6,6 @@ import { uploadBufferToCloudinary } from "../utils/cloudinaryUpload.js";
 
 const router = Router();
 
-// Return basic user info (username) by user id so frontend can resolve names
 router.get("/user/:id", requireAuth, async (req, res, next) => {
   try {
     const userId = req.params.id;
@@ -35,8 +34,10 @@ router.post(
       const userId = req.user.id;
       const { content_text } = req.body;
       let content_url = req.body.content_url || null;
+      let originalFilename = null;
 
       if (req.file && req.file.buffer) {
+        originalFilename = req.file.originalname || null;
         try {
           const uploadResult = await uploadBufferToCloudinary(
             req.file.buffer,
@@ -94,12 +95,12 @@ router.post(
         const result = await db.query(
           `
         INSERT INTO submissions
-          (assignment_id, user_id, content_url, content_text)
+          (assignment_id, user_id, content_url, content_text, original_filename)
         VALUES
-          ($1, $2, $3, $4)
+          ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, userId, content_url || null, content_text || null],
+          [assignmentId, userId, content_url || null, content_text || null, originalFilename],
         );
 
         return res.status(201).json({ submission: result.rows[0] });
@@ -144,12 +145,12 @@ router.post(
         const result = await db.query(
           `
         INSERT INTO submissions
-          (assignment_id, group_id, content_url, content_text)
+          (assignment_id, group_id, content_url, content_text, original_filename)
         VALUES
-          ($1, $2, $3, $4)
+          ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, group_id, content_url || null, content_text || null],
+          [assignmentId, group_id, content_url || null, content_text || null, originalFilename],
         );
 
         return res.status(201).json({
@@ -318,6 +319,11 @@ router.put(
         }
       }
 
+      let originalFilename = null;
+      if (req.file) {
+        originalFilename = req.file.originalname || null;
+      }
+
       const submissionResult = await db.query(
         `
       SELECT s.user_id, s.group_id, a.class_id, a.submission_type
@@ -362,11 +368,12 @@ router.put(
       UPDATE submissions
       SET content_url = $1,
           content_text = $2,
+          original_filename = COALESCE($4, original_filename),
           updated_at = CURRENT_TIMESTAMP
       WHERE id = $3
       RETURNING id, updated_at
       `,
-        [content_url || null, content_text || null, submissionId],
+        [content_url || null, content_text || null, submissionId, originalFilename],
       );
 
       res.status(200).json({ submission: updated.rows[0] });
@@ -470,7 +477,7 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
     if (submission_type === "INDIVIDUAL") {
       const submissionResult = await db.query(
         `
-        SELECT id, content_url, content_text, submitted_at
+        SELECT id, content_url, content_text, submitted_at, original_filename
         FROM submissions
         WHERE assignment_id = $1 AND user_id = $2
         LIMIT 1
@@ -483,6 +490,7 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
           exists: false,
           content: null,
           submitted_at: null,
+          original_filename: null,
         });
       }
 
@@ -491,6 +499,7 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
         exists: true,
         id: submission.id,
         content: submission.content_url || submission.content_text,
+        original_filename: submission.original_filename || null,
         submitted_at: submission.submitted_at,
       });
     }
@@ -519,7 +528,7 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
 
       const submissionResult = await db.query(
         `
-        SELECT id, content_url, content_text, submitted_at
+        SELECT id, content_url, content_text, submitted_at, original_filename
         FROM submissions
         WHERE assignment_id = $1 AND group_id = $2
         LIMIT 1
@@ -532,6 +541,7 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
           exists: false,
           content: null,
           submitted_at: null,
+          original_filename: null,
         });
       }
 
@@ -540,6 +550,7 @@ router.get("/:assignmentId/submission", requireAuth, async (req, res, next) => {
         exists: true,
         id: submission.id,
         content: submission.content_url || submission.content_text,
+        original_filename: submission.original_filename || null,
         submitted_at: submission.submitted_at,
       });
     }

@@ -46,7 +46,6 @@ router.post(
         return res.status(400).json({ message: "Invalid submission type" });
       }
 
-      // handle optional file upload
       let fileUrl = null;
       if (req.file && req.file.buffer) {
         try {
@@ -247,6 +246,50 @@ router.patch("/:assignmentId", requireAuth, async (req, res, next) => {
   }
 });
 
+router.delete("/:assignmentId", requireAuth, async (req, res, next) => {
+  try {
+    const assignmentId = req.params.assignmentId;
+    const userId = req.user.id;
+
+    const assignmentResult = await db.query(
+      `SELECT class_id FROM assignments WHERE id = $1`,
+      [assignmentId],
+    );
+
+    if (assignmentResult.rowCount === 0) {
+      return res.status(404).json({ message: "Assignment not found" });
+    }
+
+    const classId = assignmentResult.rows[0].class_id;
+
+    const enrollment = await db.query(
+      `SELECT role FROM enrollments WHERE class_id = $1 AND user_id = $2`,
+      [classId, userId],
+    );
+
+    if (enrollment.rowCount === 0 || enrollment.rows[0].role !== "TEACHER") {
+      return res
+        .status(403)
+        .json({ message: "Only teachers can delete assignments" });
+    }
+
+    // evaluations → submissions → assignment
+    await db.query(
+      `DELETE FROM evaluations WHERE submission_id IN (SELECT id FROM submissions WHERE assignment_id = $1)`,
+      [assignmentId],
+    );
+    await db.query(`DELETE FROM submissions WHERE assignment_id = $1`, [
+      assignmentId,
+    ]);
+
+    await db.query(`DELETE FROM assignments WHERE id = $1`, [assignmentId]);
+
+    res.status(200).json({ message: "Assignment deleted successfully" });
+  } catch (err) {
+    next(err);
+  }
+});
+
 router.post(
   "/:assignmentId/submissions",
   requireAuth,
@@ -257,8 +300,10 @@ router.post(
       const userId = req.user.id;
       const { content_text } = req.body;
       let content_url = req.body.content_url || null;
+      let originalFilename = null;
 
       if (req.file && req.file.buffer) {
+        originalFilename = req.file.originalname || null;
         try {
           const uploadResult = await uploadBufferToCloudinary(
             req.file.buffer,
@@ -316,12 +361,12 @@ router.post(
         const result = await db.query(
           `
         INSERT INTO submissions
-          (assignment_id, user_id, content_url, content_text)
+          (assignment_id, user_id, content_url, content_text, original_filename)
         VALUES
-          ($1, $2, $3, $4)
+          ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, userId, content_url || null, content_text || null],
+          [assignmentId, userId, content_url || null, content_text || null, originalFilename],
         );
 
         return res.status(201).json({ submission: result.rows[0] });
@@ -366,12 +411,12 @@ router.post(
         const result = await db.query(
           `
         INSERT INTO submissions
-          (assignment_id, group_id, content_url, content_text)
+          (assignment_id, group_id, content_url, content_text, original_filename)
         VALUES
-          ($1, $2, $3, $4)
+          ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, group_id, content_url || null, content_text || null],
+          [assignmentId, group_id, content_url || null, content_text || null, originalFilename],
         );
 
         return res.status(201).json({ submission: result.rows[0] });

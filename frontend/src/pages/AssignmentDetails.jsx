@@ -133,7 +133,7 @@ function AssignmentDetails() {
             <p className="text-red-400">{error}</p>
             <button
               type="button"
-              onClick={() => navigate(`/classes/${classId}`)}
+              onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
               className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
             >
               Back to Class
@@ -146,7 +146,7 @@ function AssignmentDetails() {
               <div className="mx-auto max-w-6xl">
                 <button
                   type="button"
-                  onClick={() => navigate(`/classes/${classId}`)}
+                  onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
                   className="text-sm text-indigo-400 hover:text-indigo-300"
                 >
                   ← Back to {classData.title}
@@ -275,6 +275,7 @@ function AssignmentDetails() {
                         assignmentId={assignment.id}
                         hasSubmission={submission?.exists}
                         initialContent={submission?.content}
+                        originalFilename={submission?.original_filename}
                         submissionId={submission?.id}
                         onSubmissionSuccess={refreshAssignmentData}
                       />

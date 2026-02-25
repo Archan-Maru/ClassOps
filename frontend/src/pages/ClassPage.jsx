@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import ClassHeader from "../components/ClassHeader";
 import ClassworkCard from "../components/ClassworkCard";
 import AssignmentCard from "../components/AssignmentCard";
@@ -54,10 +54,19 @@ const resolveClassCode = (classInfo) => {
   return "";
 };
 
+const VALID_TABS = ["classwork", "assignments", "people", "groups"];
+
 function ClassPage() {
   const { id: classId } = useParams();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState("classwork");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const tabFromUrl = searchParams.get("tab");
+  const activeTab = VALID_TABS.includes(tabFromUrl) ? tabFromUrl : "classwork";
+
+  const setActiveTab = (tab) => {
+    setSearchParams({ tab }, { replace: true });
+  };
   const [classData, setClassData] = useState(null);
   const [assignments, setAssignments] = useState([]);
   const [classwork, setClasswork] = useState([]);
@@ -201,11 +210,32 @@ function ClassPage() {
     }
   }, [activeGroup]);
 
-  const upcomingAssignments = assignments.slice(0, 2);
+  const upcomingAssignments = [...assignments]
+    .filter((a) => a.deadline)
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
+    .slice(0, 5);
   const isTeacher = userRole === "TEACHER";
 
   const handleAddMember = (group) => {
     setActiveGroup(group);
+  };
+
+  const handleDeleteAssignment = async (assignmentId) => {
+    try {
+      await api.delete(`/assignments/${assignmentId}`);
+      await refreshAssignments();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete assignment");
+    }
+  };
+
+  const handleDeleteClasswork = async (classworkId) => {
+    try {
+      await api.delete(`/classes/${classId}/classwork/${classworkId}`);
+      await refreshClasswork();
+    } catch (err) {
+      setError(err.response?.data?.message || "Failed to delete classwork");
+    }
   };
 
   const handleRemoveMember = async (groupId, memberId) => {
@@ -244,7 +274,6 @@ function ClassPage() {
           {error && <p className="text-red-400">{error}</p>}
           {!loading && classData && (
             <>
-              {/* Back link under the app header (goes to dashboard which lists classes) */}
               <div className="mb-4">
                 <button
                   type="button"
@@ -335,6 +364,8 @@ function ClassPage() {
                           description={item.description}
                           resourceUrl={item.resource_url}
                           createdAt={item.created_at}
+                          isTeacher={isTeacher}
+                          onDelete={handleDeleteClasswork}
                         />
                       ))
                     ) : (
@@ -374,6 +405,8 @@ function ClassPage() {
                           submissionType={assignment.submission_type}
                           deadline={assignment.deadline}
                           status={assignment.status || ""}
+                          isTeacher={isTeacher}
+                          onDelete={handleDeleteAssignment}
                         />
                       ))
                     ) : (

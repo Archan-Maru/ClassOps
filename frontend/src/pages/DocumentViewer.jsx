@@ -3,52 +3,100 @@ import { useParams, useNavigate } from "react-router-dom";
 import AppHeader from "../components/AppHeader";
 import api from "../api/api";
 
+function normalizeCloudinaryUrl(inputUrl) {
+  if (!inputUrl?.includes("cloudinary.com")) return inputUrl;
+
+  const secureUrl = inputUrl.replace("http://", "https://");
+  const parsedUrl = new URL(secureUrl);
+
+  [
+    "download",
+    "dl",
+    "fl_attachment",
+    "response-content-disposition",
+  ].forEach((param) => parsedUrl.searchParams.delete(param));
+
+  const [prefix, suffix] = parsedUrl.toString().split("/upload/");
+
+  if (!suffix) return secureUrl;
+
+  const cleanedSegments = suffix
+    .split("/")
+    .map((segment) =>
+      segment
+        .split(",")
+        .filter((token) => token && !token.startsWith("fl_attachment"))
+        .join(","),
+    )
+    .filter((segment) => segment);
+
+  return `${prefix}/upload/${cleanedSegments.join("/")}`;
+}
+
 function DocumentViewer() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [url, setUrl] = useState(null);
   const [rawUrl, setRawUrl] = useState(null);
+  const [pdfPreviewUrl, setPdfPreviewUrl] = useState(null);
+  const [pdfPreviewLoading, setPdfPreviewLoading] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  useEffect(() => {
+    return () => {
+      if (pdfPreviewUrl) {
+        URL.revokeObjectURL(pdfPreviewUrl);
+      }
+    };
+  }, [pdfPreviewUrl]);
 
   useEffect(() => {
     const fetchDocument = async () => {
       try {
         setLoading(true);
         const res = await api.get(`/documents/${id}`);
-        let docUrl = res.data.url;
-
-        // If it's a Cloudinary URL, we might need to adjust it to remove fl_attachment
-        // so it displays inline instead of downloading
-        if (docUrl.includes("cloudinary.com")) {
-          docUrl = docUrl.replace(/fl_attachment/g, "");
-          // Also ensure it's using https
-          docUrl = docUrl.replace("http://", "https://");
-
-          // Add fl_attachment:false to ensure it doesn't download
-          if (!docUrl.includes("fl_attachment:false")) {
-            if (docUrl.includes("/upload/")) {
-              docUrl = docUrl.replace(
-                "/upload/",
-                "/upload/fl_attachment:false/",
-              );
-            }
-          }
-
-          // Remove any existing attachment flags
-          docUrl = docUrl.replace(/fl_attachment:[^/]+\//g, "");
-        }
-
-        // For Google Docs Viewer, we need the raw URL without fl_attachment:false
-        const rawUrl = res.data.url
-          .replace(/fl_attachment/g, "")
-          .replace("http://", "https://");
-
-        // For PDFs, we can use the Cloudinary URL directly, but we need to ensure it's not an attachment
-        // We can also use Google Docs Viewer for PDFs if we want, but iframe is usually better
+        const docUrl = normalizeCloudinaryUrl(res.data.url);
+        const rawUrl = normalizeCloudinaryUrl(res.data.url);
+        const isDocumentPdf = rawUrl?.toLowerCase().split("?")[0].endsWith(".pdf");
 
         setUrl(docUrl);
         setRawUrl(rawUrl);
+
+        if (isDocumentPdf) {
+          setPdfPreviewLoading(true);
+          try {
+            const pdfResponse = await api.get(`/documents/${id}/content`, {
+              responseType: "blob",
+            });
+
+            const pdfBlob = pdfResponse.data;
+            const typedPdfBlob =
+              pdfBlob.type === "application/pdf"
+                ? pdfBlob
+                : new Blob([pdfBlob], { type: "application/pdf" });
+
+            const objectUrl = URL.createObjectURL(typedPdfBlob);
+            setPdfPreviewUrl((previousUrl) => {
+              if (previousUrl) URL.revokeObjectURL(previousUrl);
+              return objectUrl;
+            });
+          } catch (previewErr) {
+            console.error("PDF preview fetch error:", previewErr);
+            setPdfPreviewUrl((previousUrl) => {
+              if (previousUrl) URL.revokeObjectURL(previousUrl);
+              return null;
+            });
+          } finally {
+            setPdfPreviewLoading(false);
+          }
+        } else {
+          setPdfPreviewUrl((previousUrl) => {
+            if (previousUrl) URL.revokeObjectURL(previousUrl);
+            return null;
+          });
+          setPdfPreviewLoading(false);
+        }
       } catch (err) {
         setError(err.response?.data?.message || "Failed to load document");
         console.error("Document fetch error:", err);
@@ -115,11 +163,45 @@ function DocumentViewer() {
           {!loading && !error && url && (
             <div className="h-full w-full overflow-hidden rounded-lg border border-slate-700 bg-white shadow-xl">
               {isPdf ? (
-                <iframe
-                  src={`${url}#toolbar=0`}
-                  title="Document Viewer"
-                  className="h-full w-full border-0"
-                />
+                pdfPreviewLoading ? (
+                  <div className="flex h-full w-full items-center justify-center bg-slate-900 p-4">
+                    <p className="text-sm text-slate-200">Preparing PDF preview...</p>
+                  </div>
+                ) : pdfPreviewUrl ? (
+                  <object
+                    data={`${pdfPreviewUrl}#toolbar=0&navpanes=0&scrollbar=1`}
+                    type="application/pdf"
+                    className="h-full w-full"
+                  >
+                    <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-slate-900 p-4 text-center">
+                      <p className="text-sm text-slate-200">
+                        PDF preview is not available in this browser.
+                      </p>
+                      <a
+                        href={rawUrl}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                      >
+                        Open PDF in new tab
+                      </a>
+                    </div>
+                  </object>
+                ) : (
+                  <div className="flex h-full w-full flex-col items-center justify-center gap-3 bg-slate-900 p-4 text-center">
+                    <p className="text-sm text-slate-200">
+                      Could not prepare inline preview for this PDF.
+                    </p>
+                    <a
+                      href={rawUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700"
+                    >
+                      Open PDF in new tab
+                    </a>
+                  </div>
+                )
               ) : isImage ? (
                 <div className="flex h-full w-full items-center justify-center bg-slate-900 p-4">
                   <img

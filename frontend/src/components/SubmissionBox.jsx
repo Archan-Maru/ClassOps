@@ -7,10 +7,12 @@ function SubmissionBox({
   assignmentId,
   hasSubmission,
   initialContent,
+  originalFilename,
   onSubmissionSuccess,
   submissionId,
 }) {
   const [submission, setSubmission] = useState(initialContent || "");
+  const [fileName, setFileName] = useState(originalFilename || "");
   const [isEditing, setIsEditing] = useState(!hasSubmission);
   const [file, setFile] = useState(null);
   const fileInputRef = useRef(null);
@@ -25,7 +27,10 @@ function SubmissionBox({
       setSubmission(initialContent);
       setIsEditing(false);
     }
-  }, [hasSubmission, initialContent]);
+    if (originalFilename) {
+      setFileName(originalFilename);
+    }
+  }, [hasSubmission, initialContent, originalFilename]);
 
   useEffect(() => {
     if (error && error.includes("already submitted")) {
@@ -117,6 +122,9 @@ function SubmissionBox({
     }
   };
 
+  const displayName = fileName
+    || (submission ? submission.split("/").pop().split("?")[0] : "Submission");
+
   if (!isEditing && localHasSubmission) {
     return (
       <div className="rounded-xl border border-slate-700 bg-slate-800/60 p-5">
@@ -124,7 +132,37 @@ function SubmissionBox({
           Your Submission
         </h3>
         <div className="mt-4 rounded-lg border border-slate-600 bg-slate-900/40 p-4">
-          <p className="text-slate-300">{submission}</p>
+          <div className="flex items-center gap-3">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="h-8 w-8 shrink-0 text-indigo-400"
+            >
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6" />
+            </svg>
+            <span className="truncate text-sm font-medium text-slate-200" title={displayName}>
+              {displayName}
+            </span>
+          </div>
+          {submissionId && (
+            <Link
+              to={`/documents/submission-${submissionId}`}
+              className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-4 w-4"
+              >
+                <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+                <path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+              </svg>
+              View Submission
+            </Link>
+          )}
         </div>
         <div className="mt-4 flex gap-3">
           <button
@@ -154,7 +192,6 @@ function SubmissionBox({
       <div className="mt-4">
         <label className="block text-sm text-slate-300">Add file</label>
 
-        {/* Hidden native file input triggered by the dashed dropzone */}
         <input
           ref={fileInputRef}
           type="file"
@@ -263,6 +300,7 @@ SubmissionBox.propTypes = {
   assignmentId: PropTypes.number.isRequired,
   hasSubmission: PropTypes.bool,
   initialContent: PropTypes.string,
+  originalFilename: PropTypes.string,
   onSubmissionSuccess: PropTypes.func,
   submissionId: PropTypes.number,
 };
@@ -270,6 +308,7 @@ SubmissionBox.propTypes = {
 SubmissionBox.defaultProps = {
   hasSubmission: false,
   initialContent: "",
+  originalFilename: "",
   onSubmissionSuccess: null,
   submissionId: null,
 };

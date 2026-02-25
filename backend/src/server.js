@@ -10,6 +10,8 @@ async function start() {
     await db.query("SELECT 1");
     console.log("Database ready");
 
+  
+
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
     });

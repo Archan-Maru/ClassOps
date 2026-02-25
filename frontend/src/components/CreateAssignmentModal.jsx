@@ -22,7 +22,6 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
       setLoading(true);
       setError(null);
 
-      // If a file is attached, send multipart/form-data so backend can handle upload
       if (attachedFile) {
         const formData = new FormData();
         formData.append("title", title.trim());

@@ -122,211 +122,256 @@ function AssignmentDetails() {
   return (
     <>
       <AppHeader />
-      <div className="min-h-screen bg-slate-950">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
         {loading && (
-          <div className="flex items-center justify-center py-12">
-            <p className="text-slate-400">Loading assignment...</p>
+          <div className="flex items-center justify-center py-16">
+            <p className="text-slate-500 dark:text-slate-400">
+              Loading assignment…
+            </p>
           </div>
         )}
         {error && (
-          <div className="mx-auto max-w-6xl px-4 py-8">
-            <p className="text-red-400">{error}</p>
+          <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
+            <p className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </p>
             <button
               type="button"
               onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
-              className="mt-4 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+              className="mt-4 rounded-lg bg-indigo-600 dark:bg-indigo-500 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
             >
               Back to Class
             </button>
           </div>
         )}
         {!loading && assignment && classData && (
-          <>
-            <div className="border-b border-slate-700 bg-slate-900 px-4 py-4 sm:px-6">
-              <div className="mx-auto max-w-6xl">
-                <button
-                  type="button"
-                  onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
-                  className="text-sm text-indigo-400 hover:text-indigo-300"
+          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+            {/* Back link */}
+            <div className="mb-6">
+              <button
+                type="button"
+                onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 20 20"
+                  fill="currentColor"
+                  className="h-4 w-4"
                 >
-                  ← Back to {classData.title}
-                </button>
-              </div>
+                  <path
+                    fillRule="evenodd"
+                    d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                Back to {classData.title}
+              </button>
             </div>
 
-            <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6">
-              {isTeacher ? (
-                <div className="space-y-8">
-                  <div>
-                    <h1 className="text-4xl font-bold text-slate-100">
-                      {assignment.title}
-                    </h1>
-                    <div className="mt-3 flex items-center gap-4 text-sm text-slate-400">
-                      <span>{classData.teacher_name || "Teacher"}</span>
-                      <span>•</span>
-                      <span>{formatDate(assignment.deadline)}</span>
+            {isTeacher ? (
+              <div className="space-y-5">
+                {/* Assignment header */}
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+                  <div className="flex items-start gap-5 px-6 py-6">
+                    <div className="w-1 self-stretch rounded-full bg-indigo-500 shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                        {assignment.title}
+                      </h1>
+                      <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <span>{classData.teacher_name || "Teacher"}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Details card — 2-col grid */}
+                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-5 shadow-sm">
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                    Details
+                  </h2>
+                  <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3">
+                    <div>
+                      <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        Due date
+                      </dt>
+                      <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                        {formatDate(assignment.deadline)}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        Type
+                      </dt>
+                      <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                        {assignment.submission_type || "Individual"}
+                      </dd>
+                    </div>
+                    {assignment.description && (
+                      <div className="col-span-2 sm:col-span-3">
+                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                          Description
+                        </dt>
+                        <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                          {assignment.description}
+                        </dd>
+                      </div>
+                    )}
+                    {assignment.file_url && (
+                      <div>
+                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                          Attachment
+                        </dt>
+                        <dd className="mt-0.5">
+                          <Link
+                            to={`/documents/assignment-${assignment.id}`}
+                            className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                          >
+                            View Document
+                          </Link>
+                        </dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+
+                {/* Submissions */}
+                {submissionsLoading ? (
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Loading submissions…
+                  </p>
+                ) : (
+                  <SubmissionsList
+                    assignmentId={assignment.id}
+                    submissions={submissions}
+                    onSubmissionsUpdate={fetchSubmissions}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="grid gap-5 lg:grid-cols-3">
+                <div className="space-y-5 lg:col-span-2">
+                  {/* Assignment header */}
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+                    <div className="flex items-start gap-5 px-6 py-6">
+                      <div className="w-1 self-stretch rounded-full bg-indigo-500 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                          {assignment.title}
+                        </h1>
+                        <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                          <span>{classData.teacher_name || "Teacher"}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                    <h2 className="text-lg font-semibold text-slate-100">
+                  {/* Details card — 2-col grid */}
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-5 shadow-sm">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
                       Details
                     </h2>
-                    <div className="mt-4 space-y-4">
+                    <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3">
                       <div>
-                        <p className="text-sm font-medium text-slate-300">
+                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                          Due date
+                        </dt>
+                        <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                          {formatDate(assignment.deadline)}
+                        </dd>
+                      </div>
+                      <div>
+                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                           Type
-                        </p>
-                        <p className="mt-1 text-slate-400">
+                        </dt>
+                        <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
                           {assignment.submission_type || "Individual"}
-                        </p>
+                        </dd>
                       </div>
                       {assignment.description && (
-                        <div>
-                          <p className="text-sm font-medium text-slate-300">
+                        <div className="col-span-2">
+                          <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                             Description
-                          </p>
-                          <p className="mt-1 text-slate-400">
+                          </dt>
+                          <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
                             {assignment.description}
-                          </p>
+                          </dd>
                         </div>
                       )}
                       {assignment.file_url && (
                         <div>
-                          <p className="text-sm font-medium text-slate-300">
+                          <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
                             Attachment
-                          </p>
-                          <Link
-                            to={`/documents/assignment-${assignment.id}`}
-                            className="mt-1 inline-block text-indigo-400 hover:text-indigo-300 underline"
-                          >
-                            View Document
-                          </Link>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {submissionsLoading ? (
-                    <p className="text-slate-400">Loading submissions...</p>
-                  ) : (
-                    <SubmissionsList
-                      assignmentId={assignment.id}
-                      submissions={submissions}
-                      onSubmissionsUpdate={fetchSubmissions}
-                    />
-                  )}
-                </div>
-              ) : (
-                <div className="grid gap-8 lg:grid-cols-3">
-                  <div className="lg:col-span-2 space-y-6">
-                    <div>
-                      <h1 className="text-4xl font-bold text-slate-100">
-                        {assignment.title}
-                      </h1>
-                      <div className="mt-3 flex items-center gap-4 text-sm text-slate-400">
-                        <span>{classData.teacher_name || "Teacher"}</span>
-                        <span>•</span>
-                        <span>{formatDate(assignment.deadline)}</span>
-                      </div>
-                    </div>
-
-                    <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                      <h2 className="text-lg font-semibold text-slate-100">
-                        Details
-                      </h2>
-                      <div className="mt-4 space-y-4">
-                        <div>
-                          <p className="text-sm font-medium text-slate-300">
-                            Type
-                          </p>
-                          <p className="mt-1 text-slate-400">
-                            {assignment.submission_type || "Individual"}
-                          </p>
-                        </div>
-                        {assignment.description && (
-                          <div>
-                            <p className="text-sm font-medium text-slate-300">
-                              Description
-                            </p>
-                            <p className="mt-1 text-slate-400">
-                              {assignment.description}
-                            </p>
-                          </div>
-                        )}
-                        {assignment.file_url && (
-                          <div>
-                            <p className="text-sm font-medium text-slate-300">
-                              Attachment
-                            </p>
+                          </dt>
+                          <dd className="mt-0.5">
                             <Link
                               to={`/documents/assignment-${assignment.id}`}
-                              className="mt-1 inline-block text-indigo-400 hover:text-indigo-300 underline"
+                              className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                             >
                               View Document
                             </Link>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    <div>
-                      <SubmissionBox
-                        assignmentId={assignment.id}
-                        hasSubmission={submission?.exists}
-                        initialContent={submission?.content}
-                        originalFilename={submission?.original_filename}
-                        submissionId={submission?.id}
-                        onSubmissionSuccess={refreshAssignmentData}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-6">
-                    <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                      <h3 className="text-lg font-semibold text-slate-100">
-                        Your work
-                      </h3>
-                      {submission?.exists ? (
-                        <div className="mt-4 space-y-2">
-                          <div className="flex items-center gap-2 rounded-lg bg-green-900/20 px-3 py-2">
-                            <div className="h-2 w-2 rounded-full bg-green-400"></div>
-                            <span className="text-sm font-medium text-green-300">
-                              Submitted
-                            </span>
-                          </div>
-                          <p className="text-xs text-slate-400">
-                            {submission.submitted_at &&
-                              new Date(
-                                submission.submitted_at,
-                              ).toLocaleString()}
-                          </p>
-                        </div>
-                      ) : (
-                        <div className="mt-4">
-                          <div className="flex items-center gap-2 rounded-lg bg-yellow-900/20 px-3 py-2">
-                            <div className="h-2 w-2 rounded-full bg-yellow-400"></div>
-                            <span className="text-sm font-medium text-yellow-300">
-                              Not submitted
-                            </span>
-                          </div>
+                          </dd>
                         </div>
                       )}
-                    </div>
+                    </dl>
+                  </div>
 
-                    {evaluation && (
-                      <div className="rounded-lg border border-slate-700 bg-slate-800/50 p-6">
-                        <EvaluationCard
-                          score={evaluation?.score}
-                          feedback={evaluation?.feedback}
-                        />
+                  {/* Submission box */}
+                  <SubmissionBox
+                    assignmentId={assignment.id}
+                    hasSubmission={submission?.exists}
+                    initialContent={submission?.content}
+                    originalFilename={submission?.original_filename}
+                    submissionId={submission?.id}
+                    onSubmissionSuccess={refreshAssignmentData}
+                  />
+                </div>
+
+                {/* Right sidebar */}
+                <div className="space-y-4">
+                  {/* Your work status */}
+                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                      Your work
+                    </h3>
+                    {submission?.exists ? (
+                      <div className="mt-3">
+                        <div className="flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 px-3 py-2">
+                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
+                          <span className="text-sm font-medium text-green-700 dark:text-green-400">
+                            Submitted
+                          </span>
+                        </div>
+                        {submission.submitted_at && (
+                          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                            {new Date(submission.submitted_at).toLocaleString()}
+                          </p>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="mt-3">
+                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2">
+                          <div className="h-2 w-2 rounded-full bg-amber-400"></div>
+                          <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
+                            Not submitted
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
+
+                  {/* Evaluation */}
+                  {evaluation && (
+                    <EvaluationCard
+                      score={evaluation?.score}
+                      feedback={evaluation?.feedback}
+                    />
+                  )}
                 </div>
-              )}
-            </div>
-          </>
+              </div>
+            )}
+          </div>
         )}
       </div>
     </>

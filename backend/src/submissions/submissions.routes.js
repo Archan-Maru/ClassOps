@@ -100,7 +100,13 @@ router.post(
           ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, userId, content_url || null, content_text || null, originalFilename],
+          [
+            assignmentId,
+            userId,
+            content_url || null,
+            content_text || null,
+            originalFilename,
+          ],
         );
 
         return res.status(201).json({ submission: result.rows[0] });
@@ -150,7 +156,13 @@ router.post(
           ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, group_id, content_url || null, content_text || null, originalFilename],
+          [
+            assignmentId,
+            group_id,
+            content_url || null,
+            content_text || null,
+            originalFilename,
+          ],
         );
 
         return res.status(201).json({
@@ -273,7 +285,9 @@ router.get("/:id/submissions", requireAuth, async (req, res, next) => {
       SELECT
         s.id,
         s.user_id,
+        s.group_id,
         u.username,
+        g.name AS group_name,
         s.content_url,
         s.content_text,
         s.submitted_at,
@@ -282,6 +296,7 @@ router.get("/:id/submissions", requireAuth, async (req, res, next) => {
         e.feedback
       FROM submissions s
       LEFT JOIN users u ON u.id = s.user_id
+      LEFT JOIN groups g ON g.id = s.group_id
       LEFT JOIN evaluations e ON e.submission_id = s.id
       WHERE s.assignment_id = $1
       ORDER BY s.submitted_at DESC
@@ -373,7 +388,12 @@ router.put(
       WHERE id = $3
       RETURNING id, updated_at
       `,
-        [content_url || null, content_text || null, submissionId, originalFilename],
+        [
+          content_url || null,
+          content_text || null,
+          submissionId,
+          originalFilename,
+        ],
       );
 
       res.status(200).json({ submission: updated.rows[0] });

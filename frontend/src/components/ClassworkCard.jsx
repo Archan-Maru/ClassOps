@@ -3,7 +3,15 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
 
-function ClassworkCard({ id, title, description, resourceUrl, createdAt, isTeacher, onDelete }) {
+function ClassworkCard({
+  id,
+  title,
+  description,
+  resourceUrl,
+  createdAt,
+  isTeacher,
+  onDelete,
+}) {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -23,24 +31,30 @@ function ClassworkCard({ id, title, description, resourceUrl, createdAt, isTeach
   };
 
   return (
-    <div className="relative rounded-xl border border-slate-700 bg-slate-800/80 p-4 shadow-sm shadow-slate-950/20 transition-colors">
+    <div className="relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
         <div className="flex-1 pr-8">
-          <h3 className="text-base font-semibold text-slate-100">{title}</h3>
+          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+            {title}
+          </h3>
           {description && (
-            <p className="mt-2 text-sm text-slate-300">{description}</p>
+            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+              {description}
+            </p>
           )}
           <div className="mt-2 flex gap-3">
-            <span className="text-xs text-slate-400">Uploaded {formatDate(createdAt, { includeTime: true })}</span>
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              Uploaded {formatDate(createdAt, { includeTime: true })}
+            </span>
           </div>
         </div>
       </div>
       {resourceUrl && (
         <Link
           to={`/documents/classwork-${id}`}
-          className="mt-4 block w-full rounded-lg bg-indigo-600 px-3 py-2 text-center text-sm font-medium text-slate-100 hover:bg-indigo-700"
+          className="mt-4 inline-flex items-center rounded-lg bg-indigo-50 dark:bg-indigo-900/30 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 ring-1 ring-inset ring-indigo-100 dark:ring-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
         >
-          Open Resource
+          View Material
         </Link>
       )}
 
@@ -59,7 +73,7 @@ function ClassworkCard({ id, title, description, resourceUrl, createdAt, isTeach
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className="rounded-lg bg-slate-600 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-500 transition-colors"
+                className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
               >
                 Cancel
               </button>
@@ -69,7 +83,7 @@ function ClassworkCard({ id, title, description, resourceUrl, createdAt, isTeach
               type="button"
               onClick={handleDelete}
               title="Delete classwork"
-              className="group rounded-lg p-1.5 text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

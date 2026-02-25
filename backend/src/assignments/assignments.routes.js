@@ -110,17 +110,28 @@ router.get("/:id/assignments", requireAuth, async (req, res, next) => {
     const assignmentsResult = await db.query(
       `
       SELECT
-        id,
-        title,
-        description,
-        submission_type,
-        deadline,
-        created_at
-      FROM assignments
-      WHERE class_id = $1
-      ORDER BY created_at DESC
+        a.id,
+        a.title,
+        a.description,
+        a.submission_type,
+        a.deadline,
+        a.created_at,
+        CASE
+          WHEN a.submission_type = 'GROUP' AND gs.id IS NOT NULL THEN 'Submitted'
+          WHEN a.submission_type = 'INDIVIDUAL' AND us.id IS NOT NULL THEN 'Submitted'
+          ELSE 'Not Submitted'
+        END AS status
+      FROM assignments a
+      LEFT JOIN submissions us
+        ON us.assignment_id = a.id AND us.user_id = $2
+      LEFT JOIN group_members gm
+        ON gm.user_id = $2
+      LEFT JOIN submissions gs
+        ON gs.assignment_id = a.id AND gs.group_id = gm.group_id
+      WHERE a.class_id = $1
+      ORDER BY a.created_at DESC
       `,
-      [classId],
+      [classId, userId],
     );
 
     res.status(200).json({
@@ -366,7 +377,13 @@ router.post(
           ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, userId, content_url || null, content_text || null, originalFilename],
+          [
+            assignmentId,
+            userId,
+            content_url || null,
+            content_text || null,
+            originalFilename,
+          ],
         );
 
         return res.status(201).json({ submission: result.rows[0] });
@@ -416,7 +433,13 @@ router.post(
           ($1, $2, $3, $4, $5)
         RETURNING id, submitted_at
         `,
-          [assignmentId, group_id, content_url || null, content_text || null, originalFilename],
+          [
+            assignmentId,
+            group_id,
+            content_url || null,
+            content_text || null,
+            originalFilename,
+          ],
         );
 
         return res.status(201).json({ submission: result.rows[0] });

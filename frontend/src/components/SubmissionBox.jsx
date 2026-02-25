@@ -122,34 +122,38 @@ function SubmissionBox({
     }
   };
 
-  const displayName = fileName
-    || (submission ? submission.split("/").pop().split("?")[0] : "Submission");
+  const displayName =
+    fileName ||
+    (submission ? submission.split("/").pop().split("?")[0] : "Submission");
 
   if (!isEditing && localHasSubmission) {
     return (
-      <div className="rounded-xl border border-slate-700 bg-slate-800/60 p-5">
-        <h3 className="text-lg font-semibold text-slate-100">
+      <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           Your Submission
         </h3>
-        <div className="mt-4 rounded-lg border border-slate-600 bg-slate-900/40 p-4">
+        <div className="mt-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-4">
           <div className="flex items-center gap-3">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
               fill="currentColor"
-              className="h-8 w-8 shrink-0 text-indigo-400"
+              className="h-8 w-8 shrink-0 text-indigo-400 dark:text-indigo-500"
             >
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
               <path d="M14 2v6h6" />
             </svg>
-            <span className="truncate text-sm font-medium text-slate-200" title={displayName}>
+            <span
+              className="truncate text-sm font-medium text-slate-700 dark:text-slate-300"
+              title={displayName}
+            >
               {displayName}
             </span>
           </div>
           {submissionId && (
             <Link
               to={`/documents/submission-${submissionId}`}
-              className="mt-3 flex w-full items-center justify-center gap-2 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -158,7 +162,11 @@ function SubmissionBox({
                 className="h-4 w-4"
               >
                 <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                <path fillRule="evenodd" d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd" />
+                <path
+                  fillRule="evenodd"
+                  d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                  clipRule="evenodd"
+                />
               </svg>
               View Submission
             </Link>
@@ -168,7 +176,7 @@ function SubmissionBox({
           <button
             type="button"
             onClick={handleEdit}
-            className="flex-1 rounded-lg bg-indigo-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-indigo-700"
+            className="flex-1 rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 transition-colors"
           >
             Edit Submission
           </button>
@@ -176,9 +184,9 @@ function SubmissionBox({
             type="button"
             onClick={handleRemove}
             disabled={isRemoving}
-            className="flex-1 rounded-lg border border-red-600 bg-red-900/20 px-3 py-2 text-sm font-medium text-red-400 hover:bg-red-900/40 disabled:opacity-50"
+            className="flex-1 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 disabled:opacity-50 transition-colors"
           >
-            {isRemoving ? "Removing..." : "Remove"}
+            {isRemoving ? "Removing…" : "Remove"}
           </button>
         </div>
       </div>
@@ -186,11 +194,15 @@ function SubmissionBox({
   }
 
   return (
-    <div className="rounded-xl border border-slate-700 bg-slate-800/60 p-5">
-      <h3 className="text-lg font-semibold text-slate-100">Submit Your Work</h3>
+    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
+      <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+        Submit Your Work
+      </h3>
 
       <div className="mt-4">
-        <label className="block text-sm text-slate-300">Add file</label>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+          Attach file
+        </label>
 
         <input
           ref={fileInputRef}
@@ -210,9 +222,9 @@ function SubmissionBox({
             const f = e.dataTransfer?.files?.[0];
             if (f) setFile(f);
           }}
-          className="mt-2 w-full cursor-pointer rounded-lg border-2 border-dashed border-slate-600 bg-slate-900/40 px-4 py-3 text-slate-100 hover:border-indigo-500 flex items-center justify-between"
+          className="mt-2 flex cursor-pointer items-center justify-between rounded-lg border-2 border-dashed border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 px-4 py-3 hover:border-indigo-400 dark:hover:border-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
         >
-          <span className="text-sm text-slate-300">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             Click to attach a file or drag it here
           </span>
           <button
@@ -221,27 +233,30 @@ function SubmissionBox({
               e.stopPropagation();
               fileInputRef.current?.click();
             }}
-            className="rounded bg-green-600 px-3 py-1 text-white text-sm"
+            className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-600 transition-colors"
           >
-            Attach
+            Browse
           </button>
         </div>
 
         {file && (
-          <div className="mt-2 flex items-center gap-2 rounded-md bg-slate-800 px-3 py-1 text-sm text-slate-100">
-            <span className="truncate max-w-xs">{file.name}</span>
+          <div className="mt-2 flex items-center gap-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm">
+            <span className="max-w-xs truncate text-slate-700 dark:text-slate-300">
+              {file.name}
+            </span>
             <button
               type="button"
               onClick={() => setFile(null)}
-              className="ml-2 rounded px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 cursor-pointer"
+              className="ml-auto rounded px-2 py-0.5 text-xs text-slate-500 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
             >
               Remove
             </button>
           </div>
         )}
+
         {submission && (
-          <div className="mt-3 text-sm text-slate-300">
-            Current:
+          <div className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+            Current file:
             <div className="mt-1">
               {(() => {
                 const url = submission;
@@ -249,7 +264,7 @@ function SubmissionBox({
                 return (
                   <div className="flex items-center justify-between gap-4">
                     <Link
-                      className="text-indigo-300 underline inline-flex items-center gap-2"
+                      className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
                       to={`/documents/submission-${submissionId}`}
                       aria-label={`Open file ${filename}`}
                     >
@@ -257,7 +272,7 @@ function SubmissionBox({
                         xmlns="http://www.w3.org/2000/svg"
                         viewBox="0 0 24 24"
                         fill="currentColor"
-                        className="h-4 w-4 text-indigo-300"
+                        className="h-4 w-4 text-slate-400 dark:text-slate-500"
                         aria-hidden="true"
                       >
                         <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
@@ -265,12 +280,6 @@ function SubmissionBox({
                       </svg>
                       <span className="truncate">{filename}</span>
                     </Link>
-                    <div className="text-sm text-slate-400">
-                      Submitted by:{" "}
-                      <span className="text-slate-200">
-                        {localHasSubmission ? "You" : "Student"}
-                      </span>
-                    </div>
                   </div>
                 );
               })()}
@@ -280,17 +289,18 @@ function SubmissionBox({
       </div>
 
       {error && (
-        <div className="mt-4 rounded-lg bg-red-900/20 p-3 text-sm text-red-300">
+        <div className="mt-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">
           {error}
         </div>
       )}
+
       <button
         type="button"
         onClick={handleSubmit}
         disabled={!file || isLoading}
-        className="mt-4 w-full rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-slate-100 disabled:opacity-50 hover:bg-green-700"
+        className="mt-4 w-full rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors"
       >
-        {isLoading ? "Submitting..." : "Submit"}
+        {isLoading ? "Submitting…" : "Submit"}
       </button>
     </div>
   );

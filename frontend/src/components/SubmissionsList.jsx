@@ -88,151 +88,234 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
     }
   };
 
-  const getSubmissionStatus = (submission) => {
-    if (submission.submitted_at) {
-      return submission.evaluation_id ? "graded" : "submitted";
-    }
-    return "not-submitted";
-  };
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800/50 p-4">
-        <h3 className="text-lg font-semibold text-slate-100">
+    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+      {/* Header row */}
+      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 px-6 py-4">
+        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
           All Submissions
         </h3>
-        <div className="flex gap-3">
-          <label className="text-sm font-medium text-slate-300">Sort by:</label>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="rounded-lg border border-slate-600 bg-slate-900 px-3 py-1 text-sm text-slate-100"
-          >
-            <option value="latest">Latest First</option>
-            <option value="earliest">Earliest First</option>
-          </select>
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5">
+            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+              Sort by
+            </label>
+            <div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-0.5">
+              <button
+                type="button"
+                onClick={() => setSortBy("latest")}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  sortBy === "latest"
+                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                }`}
+              >
+                Latest
+              </button>
+              <button
+                type="button"
+                onClick={() => setSortBy("earliest")}
+                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
+                  sortBy === "earliest"
+                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
+                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                }`}
+              >
+                Earliest
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="space-y-3">
+      {/* Submission rows */}
+      <div className="divide-y divide-slate-100 dark:divide-slate-700">
         {sortedSubmissions.length === 0 ? (
-          <p className="rounded-lg border border-slate-700 bg-slate-800/50 p-4 text-slate-400">
+          <p className="px-6 py-6 text-sm text-slate-500 dark:text-slate-400">
             No submissions yet
           </p>
         ) : (
           sortedSubmissions.map((submission) => {
-            const status = getSubmissionStatus(submission);
             const isGrading = gradingSubmissionId === submission.id;
+            const displayName =
+              submission.username ||
+              submission.group_name ||
+              usernamesById[submission.user_id] ||
+              submission.user_id ||
+              "Unknown";
+            const filename = submission.content_url
+              ? submission.content_url.split("/").pop().split("?")[0]
+              : null;
 
             return (
               <div
                 key={submission.id}
-                className="rounded-lg border border-slate-700 bg-slate-800/50 p-4"
+                className="group px-6 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
               >
-                <div className="flex items-center justify-between">
-                  <div className="flex flex-1 items-center gap-4">
-                    <div className="flex-1">
-                      <p className="font-medium text-slate-100">
-                        {submission.username ||
-                          usernamesById[submission.user_id] ||
-                          submission.user_id ||
-                          "Unknown"}
-                      </p>
-                      {submission.submitted_at && (
-                        <p className="text-xs text-slate-400">
-                          {new Date(submission.submitted_at).toLocaleString()}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  {submission.submitted_at && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setGradingSubmissionId(submission.id);
-                        setGradingData({
-                          score: submission.score?.toString() || "",
-                          feedback: submission.feedback || "",
-                        });
-                      }}
-                      className="ml-4 px-3 py-2 text-sm font-medium text-indigo-400 hover:text-indigo-300"
-                    >
-                      {submission.evaluation_id ? "Edit Grade" : "Grade"}
-                    </button>
-                  )}
-                </div>
-
-                <div className="mt-3 flex items-center justify-between text-sm text-slate-300">
-                  <div className="flex items-center gap-2">
-                    {submission.content_url ? (
-                      (() => {
-                        const url = submission.content_url;
-                        const filename = url.split("/").pop().split("?")[0];
-                        return (
-                          <>
-                            <span className="truncate ml-2 text-slate-300">
-                              {filename}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() =>
-                                navigate(
-                                  `/documents/submission-${submission.id}`,
-                                )
-                              }
-                              className="ml-2 text-indigo-400 hover:text-indigo-300 underline"
-                            >
-                              View
-                            </button>
-                          </>
-                        );
-                      })()
-                    ) : (
-                      <span className="text-slate-400">No file attached</span>
-                    )}
-                  </div>
-
-                  <div className="text-slate-400">
-                    Submitted by:{" "}
-                    <span className="text-slate-100">
-                      {submission.username ||
-                        usernamesById[submission.user_id] ||
-                        submission.user_id ||
-                        "Unknown"}
-                    </span>
-                  </div>
-                </div>
-
-                {submission.evaluation_id && (
-                  <div className="mt-3 rounded-lg bg-green-900/10 p-3">
-                    <p className="text-sm font-medium text-green-300">
-                      Grade: {submission.score}
+                {/* 3-column row: name+time | file | action */}
+                <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4">
+                  {/* Col 1: student name + submitted time */}
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                      {displayName}
                     </p>
-                    {submission.feedback && (
-                      <p className="mt-1 text-sm text-green-200">
-                        {submission.feedback}
+                    {submission.submitted_at ? (
+                      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                        {new Date(submission.submitted_at).toLocaleString()}
+                      </p>
+                    ) : (
+                      <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                        Not submitted
                       </p>
                     )}
                   </div>
-                )}
 
-                {isGrading ? (
-                  <div className="mt-3 space-y-3 rounded-lg bg-indigo-900/10 p-3">
-                    <input
-                      type="number"
-                      placeholder="Score (e.g., 85)"
-                      value={gradingData.score}
-                      onChange={(e) =>
-                        setGradingData({
-                          ...gradingData,
-                          score: e.target.value,
-                        })
-                      }
-                      className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500"
-                    />
+                  {/* Col 2: file name */}
+                  <div className="hidden sm:flex min-w-0 max-w-55 items-center gap-1.5">
+                    {filename ? (
+                      <>
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500"
+                        >
+                          <path
+                            fillRule="evenodd"
+                            d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        <span className="truncate text-xs text-slate-500 dark:text-slate-400">
+                          {filename}
+                        </span>
+                      </>
+                    ) : (
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                        No file
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Col 3: grade badge + action button */}
+                  <div className="flex shrink-0 items-center gap-2">
+                    {submission.evaluation_id && (
+                      <span className="rounded-full bg-green-50 dark:bg-green-900/20 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-100 dark:ring-green-800">
+                        {submission.score ?? "Graded"}
+                      </span>
+                    )}
+                    {filename && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          navigate(`/documents/submission-${submission.id}`)
+                        }
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-3.5 w-3.5"
+                        >
+                          <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
+                          <path
+                            fillRule="evenodd"
+                            d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                        View
+                      </button>
+                    )}
+                    {submission.submitted_at && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (isGrading) {
+                            setGradingSubmissionId(null);
+                            setGradingData({ score: "", feedback: "" });
+                          } else {
+                            setGradingSubmissionId(submission.id);
+                            setGradingData({
+                              score: submission.score?.toString() || "",
+                              feedback: submission.feedback || "",
+                            });
+                          }
+                        }}
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                      >
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          viewBox="0 0 20 20"
+                          fill="currentColor"
+                          className="h-3.5 w-3.5"
+                        >
+                          <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+                        </svg>
+                        {isGrading
+                          ? "Cancel"
+                          : submission.evaluation_id
+                            ? "Edit Grade"
+                            : "Grade"}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Feedback display */}
+                {submission.evaluation_id &&
+                  submission.feedback &&
+                  !isGrading && (
+                    <div className="mt-2 ml-0 rounded-lg bg-slate-50 dark:bg-slate-900 px-3 py-2">
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        Feedback:{" "}
+                        <span className="text-slate-700 dark:text-slate-300">
+                          {submission.feedback}
+                        </span>
+                      </p>
+                    </div>
+                  )}
+
+                {/* Grading form (inline, expands below the row) */}
+                {isGrading && (
+                  <div className="mt-3 space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+                    <div className="grid grid-cols-2 gap-3">
+                      <input
+                        type="number"
+                        placeholder="Score (e.g. 85)"
+                        value={gradingData.score}
+                        onChange={(e) =>
+                          setGradingData({
+                            ...gradingData,
+                            score: e.target.value,
+                          })
+                        }
+                        className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      />
+                      <div className="flex gap-2">
+                        <button
+                          type="button"
+                          onClick={() => handleGradeSubmission(submission)}
+                          disabled={submitting}
+                          className="flex-1 rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors"
+                        >
+                          {submitting ? "Saving…" : "Save Grade"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setGradingSubmissionId(null);
+                            setGradingData({ score: "", feedback: "" });
+                          }}
+                          className="flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
+                    </div>
                     <textarea
-                      placeholder="Feedback"
+                      placeholder="Feedback (optional)"
                       value={gradingData.feedback}
                       onChange={(e) =>
                         setGradingData({
@@ -240,31 +323,11 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                           feedback: e.target.value,
                         })
                       }
-                      rows="3"
-                      className="w-full rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 placeholder-slate-500"
+                      rows={2}
+                      className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
                     />
-                    <div className="flex gap-2">
-                      <button
-                        type="button"
-                        onClick={() => handleGradeSubmission(submission)}
-                        disabled={submitting}
-                        className="flex-1 rounded-lg bg-green-600 px-3 py-2 text-sm font-medium text-slate-100 hover:bg-green-700 disabled:opacity-50"
-                      >
-                        {submitting ? "Saving..." : "Save Grade"}
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setGradingSubmissionId(null);
-                          setGradingData({ score: "", feedback: "" });
-                        }}
-                        className="flex-1 rounded-lg border border-slate-600 bg-slate-900 px-3 py-2 text-sm font-medium text-slate-100 hover:border-slate-500"
-                      >
-                        Cancel
-                      </button>
-                    </div>
                   </div>
-                ) : null}
+                )}
               </div>
             );
           })

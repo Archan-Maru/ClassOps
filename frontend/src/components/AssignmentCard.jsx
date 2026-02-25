@@ -3,8 +3,20 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { formatDate } from "../utils/formatDate";
 
-function AssignmentCard({ id, classId, title, submissionType, deadline, status, isTeacher, onDelete }) {
-  const statusColor = status === "Submitted" ? "text-green-400" : "text-yellow-400";
+function AssignmentCard({
+  id,
+  classId,
+  title,
+  submissionType,
+  deadline,
+  status,
+  isTeacher,
+  onDelete,
+}) {
+  const statusColor =
+    status === "Submitted"
+      ? "text-green-600 bg-green-50"
+      : "text-amber-600 bg-amber-50";
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -33,26 +45,45 @@ function AssignmentCard({ id, classId, title, submissionType, deadline, status, 
   };
 
   return (
-    <div className="relative rounded-xl border border-slate-700 bg-slate-800/80 shadow-sm shadow-slate-950/20 hover:bg-slate-800 transition-colors">
-      <Link
-        to={`/classes/${classId}/assignments/${id}`}
-        className="block p-4"
-      >
+    <div className="relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm transition-shadow hover:shadow-md">
+      <Link to={`/classes/${classId}/assignments/${id}`} className="block p-5">
         <div className="flex items-start justify-between">
           <div className="flex-1 pr-8">
-            <h3 className="text-base font-semibold text-slate-100">{title}</h3>
-            <div className="mt-2 flex gap-3">
-              <span className="inline-block rounded-full bg-slate-700 px-2 py-1 text-xs font-medium text-slate-300">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              {title}
+            </h3>
+            <div className="mt-2 flex flex-wrap items-center gap-2">
+              <span className="inline-block rounded-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
                 {submissionType}
               </span>
-              {status && (
-                <span className={`inline-block text-xs font-medium ${statusColor}`}>{status}</span>
-              )}
             </div>
-            <p className="mt-3 text-sm text-slate-400">Due: {formatDate(deadline)}</p>
+            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+              Due: {formatDate(deadline)}
+            </p>
           </div>
+          {!isTeacher && status && (
+            <span
+              className={`shrink-0 self-start rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor}`}
+            >
+              {status}
+            </span>
+          )}
         </div>
-        <div className="mt-4 text-center text-sm text-indigo-400">View Assignment →</div>
+        <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+          View Assignment
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 20 20"
+            fill="currentColor"
+            className="h-4 w-4"
+          >
+            <path
+              fillRule="evenodd"
+              d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
+              clipRule="evenodd"
+            />
+          </svg>
+        </div>
       </Link>
 
       {isTeacher && onDelete && (
@@ -70,7 +101,7 @@ function AssignmentCard({ id, classId, title, submissionType, deadline, status, 
               <button
                 type="button"
                 onClick={handleCancelDelete}
-                className="rounded-lg bg-slate-600 px-2.5 py-1 text-xs font-medium text-slate-200 hover:bg-slate-500 transition-colors"
+                className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
               >
                 Cancel
               </button>
@@ -80,7 +111,7 @@ function AssignmentCard({ id, classId, title, submissionType, deadline, status, 
               type="button"
               onClick={handleDelete}
               title="Delete assignment"
-              className="group rounded-lg p-1.5 text-slate-500 hover:bg-red-500/10 hover:text-red-400 transition-colors"
+              className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { ThemeProvider } from "./context/ThemeContext";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import VerifyEmail from "./pages/VerifyEmail";
@@ -12,23 +13,25 @@ import "./App.css";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
-        <Route path="/verify-email" element={<VerifyEmail />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-        <Route path="/reset-password" element={<ResetPassword />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/classes/:id" element={<ClassPage />} />
-        <Route
-          path="/classes/:classId/assignments/:assignmentId"
-          element={<AssignmentDetails />}
-        />
-        <Route path="/documents/:id" element={<DocumentViewer />} />
-      </Routes>
-    </BrowserRouter>
+    <ThemeProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<Navigate to="/login" />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/classes/:id" element={<ClassPage />} />
+          <Route
+            path="/classes/:classId/assignments/:assignmentId"
+            element={<AssignmentDetails />}
+          />
+          <Route path="/documents/:id" element={<DocumentViewer />} />
+        </Routes>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 

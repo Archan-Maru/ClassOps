@@ -378,4 +378,35 @@ router.post("/join-by-code", requireAuth, async (req, res, next) => {
   }
 });
 
+router.delete("/:id/enroll", requireAuth, async (req, res, next) => {
+  try {
+    const classId = req.params.id;
+    const userId = req.user.id;
+
+    // Prevent the teacher/owner from unenrolling themselves
+    const ownerCheck = await db.query(
+      `SELECT 1 FROM classes WHERE id = $1 AND teacher_id = $2`,
+      [classId, userId],
+    );
+    if (ownerCheck.rowCount > 0) {
+      return res
+        .status(403)
+        .json({ message: "Class owner cannot unenroll from their own class" });
+    }
+
+    const result = await db.query(
+      `DELETE FROM enrollments WHERE user_id = $1 AND class_id = $2`,
+      [userId, classId],
+    );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ message: "Enrollment not found" });
+    }
+
+    res.status(200).json({ message: "Unenrolled successfully" });
+  } catch (err) {
+    next(err);
+  }
+});
+
 export default router;

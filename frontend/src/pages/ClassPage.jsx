@@ -13,24 +13,28 @@ import GroupCard from "../components/GroupCard";
 import AppHeader from "../components/AppHeader";
 import api from "../api/api";
 
-function BackToHomeButton() {
+function BackToClassesLink() {
   const navigate = useNavigate();
 
   return (
     <button
       type="button"
       onClick={() => navigate("/dashboard")}
-      className="inline-flex items-center gap-2 rounded-lg border border-slate-700 bg-slate-800/80 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-800"
+      className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
     >
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
+        viewBox="0 0 20 20"
         fill="currentColor"
-        className="h-4 w-4 text-slate-100"
+        className="h-4 w-4"
       >
-        <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
+        <path
+          fillRule="evenodd"
+          d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
+          clipRule="evenodd"
+        />
       </svg>
-      <span>Home</span>
+      <span>Back to classes</span>
     </button>
   );
 }
@@ -265,26 +269,34 @@ function ClassPage() {
         group.members?.some((member) => member.id === currentUserId),
       );
 
+  const TABS = [
+    { key: "classwork", label: "Classwork" },
+    { key: "assignments", label: "Assignments" },
+    { key: "people", label: "People" },
+    { key: "groups", label: "Groups" },
+  ];
+
   return (
     <>
       <AppHeader />
-      <div className="min-h-screen bg-slate-950 px-4 py-6 text-slate-100 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-6xl">
-          {loading && <p className="text-slate-400">Loading class...</p>}
-          {error && <p className="text-red-400">{error}</p>}
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+          {loading && (
+            <p className="text-slate-500 dark:text-slate-400">Loading class…</p>
+          )}
+          {error && (
+            <p className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+              {error}
+            </p>
+          )}
           {!loading && classData && (
             <>
-              <div className="mb-4">
-                <button
-                  type="button"
-                  onClick={() => navigate("/dashboard")}
-                  className="inline-flex items-center gap-2 text-indigo-300 hover:text-indigo-400"
-                >
-                  <span className="text-lg">←</span>
-                  <span className="text-sm">Back to classes</span>
-                </button>
+              {/* Back link */}
+              <div className="mb-5">
+                <BackToClassesLink />
               </div>
 
+              {/* Class header */}
               <ClassHeader
                 title={classData.title}
                 teacher={classData.teacher}
@@ -292,66 +304,46 @@ function ClassPage() {
                 classCode={isTeacher ? classData.code : ""}
               />
 
-              <div className="mt-6 border-b border-slate-700">
-                <div className="flex gap-6">
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("classwork")}
-                    className={`px-4 py-3 font-medium ${
-                      activeTab === "classwork"
-                        ? "border-b-2 border-indigo-500 text-slate-100"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    Classwork
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("assignments")}
-                    className={`px-4 py-3 font-medium ${
-                      activeTab === "assignments"
-                        ? "border-b-2 border-indigo-500 text-slate-100"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    Assignments
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("people")}
-                    className={`px-4 py-3 font-medium ${
-                      activeTab === "people"
-                        ? "border-b-2 border-indigo-500 text-slate-100"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    People
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab("groups")}
-                    className={`px-4 py-3 font-medium ${
-                      activeTab === "groups"
-                        ? "border-b-2 border-indigo-500 text-slate-100"
-                        : "text-slate-400"
-                    }`}
-                  >
-                    Groups
-                  </button>
-                </div>
+              {/* Tabs */}
+              <div className="mt-6 border-b border-slate-200 dark:border-slate-700">
+                <nav className="-mb-px flex justify-center gap-0">
+                  {TABS.map((tab) => (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => setActiveTab(tab.key)}
+                      className={`px-5 py-3 text-sm font-medium transition-colors ${
+                        activeTab === tab.key
+                          ? "border-b-2 border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400"
+                          : "border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                      }`}
+                    >
+                      {tab.label}
+                    </button>
+                  ))}
+                </nav>
               </div>
 
+              {/* Classwork tab */}
               {activeTab === "classwork" && (
                 <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                  <div className="lg:col-span-2 space-y-4">
+                  <div className="space-y-4 lg:col-span-2">
                     {isTeacher && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start">
                         <button
                           type="button"
                           onClick={() => setIsCreateClassworkOpen(true)}
-                          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
                         >
-                          + Add Material
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 20 20"
+                            fill="currentColor"
+                            className="h-4 w-4"
+                          >
+                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
+                          </svg>
+                          New Announcement
                         </button>
                       </div>
                     )}
@@ -369,27 +361,27 @@ function ClassPage() {
                         />
                       ))
                     ) : (
-                      <p className="text-slate-400">
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
                         No classwork materials yet
                       </p>
                     )}
                   </div>
-
                   <div>
                     <UpcomingPanel assignments={upcomingAssignments} />
                   </div>
                 </div>
               )}
 
+              {/* Assignments tab */}
               {activeTab === "assignments" && (
                 <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                  <div className="lg:col-span-2 space-y-4">
+                  <div className="space-y-4 lg:col-span-2">
                     {isTeacher && (
-                      <div className="flex justify-end">
+                      <div className="flex justify-start">
                         <button
                           type="button"
                           onClick={() => setIsCreateAssignmentOpen(true)}
-                          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
                         >
                           + Create Assignment
                         </button>
@@ -410,30 +402,33 @@ function ClassPage() {
                         />
                       ))
                     ) : (
-                      <p className="text-slate-400">No assignments yet</p>
+                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                        No assignments yet
+                      </p>
                     )}
                   </div>
-
                   <div>
                     <UpcomingPanel assignments={upcomingAssignments} />
                   </div>
                 </div>
               )}
 
+              {/* People tab */}
               {activeTab === "people" && (
                 <div className="mt-6">
                   <PeopleList people={people} />
                 </div>
               )}
 
+              {/* Groups tab */}
               {activeTab === "groups" && (
                 <div className="mt-6 space-y-4">
                   {isTeacher && (
-                    <div className="flex justify-end">
+                    <div className="flex justify-start">
                       <button
                         type="button"
                         onClick={() => setIsCreateGroupOpen(true)}
-                        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+                        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
                       >
                         + Create Group
                       </button>
@@ -451,7 +446,7 @@ function ClassPage() {
                       />
                     ))
                   ) : (
-                    <p className="text-slate-400">
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
                       {isTeacher
                         ? "No groups yet"
                         : "You are not assigned to a group yet"}

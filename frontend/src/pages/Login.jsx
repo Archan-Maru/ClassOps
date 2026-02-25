@@ -32,56 +32,81 @@ function Login() {
   return (
     <AuthLayout
       title="Welcome back"
-      subtitle="Sign in to manage your classes, submissions, and groups."
       footer={
         <p>
-          Don't have an account?{" "}
-          <Link className="link-inline" to="/signup">
+          Don&apos;t have an account?{" "}
+          <Link
+            className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300"
+            to="/signup"
+          >
             Create one
           </Link>
         </p>
       }
     >
-      {error && <div className="alert alert--error">{error}</div>}
+      {error && (
+        <div className="mb-5 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 px-4 py-3 text-sm text-red-700 dark:text-red-400">
+          {error}
+        </div>
+      )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="identifier">Email or Username</label>
+      <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        {/* Email / username */}
+        <div className="flex flex-col gap-1.5">
+          <label
+            htmlFor="identifier"
+            className="text-sm font-medium text-slate-700 dark:text-slate-300"
+          >
+            Email or username
+          </label>
           <input
             id="identifier"
             name="identifier"
-            placeholder="Enter your email or username"
+            placeholder="you@example.com"
             value={form.identifier}
             onChange={handleChange}
-            className="input"
             autoComplete="username"
             required
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
           />
         </div>
 
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
+        {/* Password */}
+        <div className="flex flex-col gap-1.5">
+          <div className="flex items-center justify-between">
+            <label
+              htmlFor="password"
+              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
+              Password
+            </label>
+            <Link
+              to="/forgot-password"
+              className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+            >
+              Forgot password?
+            </Link>
+          </div>
           <input
             id="password"
             type="password"
             name="password"
-            placeholder="Enter your password"
+            placeholder="••••••••"
             value={form.password}
             onChange={handleChange}
-            className="input"
             autoComplete="current-password"
             required
+            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
           />
         </div>
 
-        <div className="form-meta">
-          <Link className="link-inline" to="/forgot-password">
-            Forgot password?
-          </Link>
-        </div>
-
-        <button className="primary-btn" type="submit" disabled={loading}>
-          {loading ? "Logging in..." : "Sign in"}
+        {/* Submit */}
+        <button
+          type="submit"
+          disabled={loading}
+          className="mt-1 w-full rounded-xl bg-indigo-600 dark:bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 dark:hover:bg-indigo-600 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          {loading ? "Signing in…" : "Sign in"}
         </button>
       </form>
     </AuthLayout>

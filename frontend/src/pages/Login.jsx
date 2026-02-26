@@ -38,7 +38,7 @@ function Login() {
         <p>
           Don&apos;t have an account?{" "}
           <Link
-            className="text-indigo-600 dark:text-indigo-400 font-medium hover:text-indigo-700 dark:hover:text-indigo-300"
+            className="text-violet-600 dark:text-violet-400 font-medium hover:text-violet-700 dark:hover:text-violet-300"
             to="/signup"
           >
             Create one
@@ -57,7 +57,7 @@ function Login() {
         <div className="flex flex-col gap-1.5">
           <label
             htmlFor="identifier"
-            className="text-sm font-medium text-slate-700 dark:text-slate-300"
+            className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
           >
             Email or username
           </label>
@@ -69,7 +69,7 @@ function Login() {
             onChange={handleChange}
             autoComplete="username"
             required
-            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+            className="w-full rounded-xl border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 transition focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/10"
           />
         </div>
 
@@ -78,13 +78,13 @@ function Login() {
           <div className="flex items-center justify-between">
             <label
               htmlFor="password"
-              className="text-sm font-medium text-slate-700 dark:text-slate-300"
+              className="text-sm font-medium text-zinc-700 dark:text-zinc-300"
             >
               Password
             </label>
             <Link
               to="/forgot-password"
-              className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+              className="text-xs text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
             >
               Forgot password?
             </Link>
@@ -93,12 +93,12 @@ function Login() {
             id="password"
             type="password"
             name="password"
-            placeholder="••••••••"
+            placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
             value={form.password}
             onChange={handleChange}
             autoComplete="current-password"
             required
-            className="w-full rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-4 py-3 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-500 transition focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/10"
+            className="w-full rounded-xl border border-zinc-300 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-4 py-3 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 transition focus:border-violet-500 focus:outline-none focus:ring-2 focus:ring-violet-500/10"
           />
         </div>
 
@@ -106,9 +106,9 @@ function Login() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-1 w-full rounded-xl bg-indigo-600 dark:bg-indigo-500 py-3 text-sm font-semibold text-white transition hover:bg-indigo-700 dark:hover:bg-indigo-600 active:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+          className="mt-1 w-full rounded-xl bg-violet-600 dark:bg-violet-500 py-3 text-sm font-semibold text-white transition hover:bg-violet-700 dark:hover:bg-violet-600 active:bg-violet-800 focus:outline-none focus:ring-2 focus:ring-violet-500/40 disabled:cursor-not-allowed disabled:opacity-50"
         >
-          {loading ? "Signing in…" : "Sign in"}
+          {loading ? "Signing inâ€¦" : "Sign in"}
         </button>
       </form>
     </AuthLayout>

@@ -122,11 +122,11 @@ function AssignmentDetails() {
   return (
     <>
       <AppHeader />
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         {loading && (
           <div className="flex items-center justify-center py-16">
-            <p className="text-slate-500 dark:text-slate-400">
-              Loading assignment…
+            <p className="text-zinc-500 dark:text-zinc-400">
+              Loading assignmentâ€¦
             </p>
           </div>
         )}
@@ -138,7 +138,7 @@ function AssignmentDetails() {
             <button
               type="button"
               onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
-              className="mt-4 rounded-lg bg-indigo-600 dark:bg-indigo-500 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
+              className="mt-4 rounded-lg bg-violet-600 dark:bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600"
             >
               Back to Class
             </button>
@@ -151,7 +151,7 @@ function AssignmentDetails() {
               <button
                 type="button"
                 onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -172,61 +172,61 @@ function AssignmentDetails() {
             {isTeacher ? (
               <div className="space-y-5">
                 {/* Assignment header */}
-                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden">
                   <div className="flex items-start gap-5 px-6 py-6">
-                    <div className="w-1 self-stretch rounded-full bg-indigo-500 shrink-0" />
+                    <div className="w-1 self-stretch rounded-full bg-violet-500 shrink-0" />
                     <div className="flex-1 min-w-0">
-                      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
                         {assignment.title}
                       </h1>
-                      <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                      <div className="mt-1.5 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
                         <span>{classData.teacher_name || "Teacher"}</span>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Details card — 2-col grid */}
-                <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-5 shadow-sm">
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                {/* Details card â€” 2-col grid */}
+                <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-5 shadow-sm">
+                  <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
                     Details
                   </h2>
                   <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3">
                     <div>
-                      <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                         Due date
                       </dt>
-                      <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                      <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
                         {formatDate(assignment.deadline)}
                       </dd>
                     </div>
                     <div>
-                      <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                         Type
                       </dt>
-                      <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                      <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
                         {assignment.submission_type || "Individual"}
                       </dd>
                     </div>
                     {assignment.description && (
                       <div className="col-span-2 sm:col-span-3">
-                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                           Description
                         </dt>
-                        <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                        <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
                           {assignment.description}
                         </dd>
                       </div>
                     )}
                     {assignment.file_url && (
                       <div>
-                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                           Attachment
                         </dt>
                         <dd className="mt-0.5">
                           <Link
                             to={`/documents/assignment-${assignment.id}`}
-                            className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                            className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
                           >
                             View Document
                           </Link>
@@ -238,8 +238,8 @@ function AssignmentDetails() {
 
                 {/* Submissions */}
                 {submissionsLoading ? (
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
-                    Loading submissions…
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    Loading submissionsâ€¦
                   </p>
                 ) : (
                   <SubmissionsList
@@ -253,61 +253,61 @@ function AssignmentDetails() {
               <div className="grid gap-5 lg:grid-cols-3">
                 <div className="space-y-5 lg:col-span-2">
                   {/* Assignment header */}
-                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm overflow-hidden">
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden">
                     <div className="flex items-start gap-5 px-6 py-6">
-                      <div className="w-1 self-stretch rounded-full bg-indigo-500 shrink-0" />
+                      <div className="w-1 self-stretch rounded-full bg-violet-500 shrink-0" />
                       <div className="flex-1 min-w-0">
-                        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100 leading-snug">
+                        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
                           {assignment.title}
                         </h1>
-                        <div className="mt-1.5 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+                        <div className="mt-1.5 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
                           <span>{classData.teacher_name || "Teacher"}</span>
                         </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Details card — 2-col grid */}
-                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-5 shadow-sm">
-                    <h2 className="text-sm font-semibold uppercase tracking-wide text-slate-400">
+                  {/* Details card â€” 2-col grid */}
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-5 shadow-sm">
+                    <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
                       Details
                     </h2>
                     <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3">
                       <div>
-                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                           Due date
                         </dt>
-                        <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                        <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
                           {formatDate(assignment.deadline)}
                         </dd>
                       </div>
                       <div>
-                        <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                           Type
                         </dt>
-                        <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                        <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
                           {assignment.submission_type || "Individual"}
                         </dd>
                       </div>
                       {assignment.description && (
                         <div className="col-span-2">
-                          <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                          <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                             Description
                           </dt>
-                          <dd className="mt-0.5 text-sm text-slate-800 dark:text-slate-200">
+                          <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
                             {assignment.description}
                           </dd>
                         </div>
                       )}
                       {assignment.file_url && (
                         <div>
-                          <dt className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                          <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
                             Attachment
                           </dt>
                           <dd className="mt-0.5">
                             <Link
                               to={`/documents/assignment-${assignment.id}`}
-                              className="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
+                              className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
                             >
                               View Document
                             </Link>
@@ -331,8 +331,8 @@ function AssignmentDetails() {
                 {/* Right sidebar */}
                 <div className="space-y-4">
                   {/* Your work status */}
-                  <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-5 py-5 shadow-sm">
-                    <h3 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-5 py-5 shadow-sm">
+                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
                       Your work
                     </h3>
                     {submission?.exists ? (
@@ -344,7 +344,7 @@ function AssignmentDetails() {
                           </span>
                         </div>
                         {submission.submitted_at && (
-                          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">
+                          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
                             {new Date(submission.submitted_at).toLocaleString()}
                           </p>
                         )}

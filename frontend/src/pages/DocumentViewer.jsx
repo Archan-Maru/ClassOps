@@ -114,15 +114,15 @@ function DocumentViewer() {
   const fileName = url ? url.split("/").pop().split("?")[0] : "Document";
 
   return (
-    <div className="flex h-screen flex-col bg-slate-50 dark:bg-slate-950">
+    <div className="flex h-screen flex-col bg-zinc-50 dark:bg-zinc-950">
       {/* Top bar */}
-      <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-4 shadow-sm">
+      <header className="flex h-14 shrink-0 items-center justify-between border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 px-4 shadow-sm">
         {/* Left: back + filename */}
         <div className="flex min-w-0 items-center gap-3">
           <button
             type="button"
             onClick={() => navigate(-1)}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-slate-800 transition-colors"
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg px-2 py-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-800 transition-colors"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -138,8 +138,8 @@ function DocumentViewer() {
             </svg>
             Back
           </button>
-          <div className="h-4 w-px bg-slate-200 dark:bg-slate-700 shrink-0" />
-          <span className="truncate text-sm font-medium text-slate-700 dark:text-slate-300">
+          <div className="h-4 w-px bg-zinc-200 dark:bg-zinc-700 shrink-0" />
+          <span className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300">
             {fileName}
           </span>
         </div>
@@ -150,7 +150,7 @@ function DocumentViewer() {
             <a
               href={rawUrl}
               download
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               title="Download"
             >
               <svg
@@ -168,7 +168,7 @@ function DocumentViewer() {
               href={rawUrl}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+              className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
               title="Open in new tab"
             >
               <svg
@@ -195,13 +195,13 @@ function DocumentViewer() {
       </header>
 
       {/* Viewer area */}
-      <main className="flex flex-1 flex-col items-center overflow-hidden bg-slate-100 dark:bg-slate-900 px-4 py-6">
+      <main className="flex flex-1 flex-col items-center overflow-hidden bg-zinc-100 dark:bg-zinc-900 px-4 py-6">
         {/* Loading */}
         {loading && (
           <div className="flex flex-1 items-center justify-center">
-            <div className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+            <div className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
               <svg
-                className="h-4 w-4 animate-spin text-indigo-500"
+                className="h-4 w-4 animate-spin text-violet-500"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
                 viewBox="0 0 24 24"
@@ -220,7 +220,7 @@ function DocumentViewer() {
                   d="M4 12a8 8 0 018-8v8H4z"
                 />
               </svg>
-              Loading document…
+              Loading documentâ€¦
             </div>
           </div>
         )}
@@ -228,14 +228,14 @@ function DocumentViewer() {
         {/* Error */}
         {error && (
           <div className="flex flex-1 flex-col items-center justify-center gap-4 text-center">
-            <div className="rounded-xl border border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 px-6 py-5 shadow-sm">
+            <div className="rounded-xl border border-red-200 dark:border-red-800 bg-white dark:bg-zinc-800 px-6 py-5 shadow-sm">
               <p className="text-sm font-medium text-red-600 dark:text-red-400">
                 {error}
               </p>
               <button
                 type="button"
                 onClick={() => navigate(-1)}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                className="mt-3 inline-flex items-center gap-1.5 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
               >
                 Go Back
               </button>
@@ -245,11 +245,11 @@ function DocumentViewer() {
 
         {/* Document */}
         {!loading && !error && url && (
-          <div className="flex w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+          <div className="flex w-full max-w-5xl flex-1 flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
             {isPdf && pdfPreviewLoading && (
-              <div className="flex flex-1 items-center justify-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+              <div className="flex flex-1 items-center justify-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
                 <svg
-                  className="h-4 w-4 animate-spin text-indigo-500"
+                  className="h-4 w-4 animate-spin text-violet-500"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
@@ -268,7 +268,7 @@ function DocumentViewer() {
                     d="M4 12a8 8 0 018-8v8H4z"
                   />
                 </svg>
-                Preparing preview…
+                Preparing previewâ€¦
               </div>
             )}
             {isPdf && !pdfPreviewLoading && pdfPreviewUrl && (
@@ -278,14 +278,14 @@ function DocumentViewer() {
                 className="h-full w-full flex-1"
               >
                 <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
                     PDF preview is not supported in this browser.
                   </p>
                   <a
                     href={rawUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                    className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
                   >
                     Open PDF in new tab
                   </a>
@@ -294,21 +294,21 @@ function DocumentViewer() {
             )}
             {isPdf && !pdfPreviewLoading && !pdfPreviewUrl && (
               <div className="flex flex-1 flex-col items-center justify-center gap-3 p-8 text-center">
-                <p className="text-sm text-slate-500 dark:text-slate-400">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400">
                   Could not prepare inline preview for this PDF.
                 </p>
                 <a
                   href={rawUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 transition-colors"
+                  className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 transition-colors"
                 >
                   Open PDF in new tab
                 </a>
               </div>
             )}
             {!isPdf && isImage && (
-              <div className="flex flex-1 items-center justify-center overflow-auto bg-slate-50 dark:bg-slate-900 p-6">
+              <div className="flex flex-1 items-center justify-center overflow-auto bg-zinc-50 dark:bg-zinc-900 p-6">
                 <img
                   src={url}
                   alt="Document"

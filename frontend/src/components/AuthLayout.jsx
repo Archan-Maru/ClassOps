@@ -5,12 +5,12 @@ function AuthLayout({ title, subtitle, children, footer }) {
   const { theme, toggleTheme } = useTheme();
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex">
-      {/* ── Left panel – branding ── */}
-      <div className="hidden lg:flex lg:w-5/12 xl:w-2/5 flex-col justify-center px-16 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-700">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950 flex">
+      {/* â”€â”€ Left panel â€“ branding â”€â”€ */}
+      <div className="hidden lg:flex lg:w-5/12 xl:w-2/5 flex-col justify-center px-16 bg-white dark:bg-zinc-900 border-r border-zinc-200 dark:border-zinc-700">
         {/* Logo mark */}
         <div className="flex items-center gap-3 mb-10">
-          <div className="w-9 h-9 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center">
+          <div className="w-9 h-9 rounded-xl bg-violet-600 dark:bg-violet-500 flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -24,31 +24,31 @@ function AuthLayout({ title, subtitle, children, footer }) {
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
             </svg>
           </div>
-          <span className="text-xl font-semibold text-slate-900 dark:text-slate-100 tracking-tight">
+          <span className="text-xl font-semibold text-zinc-900 dark:text-zinc-100 tracking-tight">
             ClassOps
           </span>
         </div>
 
         {/* Tagline */}
-        <h2 className="text-3xl font-bold text-slate-900 dark:text-slate-100 leading-snug mb-4">
+        <h2 className="text-3xl font-bold text-zinc-900 dark:text-zinc-100 leading-snug mb-4">
           All your classes.
           <br />
           One simple platform.
         </h2>
-        <p className="text-slate-500 dark:text-slate-400 text-base leading-relaxed max-w-xs">
-          Manage assignments, submissions, and grades — all in one calm,
+        <p className="text-zinc-500 dark:text-zinc-400 text-base leading-relaxed max-w-xs">
+          Manage assignments, submissions, and grades â€” all in one calm,
           organised space.
         </p>
       </div>
 
-      {/* ── Right panel – form ── */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-slate-50 dark:bg-slate-950">
-        {/* Theme toggle — top right */}
+      {/* â”€â”€ Right panel â€“ form â”€â”€ */}
+      <div className="flex-1 flex flex-col items-center justify-center px-6 py-12 bg-zinc-50 dark:bg-zinc-950">
+        {/* Theme toggle â€” top right */}
         <div className="absolute top-4 right-4">
           <button
             type="button"
             onClick={toggleTheme}
-            className="rounded-lg p-2 text-slate-500 dark:text-slate-400 transition hover:bg-slate-200 dark:hover:bg-slate-800"
+            className="rounded-lg p-2 text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-200 dark:hover:bg-zinc-800"
             title={
               theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
             }
@@ -81,7 +81,7 @@ function AuthLayout({ title, subtitle, children, footer }) {
 
         {/* Mobile logo */}
         <div className="flex lg:hidden items-center gap-2 mb-8">
-          <div className="w-8 h-8 rounded-xl bg-indigo-600 dark:bg-indigo-500 flex items-center justify-center">
+          <div className="w-8 h-8 rounded-xl bg-violet-600 dark:bg-violet-500 flex items-center justify-center">
             <svg
               viewBox="0 0 24 24"
               fill="none"
@@ -95,20 +95,20 @@ function AuthLayout({ title, subtitle, children, footer }) {
               <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
             </svg>
           </div>
-          <span className="text-lg font-semibold text-slate-900 dark:text-slate-100">
+          <span className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
             ClassOps
           </span>
         </div>
 
         {/* Card */}
-        <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-[0_1px_4px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] px-8 py-10">
+        <div className="w-full max-w-md bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 shadow-[0_1px_4px_rgba(0,0,0,0.06)] dark:shadow-[0_1px_4px_rgba(0,0,0,0.3)] px-8 py-10">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-1">
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mb-1">
               {title}
             </h1>
             {subtitle && (
-              <p className="text-sm text-slate-500 dark:text-slate-400">
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">
                 {subtitle}
               </p>
             )}
@@ -117,7 +117,7 @@ function AuthLayout({ title, subtitle, children, footer }) {
           {children}
 
           {footer && (
-            <div className="mt-6 text-center text-sm text-slate-500 dark:text-slate-400">
+            <div className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
               {footer}
             </div>
           )}

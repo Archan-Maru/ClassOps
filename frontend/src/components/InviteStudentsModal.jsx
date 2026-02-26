@@ -78,7 +78,7 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
       case "email_failed":
         return { text: "Email failed", color: "text-red-400" };
       default:
-        return { text: status, color: "text-slate-400" };
+        return { text: status, color: "text-zinc-400" };
     }
   };
 
@@ -86,14 +86,14 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-slate-100">Invite Students</h2>
-        <p className="mt-1 text-sm text-slate-400">Send email invites to join this class</p>
+      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
+        <h2 className="text-lg font-semibold text-zinc-100">Invite Students</h2>
+        <p className="mt-1 text-sm text-zinc-400">Send email invites to join this class</p>
 
         {!results ? (
           <div className="mt-4 space-y-4">
             <div>
-              <label className="block text-sm font-medium text-slate-400">Email Address</label>
+              <label className="block text-sm font-medium text-zinc-400">Email Address</label>
               <div className="mt-1 flex gap-2">
                 <input
                   type="email"
@@ -101,12 +101,12 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
                   onChange={(e) => setEmailInput(e.target.value)}
                   onKeyDown={handleKeyDown}
                   placeholder="student@example.com"
-                  className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+                  className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-violet-500 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={addEmail}
-                  className="rounded-lg bg-slate-700 px-3 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600"
+                  className="rounded-lg bg-zinc-700 px-3 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-600"
                 >
                   Add
                 </button>
@@ -118,15 +118,15 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
                 {emails.map((email) => (
                   <span
                     key={email}
-                    className="flex items-center gap-1.5 rounded-full bg-indigo-600/20 px-3 py-1 text-xs font-medium text-indigo-200"
+                    className="flex items-center gap-1.5 rounded-full bg-violet-600/20 px-3 py-1 text-xs font-medium text-violet-200"
                   >
                     {email}
                     <button
                       type="button"
                       onClick={() => removeEmail(email)}
-                      className="text-indigo-300 hover:text-white"
+                      className="text-violet-300 hover:text-white"
                     >
-                      ×
+                      Ã—
                     </button>
                   </span>
                 ))}
@@ -140,7 +140,7 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
                 type="button"
                 onClick={handleClose}
                 disabled={loading}
-                className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
+                className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
               >
                 Cancel
               </button>
@@ -148,7 +148,7 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
                 type="button"
                 onClick={handleSend}
                 disabled={loading || emails.length === 0}
-                className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+                className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
               >
                 {loading ? "Sending..." : `Send ${emails.length > 0 ? `(${emails.length})` : ""}`}
               </button>
@@ -159,8 +159,8 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
             {results.map((r, i) => {
               const label = statusLabel(r.status);
               return (
-                <div key={i} className="flex items-center justify-between rounded-lg border border-slate-700 bg-slate-800/60 px-3 py-2">
-                  <span className="text-sm text-slate-200">{r.email}</span>
+                <div key={i} className="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-2">
+                  <span className="text-sm text-zinc-200">{r.email}</span>
                   <span className={`text-xs font-medium ${label.color}`}>{label.text}</span>
                 </div>
               );
@@ -169,7 +169,7 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
             <button
               type="button"
               onClick={handleClose}
-              className="mt-2 w-full rounded-lg bg-slate-700 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-600"
+              className="mt-2 w-full rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-600"
             >
               Done
             </button>

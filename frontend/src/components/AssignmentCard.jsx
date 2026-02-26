@@ -45,19 +45,19 @@ function AssignmentCard({
   };
 
   return (
-    <div className="relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm transition-shadow hover:shadow-md">
+    <div className="relative rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm transition-shadow hover:shadow-md">
       <Link to={`/classes/${classId}/assignments/${id}`} className="block p-5">
         <div className="flex items-start justify-between">
           <div className="flex-1 pr-8">
-            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+            <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
               {title}
             </h3>
             <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className="inline-block rounded-full border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 px-2.5 py-0.5 text-xs font-medium text-slate-600 dark:text-slate-300">
+              <span className="inline-block rounded-full border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:text-zinc-300">
                 {submissionType}
               </span>
             </div>
-            <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
               Due: {formatDate(deadline)}
             </p>
           </div>
@@ -69,7 +69,7 @@ function AssignmentCard({
             </span>
           )}
         </div>
-        <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-indigo-600 dark:text-indigo-400">
+        <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-violet-600 dark:text-violet-400">
           View Assignment
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -96,12 +96,12 @@ function AssignmentCard({
                 disabled={deleting}
                 className="rounded-lg bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
               >
-                {deleting ? "Deleting…" : "Confirm"}
+                {deleting ? "Deletingâ€¦" : "Confirm"}
               </button>
               <button
                 type="button"
                 onClick={handleCancelDelete}
-                className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
               >
                 Cancel
               </button>
@@ -111,7 +111,7 @@ function AssignmentCard({
               type="button"
               onClick={handleDelete}
               title="Delete assignment"
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+              className="rounded-lg p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

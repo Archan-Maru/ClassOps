@@ -89,25 +89,25 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
       {/* Header row */}
-      <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 px-6 py-4">
-        <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+      <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700 px-6 py-4">
+        <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
           All Submissions
         </h3>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5">
-            <label className="text-xs font-medium text-slate-500 dark:text-slate-400">
+            <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
               Sort by
             </label>
-            <div className="flex overflow-hidden rounded-lg border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 p-0.5">
+            <div className="flex overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 p-0.5">
               <button
                 type="button"
                 onClick={() => setSortBy("latest")}
                 className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                   sortBy === "latest"
-                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                    ? "bg-white dark:bg-zinc-700 text-violet-600 dark:text-violet-400 shadow-sm"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
                 }`}
               >
                 Latest
@@ -117,8 +117,8 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                 onClick={() => setSortBy("earliest")}
                 className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
                   sortBy === "earliest"
-                    ? "bg-white dark:bg-slate-700 text-indigo-600 dark:text-indigo-400 shadow-sm"
-                    : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                    ? "bg-white dark:bg-zinc-700 text-violet-600 dark:text-violet-400 shadow-sm"
+                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
                 }`}
               >
                 Earliest
@@ -129,9 +129,9 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
       </div>
 
       {/* Submission rows */}
-      <div className="divide-y divide-slate-100 dark:divide-slate-700">
+      <div className="divide-y divide-zinc-100 dark:divide-zinc-700">
         {sortedSubmissions.length === 0 ? (
-          <p className="px-6 py-6 text-sm text-slate-500 dark:text-slate-400">
+          <p className="px-6 py-6 text-sm text-zinc-500 dark:text-zinc-400">
             No submissions yet
           </p>
         ) : (
@@ -150,21 +150,21 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
             return (
               <div
                 key={submission.id}
-                className="group px-6 py-3.5 hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors"
+                className="group px-6 py-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
               >
                 {/* 3-column row: name+time | file | action */}
                 <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4">
                   {/* Col 1: student name + submitted time */}
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-slate-900 dark:text-slate-100 truncate">
+                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
                       {displayName}
                     </p>
                     {submission.submitted_at ? (
-                      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
+                      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
                         {new Date(submission.submitted_at).toLocaleString()}
                       </p>
                     ) : (
-                      <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+                      <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
                         Not submitted
                       </p>
                     )}
@@ -178,7 +178,7 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                           xmlns="http://www.w3.org/2000/svg"
                           viewBox="0 0 20 20"
                           fill="currentColor"
-                          className="h-3.5 w-3.5 shrink-0 text-slate-400 dark:text-slate-500"
+                          className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-500"
                         >
                           <path
                             fillRule="evenodd"
@@ -186,12 +186,12 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             clipRule="evenodd"
                           />
                         </svg>
-                        <span className="truncate text-xs text-slate-500 dark:text-slate-400">
+                        <span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                           {filename}
                         </span>
                       </>
                     ) : (
-                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                      <span className="text-xs text-zinc-400 dark:text-zinc-500">
                         No file
                       </span>
                     )}
@@ -210,7 +210,7 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                         onClick={() =>
                           navigate(`/documents/submission-${submission.id}`)
                         }
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -243,7 +243,7 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             });
                           }
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-indigo-200 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+                        className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/30 px-3 py-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
                       >
                         <svg
                           xmlns="http://www.w3.org/2000/svg"
@@ -267,10 +267,10 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                 {submission.evaluation_id &&
                   submission.feedback &&
                   !isGrading && (
-                    <div className="mt-2 ml-0 rounded-lg bg-slate-50 dark:bg-slate-900 px-3 py-2">
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                    <div className="mt-2 ml-0 rounded-lg bg-zinc-50 dark:bg-zinc-900 px-3 py-2">
+                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
                         Feedback:{" "}
-                        <span className="text-slate-700 dark:text-slate-300">
+                        <span className="text-zinc-700 dark:text-zinc-300">
                           {submission.feedback}
                         </span>
                       </p>
@@ -279,7 +279,7 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
 
                 {/* Grading form (inline, expands below the row) */}
                 {isGrading && (
-                  <div className="mt-3 space-y-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-4">
+                  <div className="mt-3 space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4">
                     <div className="grid grid-cols-2 gap-3">
                       <input
                         type="number"
@@ -291,16 +291,16 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             score: e.target.value,
                           })
                         }
-                        className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                       />
                       <div className="flex gap-2">
                         <button
                           type="button"
                           onClick={() => handleGradeSubmission(submission)}
                           disabled={submitting}
-                          className="flex-1 rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600 disabled:opacity-50 transition-colors"
+                          className="flex-1 rounded-lg bg-violet-600 dark:bg-violet-500 px-3 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600 disabled:opacity-50 transition-colors"
                         >
-                          {submitting ? "Saving…" : "Save Grade"}
+                          {submitting ? "Savingâ€¦" : "Save Grade"}
                         </button>
                         <button
                           type="button"
@@ -308,7 +308,7 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             setGradingSubmissionId(null);
                             setGradingData({ score: "", feedback: "" });
                           }}
-                          className="flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                          className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
                         >
                           Cancel
                         </button>
@@ -324,7 +324,7 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                         })
                       }
                       rows={2}
-                      className="w-full rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                      className="w-full rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                     />
                   </div>
                 )}

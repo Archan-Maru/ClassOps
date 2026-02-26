@@ -12,6 +12,7 @@ function VerifyEmail() {
   const navigate = useNavigate();
 
   const email = location.state?.email;
+  const redirect = location.state?.redirect;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,7 +21,7 @@ function VerifyEmail() {
 
     try {
       await api.post("/auth/verify-email", { email, otp });
-      navigate("/login");
+      navigate(redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login");
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed");
     } finally {

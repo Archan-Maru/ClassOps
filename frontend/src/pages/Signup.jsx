@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import api from "../api/api";
 import AuthLayout from "../components/AuthLayout";
 
@@ -13,6 +13,8 @@ function Signup() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirect = searchParams.get("redirect");
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -25,7 +27,7 @@ function Signup() {
 
     try {
       await api.post("/auth/signup", form);
-      navigate("/verify-email", { state: { email: form.email } });
+      navigate("/verify-email", { state: { email: form.email, redirect } });
     } catch (err) {
       setError(err.response?.data?.message || "Signup failed");
     } finally {

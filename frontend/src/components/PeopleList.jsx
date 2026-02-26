@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 function PeopleList({ people }) {
   if (people.length === 0) {
     return (
-      <p className="text-sm text-slate-500 dark:text-slate-400">
+      <p className="text-sm text-zinc-500 dark:text-zinc-400">
         No students enrolled yet
       </p>
     );
@@ -14,18 +14,18 @@ function PeopleList({ people }) {
       {people.map((person) => (
         <div
           key={person.id}
-          className="flex items-center justify-between rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-3 shadow-sm"
+          className="flex items-center justify-between rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 shadow-sm"
         >
           <div>
-            <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
               {person.username}
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-400">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
               {person.role}
             </p>
           </div>
           {person.role === "TEACHER" && (
-            <span className="rounded-full bg-indigo-50 dark:bg-indigo-900/30 px-2.5 py-1 text-xs font-medium text-indigo-600 dark:text-indigo-400 ring-1 ring-inset ring-indigo-100 dark:ring-indigo-800">
+            <span className="rounded-full bg-violet-50 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-medium text-violet-600 dark:text-violet-400 ring-1 ring-inset ring-violet-100 dark:ring-violet-800">
               Teacher
             </span>
           )}

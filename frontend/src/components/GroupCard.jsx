@@ -57,10 +57,10 @@ function GroupCard({
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm">
       <button type="button" onClick={toggleCard} className="w-full text-left">
         <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
             {group.name}
           </h3>
           {isTeacher && (
@@ -79,7 +79,7 @@ function GroupCard({
                     onAddMember(group);
                   }
                 }}
-                className="rounded-lg bg-indigo-600 dark:bg-indigo-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-indigo-700 dark:hover:bg-indigo-600"
+                className="rounded-lg bg-violet-600 dark:bg-violet-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600"
               >
                 Add Member
               </span>
@@ -99,7 +99,7 @@ function GroupCard({
                     setShowLeaderPicker(false);
                   }
                 }}
-                className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-600"
+                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-zinc-50 dark:hover:bg-zinc-600"
               >
                 Remove Member
               </span>
@@ -119,31 +119,31 @@ function GroupCard({
                     setShowRemovePicker(false);
                   }
                 }}
-                className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-xs font-medium text-indigo-600 dark:text-indigo-400 hover:bg-slate-50 dark:hover:bg-slate-600"
+                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-zinc-50 dark:hover:bg-zinc-600"
               >
                 Assign Leader
               </span>
             </div>
           )}
         </div>
-        <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
           Leader:{" "}
-          <span className="font-medium text-slate-700 dark:text-slate-300">
+          <span className="font-medium text-zinc-700 dark:text-zinc-300">
             {leader?.username || "Not assigned"}
           </span>
         </p>
       </button>
 
       {isTeacher && showRemovePicker && (
-        <div className="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3">
-          <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+        <div className="mt-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-3">
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             Remove a member
           </p>
           <div className="mt-2 flex gap-2">
             <select
               value={selectedMemberId}
               onChange={(event) => setSelectedMemberId(event.target.value)}
-              className="flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
             >
               <option value="">Select member</option>
               {removableMembers.map((member) => (
@@ -165,15 +165,15 @@ function GroupCard({
       )}
 
       {isTeacher && showLeaderPicker && (
-        <div className="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-3">
-          <p className="text-xs font-medium text-slate-700 dark:text-slate-300">
+        <div className="mt-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-3">
+          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
             Assign leader
           </p>
           <div className="mt-2 flex gap-2">
             <select
               value={selectedLeaderId}
               onChange={(event) => setSelectedLeaderId(event.target.value)}
-              className="flex-1 rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-2 text-sm text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
             >
               <option value="">Select member</option>
               {normalizedMembers.map((member) => (
@@ -186,7 +186,7 @@ function GroupCard({
               type="button"
               onClick={handleAssignLeaderSubmit}
               disabled={!selectedLeaderId}
-              className="rounded-lg bg-indigo-600 px-3 py-2 text-xs font-medium text-white hover:bg-indigo-700 disabled:opacity-40 transition-colors"
+              className="rounded-lg bg-violet-600 px-3 py-2 text-xs font-medium text-white hover:bg-violet-700 disabled:opacity-40 transition-colors"
             >
               Assign
             </button>
@@ -199,9 +199,9 @@ function GroupCard({
           {normalizedMembers.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between rounded-lg bg-slate-50 dark:bg-slate-900 px-3 py-2"
+              className="flex items-center justify-between rounded-lg bg-zinc-50 dark:bg-zinc-900 px-3 py-2"
             >
-              <span className="text-sm text-slate-700 dark:text-slate-300">
+              <span className="text-sm text-zinc-700 dark:text-zinc-300">
                 {member.username}
               </span>
               {member.normalizedRole === "LEADER" ? (
@@ -209,7 +209,7 @@ function GroupCard({
                   Leader
                 </span>
               ) : (
-                <span className="text-xs font-medium text-slate-400 dark:text-slate-500">
+                <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
                   Member
                 </span>
               )}
@@ -219,7 +219,7 @@ function GroupCard({
       ) : null}
 
       {isExpanded && normalizedMembers.length === 0 ? (
-        <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+        <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
           No members yet
         </p>
       ) : null}

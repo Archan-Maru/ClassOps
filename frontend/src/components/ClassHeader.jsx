@@ -12,31 +12,31 @@ function ClassHeader({ title, teacher, semester, classCode }) {
   };
 
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-6 py-6 shadow-sm">
-      <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-6 shadow-sm">
+      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
         {title}
       </h1>
-      <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
         {teacher}
       </p>
       {semester && (
-        <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
+        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
           {semester}
         </p>
       )}
       {classCode && (
-        <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-indigo-100 dark:border-indigo-800 bg-indigo-50 dark:bg-indigo-900/30 px-3 py-1.5">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-indigo-500 dark:text-indigo-400">
+        <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-violet-100 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/30 px-3 py-1.5">
+          <span className="text-[11px] font-semibold uppercase tracking-wide text-violet-500 dark:text-violet-400">
             Class Code
           </span>
-          <span className="rounded-md bg-white dark:bg-slate-700 px-2 py-0.5 text-sm font-bold tracking-wider text-indigo-700 dark:text-indigo-300 shadow-sm ring-1 ring-indigo-100 dark:ring-indigo-700">
+          <span className="rounded-md bg-white dark:bg-zinc-700 px-2 py-0.5 text-sm font-bold tracking-wider text-violet-700 dark:text-violet-300 shadow-sm ring-1 ring-violet-100 dark:ring-violet-700">
             {classCode}
           </span>
           <button
             type="button"
             onClick={handleCopy}
             title="Copy class code"
-            className="ml-1 rounded-md p-1 text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-800 hover:text-indigo-600 dark:hover:text-indigo-300 transition-colors"
+            className="ml-1 rounded-md p-1 text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-800 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
           >
             {copied ? (
               <svg

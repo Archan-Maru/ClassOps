@@ -1,7 +1,8 @@
 import { useNavigate } from "react-router-dom";
+import PropTypes from "prop-types";
 import { useTheme } from "../context/ThemeContext";
 
-function AppHeader() {
+function AppHeader({ breadcrumb }) {
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
 
@@ -11,27 +12,54 @@ function AppHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-10 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900">
+    <header className="sticky top-0 z-10 border-b border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-900">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-0 sm:px-6 lg:px-8">
-        {/* Logo */}
+        {/* Logo + breadcrumb */}
         <div className="flex items-center gap-3 py-3.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-indigo-600 dark:bg-indigo-500">
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              className="h-5 w-5 text-white"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
-              <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
-            </svg>
-          </div>
-          <span className="text-xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
-            ClassOps
-          </span>
+          <button
+            type="button"
+            onClick={() => navigate("/dashboard")}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-violet-600 dark:bg-violet-500">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                className="h-5 w-5 text-white"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path d="M4 19.5A2.5 2.5 0 016.5 17H20" />
+                <path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z" />
+              </svg>
+            </div>
+            <span className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100">
+              ClassOps
+            </span>
+          </button>
+
+          {/* Breadcrumb for class pages */}
+          {breadcrumb && (
+            <div className="flex items-center gap-2">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-4 w-4 text-zinc-400 dark:text-zinc-500"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <span className="text-lg font-medium text-zinc-600 dark:text-zinc-300 truncate max-w-[200px] sm:max-w-xs">
+                {breadcrumb}
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Right side */}
@@ -39,7 +67,7 @@ function AppHeader() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="rounded-lg p-2 text-slate-500 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+            className="rounded-lg p-2 text-zinc-500 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800"
             title={
               theme === "dark" ? "Switch to light mode" : "Switch to dark mode"
             }
@@ -71,7 +99,7 @@ function AppHeader() {
           <button
             type="button"
             onClick={handleLogout}
-            className="rounded-lg px-4 py-2 text-sm font-medium text-slate-600 dark:text-slate-400 transition hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100"
+            className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 transition hover:bg-zinc-100 dark:hover:bg-zinc-800 hover:text-zinc-900 dark:hover:text-zinc-100"
           >
             Log out
           </button>
@@ -80,5 +108,13 @@ function AppHeader() {
     </header>
   );
 }
+
+AppHeader.propTypes = {
+  breadcrumb: PropTypes.string,
+};
+
+AppHeader.defaultProps = {
+  breadcrumb: "",
+};
 
 export default AppHeader;

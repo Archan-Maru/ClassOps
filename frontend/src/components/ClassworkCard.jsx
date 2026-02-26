@@ -31,19 +31,19 @@ function ClassworkCard({
   };
 
   return (
-    <div className="relative rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-5 shadow-sm transition-shadow hover:shadow-md">
+    <div className="relative rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm transition-shadow hover:shadow-md">
       <div className="flex items-start justify-between">
         <div className="flex-1 pr-8">
-          <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
             {title}
           </h3>
           {description && (
-            <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">
+            <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
               {description}
             </p>
           )}
           <div className="mt-2 flex gap-3">
-            <span className="text-xs text-slate-400 dark:text-slate-500">
+            <span className="text-xs text-zinc-400 dark:text-zinc-500">
               Uploaded {formatDate(createdAt, { includeTime: true })}
             </span>
           </div>
@@ -52,7 +52,7 @@ function ClassworkCard({
       {resourceUrl && (
         <Link
           to={`/documents/classwork-${id}`}
-          className="mt-4 inline-flex items-center rounded-lg bg-indigo-50 dark:bg-indigo-900/30 px-3 py-2 text-sm font-medium text-indigo-600 dark:text-indigo-400 ring-1 ring-inset ring-indigo-100 dark:ring-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors"
+          className="mt-4 inline-flex items-center rounded-lg bg-violet-50 dark:bg-violet-900/30 px-3 py-2 text-sm font-medium text-violet-600 dark:text-violet-400 ring-1 ring-inset ring-violet-100 dark:ring-violet-800 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
         >
           View Material
         </Link>
@@ -68,12 +68,12 @@ function ClassworkCard({
                 disabled={deleting}
                 className="rounded-lg bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
               >
-                {deleting ? "Deleting…" : "Confirm"}
+                {deleting ? "Deletingâ€¦" : "Confirm"}
               </button>
               <button
                 type="button"
                 onClick={() => setConfirming(false)}
-                className="rounded-lg border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700 px-2.5 py-1 text-xs font-medium text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 transition-colors"
+                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
               >
                 Cancel
               </button>
@@ -83,7 +83,7 @@ function ClassworkCard({
               type="button"
               onClick={handleDelete}
               title="Delete classwork"
-              className="rounded-lg p-1.5 text-slate-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+              className="rounded-lg p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

@@ -99,12 +99,12 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-slate-100">Create Group</h2>
+      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
+        <h2 className="text-lg font-semibold text-zinc-100">Create Group</h2>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label htmlFor="group-name" className="block text-sm font-medium text-slate-400">
+            <label htmlFor="group-name" className="block text-sm font-medium text-zinc-400">
               Group Name
             </label>
             <input
@@ -112,12 +112,12 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
               type="text"
               value={groupName}
               onChange={(event) => setGroupName(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
             />
           </div>
 
           <div>
-            <p className="block text-sm font-medium text-slate-400">Students not in any group</p>
+            <p className="block text-sm font-medium text-zinc-400">Students not in any group</p>
             <StudentSelector
               students={students}
               selectedStudentIds={selectedStudentIds}
@@ -125,7 +125,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
               loading={loadingStudents}
             />
             {!loadingStudents && students.length > 0 && (
-              <p className="mt-2 text-xs text-slate-400">
+              <p className="mt-2 text-xs text-zinc-400">
                 Selected: {selectedStudentIds.length}
               </p>
             )}
@@ -133,14 +133,14 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
 
           {selectedStudents.length > 0 && (
             <div>
-              <label htmlFor="group-leader" className="block text-sm font-medium text-slate-400">
+              <label htmlFor="group-leader" className="block text-sm font-medium text-zinc-400">
                 Group Leader
               </label>
               <select
                 id="group-leader"
                 value={leaderId}
                 onChange={(event) => setLeaderId(event.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+                className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
               >
                 <option value="">Select leader</option>
                 {selectedStudents.map((student) => (
@@ -159,14 +159,14 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
               type="button"
               onClick={handleClose}
               disabled={loading}
-              className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100"
+              className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={isSubmitDisabled}
-              className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? "Creating..." : "Create"}
             </button>

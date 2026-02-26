@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import { useParams, useSearchParams } from "react-router-dom";
 import ClassHeader from "../components/ClassHeader";
 import ClassworkCard from "../components/ClassworkCard";
 import AssignmentCard from "../components/AssignmentCard";
@@ -13,32 +13,6 @@ import InviteStudentsModal from "../components/InviteStudentsModal";
 import GroupCard from "../components/GroupCard";
 import AppHeader from "../components/AppHeader";
 import api from "../api/api";
-
-function BackToClassesLink() {
-  const navigate = useNavigate();
-
-  return (
-    <button
-      type="button"
-      onClick={() => navigate("/dashboard")}
-      className="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 20 20"
-        fill="currentColor"
-        className="h-4 w-4"
-      >
-        <path
-          fillRule="evenodd"
-          d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
-          clipRule="evenodd"
-        />
-      </svg>
-      <span>Back to classes</span>
-    </button>
-  );
-}
 
 const resolveClassCode = (classInfo) => {
   const apiCode =
@@ -63,7 +37,6 @@ const VALID_TABS = ["classwork", "assignments", "people", "groups"];
 
 function ClassPage() {
   const { id: classId } = useParams();
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
   const tabFromUrl = searchParams.get("tab");
@@ -218,8 +191,7 @@ function ClassPage() {
 
   const upcomingAssignments = [...assignments]
     .filter((a) => a.deadline)
-    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline))
-    .slice(0, 5);
+    .sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
   const isTeacher = userRole === "TEACHER";
 
   const handleAddMember = (group) => {
@@ -280,11 +252,11 @@ function ClassPage() {
 
   return (
     <>
-      <AppHeader />
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+      <AppHeader breadcrumb={classData?.title || ""} />
+      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
         <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
           {loading && (
-            <p className="text-slate-500 dark:text-slate-400">Loading class…</p>
+            <p className="text-zinc-500 dark:text-zinc-400">Loading classâ€¦</p>
           )}
           {error && (
             <p className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
@@ -293,11 +265,6 @@ function ClassPage() {
           )}
           {!loading && classData && (
             <>
-              {/* Back link */}
-              <div className="mb-5">
-                <BackToClassesLink />
-              </div>
-
               {/* Class header */}
               <ClassHeader
                 title={classData.title}
@@ -307,7 +274,7 @@ function ClassPage() {
               />
 
               {/* Tabs */}
-              <div className="mt-6 border-b border-slate-200 dark:border-slate-700">
+              <div className="mt-6 border-b border-zinc-200 dark:border-zinc-700">
                 <nav className="-mb-px flex justify-center gap-0">
                   {TABS.map((tab) => (
                     <button
@@ -316,8 +283,8 @@ function ClassPage() {
                       onClick={() => setActiveTab(tab.key)}
                       className={`px-5 py-3 text-sm font-medium transition-colors ${
                         activeTab === tab.key
-                          ? "border-b-2 border-indigo-600 dark:border-indigo-400 text-indigo-600 dark:text-indigo-400"
-                          : "border-b-2 border-transparent text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-300"
+                          ? "border-b-2 border-violet-600 dark:border-violet-400 text-violet-600 dark:text-violet-400"
+                          : "border-b-2 border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
                       }`}
                     >
                       {tab.label}
@@ -335,7 +302,7 @@ function ClassPage() {
                         <button
                           type="button"
                           onClick={() => setIsCreateClassworkOpen(true)}
-                          className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                          className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700"
                         >
                           <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -363,7 +330,7 @@ function ClassPage() {
                         />
                       ))
                     ) : (
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         No classwork materials yet
                       </p>
                     )}
@@ -383,7 +350,7 @@ function ClassPage() {
                         <button
                           type="button"
                           onClick={() => setIsCreateAssignmentOpen(true)}
-                          className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700"
                         >
                           + Create Assignment
                         </button>
@@ -404,7 +371,7 @@ function ClassPage() {
                         />
                       ))
                     ) : (
-                      <p className="text-sm text-slate-500 dark:text-slate-400">
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
                         No assignments yet
                       </p>
                     )}
@@ -423,7 +390,7 @@ function ClassPage() {
                       <button
                         type="button"
                         onClick={() => setIsInviteOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-500"
+                        className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
                       >
                         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                           <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -444,7 +411,7 @@ function ClassPage() {
                       <button
                         type="button"
                         onClick={() => setIsCreateGroupOpen(true)}
-                        className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-700"
+                        className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700"
                       >
                         + Create Group
                       </button>
@@ -462,7 +429,7 @@ function ClassPage() {
                       />
                     ))
                   ) : (
-                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
                       {isTeacher
                         ? "No groups yet"
                         : "You are not assigned to a group yet"}

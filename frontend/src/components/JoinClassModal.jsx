@@ -33,13 +33,13 @@ function JoinClassModal({ isOpen, onClose, onSuccess }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-slate-100">Join a Class</h2>
-        <p className="mt-1 text-sm text-slate-400">Enter the class code provided by your teacher</p>
+      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
+        <h2 className="text-lg font-semibold text-zinc-100">Join a Class</h2>
+        <p className="mt-1 text-sm text-zinc-400">Enter the class code provided by your teacher</p>
 
         <form onSubmit={handleSubmit} className="mt-4 space-y-4">
           <div>
-            <label htmlFor="code" className="block text-sm font-medium text-slate-400">
+            <label htmlFor="code" className="block text-sm font-medium text-zinc-400">
               Class Code
             </label>
             <input
@@ -49,7 +49,7 @@ function JoinClassModal({ isOpen, onClose, onSuccess }) {
               onChange={(e) => setCode(e.target.value.toUpperCase())}
               placeholder="e.g., ABC123"
               maxLength="10"
-              className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-center text-lg font-mono text-slate-100 placeholder-slate-500 focus:border-indigo-500 focus:outline-none"
+              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-center text-lg font-mono text-zinc-100 placeholder-zinc-500 focus:border-violet-500 focus:outline-none"
             />
           </div>
 
@@ -60,14 +60,14 @@ function JoinClassModal({ isOpen, onClose, onSuccess }) {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100 hover:bg-slate-700 disabled:opacity-50"
+              className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
             >
               {loading ? "Joining..." : "Join"}
             </button>

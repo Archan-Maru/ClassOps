@@ -59,8 +59,8 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-slate-700/60 bg-slate-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-slate-100">
+      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
+        <h2 className="text-lg font-semibold text-zinc-100">
           Create Assignment
         </h2>
 
@@ -68,7 +68,7 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
           <div>
             <label
               htmlFor="assignment-title"
-              className="block text-sm font-medium text-slate-400"
+              className="block text-sm font-medium text-zinc-400"
             >
               Title
             </label>
@@ -77,14 +77,14 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
               type="text"
               value={title}
               onChange={(event) => setTitle(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
             />
           </div>
 
           <div>
             <label
               htmlFor="assignment-description"
-              className="block text-sm font-medium text-slate-400"
+              className="block text-sm font-medium text-zinc-400"
             >
               Description
             </label>
@@ -93,14 +93,14 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
               value={description}
               onChange={(event) => setDescription(event.target.value)}
               rows="3"
-              className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
             />
           </div>
 
           <div>
             <label
               htmlFor="assignment-type"
-              className="block text-sm font-medium text-slate-400"
+              className="block text-sm font-medium text-zinc-400"
             >
               Submission Type
             </label>
@@ -108,7 +108,7 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
               id="assignment-type"
               value={submissionType}
               onChange={(event) => setSubmissionType(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
             >
               <option value="INDIVIDUAL">Individual</option>
               <option value="GROUP">Group</option>
@@ -118,7 +118,7 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
           <div>
             <label
               htmlFor="assignment-deadline"
-              className="block text-sm font-medium text-slate-400"
+              className="block text-sm font-medium text-zinc-400"
             >
               Deadline
             </label>
@@ -127,14 +127,14 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
               type="datetime-local"
               value={deadline}
               onChange={(event) => setDeadline(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-slate-600 bg-slate-800 px-3 py-2 text-slate-100"
+              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
             />
           </div>
 
           <div>
             <label
               htmlFor="assignment-file"
-              className="block text-sm font-medium text-slate-400"
+              className="block text-sm font-medium text-zinc-400"
             >
               Attach file (optional)
             </label>
@@ -160,7 +160,7 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
                   const f = e.dataTransfer?.files?.[0];
                   if (f) setAttachedFile(f);
                 }}
-                className="mt-1 w-full cursor-pointer rounded-lg border-2 border-dashed border-slate-600 bg-slate-800/40 px-3 py-3 text-sm text-slate-300 hover:border-indigo-500"
+                className="mt-1 w-full cursor-pointer rounded-lg border-2 border-dashed border-zinc-600 bg-zinc-800/40 px-3 py-3 text-sm text-zinc-300 hover:border-violet-500"
               >
                 <div className="flex items-center justify-between">
                   <span>Click to attach a file or drag it here.</span>
@@ -170,7 +170,7 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
                       e.stopPropagation();
                       fileInputRef.current?.click();
                     }}
-                    className="rounded bg-indigo-600 px-3 py-1 text-white text-sm"
+                    className="rounded bg-violet-600 px-3 py-1 text-white text-sm"
                   >
                     Attach
                   </button>
@@ -178,12 +178,12 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
               </div>
 
               {attachedFile && (
-                <div className="mt-2 flex items-center gap-2 rounded-md bg-slate-800 px-3 py-1 text-sm text-slate-100">
+                <div className="mt-2 flex items-center gap-2 rounded-md bg-zinc-800 px-3 py-1 text-sm text-zinc-100">
                   <span className="truncate max-w-xs">{attachedFile.name}</span>
                   <button
                     type="button"
                     onClick={() => setAttachedFile(null)}
-                    className="ml-2 rounded px-2 py-1 text-xs text-slate-300 hover:bg-slate-700 cursor-pointer"
+                    className="ml-2 rounded px-2 py-1 text-xs text-zinc-300 hover:bg-zinc-700 cursor-pointer"
                   >
                     Remove
                   </button>
@@ -199,14 +199,14 @@ function CreateAssignmentModal({ isOpen, onClose, onSuccess, classId }) {
               type="button"
               onClick={onClose}
               disabled={loading}
-              className="flex-1 rounded-lg border border-slate-600 bg-slate-800 px-4 py-2 text-sm font-medium text-slate-100"
+              className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white"
+              className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white"
             >
               {loading ? "Creating..." : "Create"}
             </button>

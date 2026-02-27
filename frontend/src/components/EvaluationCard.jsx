@@ -1,49 +1,62 @@
 import PropTypes from "prop-types";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 
 function EvaluationCard({ score, feedback }) {
   if (!score && !feedback) {
     return (
-      <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm">
-        <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-          Evaluation
-        </h3>
-        <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+      <Paper sx={{ p: 2.5 }}>
+        <Typography variant="subtitle2">Evaluation</Typography>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
           No evaluation yet. Your teacher will review your submission soon.
-        </p>
-      </div>
+        </Typography>
+      </Paper>
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm">
-      <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-        Evaluation
-      </h3>
+    <Paper sx={{ p: 2.5 }}>
+      <Typography variant="subtitle2">Evaluation</Typography>
 
       {score && (
-        <div className="mt-4">
-          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="caption" fontWeight={500} color="text.secondary">
             Score
-          </p>
-          <p className="mt-1 text-3xl font-bold text-violet-600 dark:text-violet-400">
+          </Typography>
+          <Typography
+            variant="h4"
+            fontWeight={700}
+            color="primary.main"
+            sx={{ mt: 0.5 }}
+          >
             {score}
-          </p>
-        </div>
+          </Typography>
+        </Box>
       )}
 
       {feedback && (
-        <div className="mt-4">
-          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        <Box sx={{ mt: 2 }}>
+          <Typography variant="caption" fontWeight={500} color="text.secondary">
             Feedback
-          </p>
-          <div className="mt-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-3">
-            <p className="text-sm text-zinc-700 dark:text-zinc-300">
+          </Typography>
+          <Box
+            sx={{
+              mt: 1,
+              borderRadius: 2,
+              border: 1,
+              borderColor: "divider",
+              bgcolor: "action.hover",
+              p: 1.5,
+            }}
+          >
+            <Typography variant="body2" color="text.primary">
               {feedback}
-            </p>
-          </div>
-        </div>
+            </Typography>
+          </Box>
+        </Box>
       )}
-    </div>
+    </Paper>
   );
 }
 

@@ -1,37 +1,45 @@
 import PropTypes from "prop-types";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
 
 function PeopleList({ people }) {
   if (people.length === 0) {
     return (
-      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+      <Typography variant="body2" color="text.secondary">
         No students enrolled yet
-      </p>
+      </Typography>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
       {people.map((person) => (
-        <div
+        <Paper
           key={person.id}
-          className="flex items-center justify-between rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-4 py-3 shadow-sm"
+          sx={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            px: 2,
+            py: 1.5,
+          }}
         >
-          <div>
-            <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
+          <Box>
+            <Typography variant="body2" fontWeight={600}>
               {person.username}
-            </p>
-            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
               {person.role}
-            </p>
-          </div>
+            </Typography>
+          </Box>
           {person.role === "TEACHER" && (
-            <span className="rounded-full bg-violet-50 dark:bg-violet-900/30 px-2.5 py-1 text-xs font-medium text-violet-600 dark:text-violet-400 ring-1 ring-inset ring-violet-100 dark:ring-violet-800">
-              Teacher
-            </span>
+            <Chip label="Teacher" size="small" color="primary" variant="outlined" />
           )}
-        </div>
+        </Paper>
       ))}
-    </div>
+    </Box>
   );
 }
 

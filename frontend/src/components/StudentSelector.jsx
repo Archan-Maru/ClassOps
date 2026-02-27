@@ -1,12 +1,32 @@
 import PropTypes from "prop-types";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Checkbox from "@mui/material/Checkbox";
+import FormControlLabel from "@mui/material/FormControlLabel";
 
 function StudentSelector({ students, selectedStudentIds, onToggleStudent, loading }) {
   return (
-    <div className="mt-2 max-h-56 overflow-y-auto rounded-lg border border-zinc-700 bg-zinc-800/60">
-      {loading && <p className="px-3 py-3 text-sm text-zinc-400">Loading students...</p>}
+    <Box
+      sx={{
+        mt: 1,
+        maxHeight: 224,
+        overflowY: "auto",
+        borderRadius: 2,
+        border: 1,
+        borderColor: "divider",
+        bgcolor: "action.hover",
+      }}
+    >
+      {loading && (
+        <Typography variant="body2" color="text.secondary" sx={{ px: 1.5, py: 1.5 }}>
+          Loading students...
+        </Typography>
+      )}
 
       {!loading && students.length === 0 && (
-        <p className="px-3 py-3 text-sm text-zinc-400">No available students</p>
+        <Typography variant="body2" color="text.secondary" sx={{ px: 1.5, py: 1.5 }}>
+          No available students
+        </Typography>
       )}
 
       {!loading &&
@@ -14,23 +34,32 @@ function StudentSelector({ students, selectedStudentIds, onToggleStudent, loadin
           const isSelected = selectedStudentIds.includes(student.id);
 
           return (
-            <label
+            <Box
               key={student.id}
-              htmlFor={`student-${student.id}`}
-              className="flex cursor-pointer items-center gap-3 border-b border-zinc-700/60 px-3 py-2 last:border-b-0"
+              sx={{
+                borderBottom: 1,
+                borderColor: "divider",
+                px: 1.5,
+                py: 0.5,
+                "&:last-child": { borderBottom: 0 },
+              }}
             >
-              <input
-                id={`student-${student.id}`}
-                type="checkbox"
-                checked={isSelected}
-                onChange={() => onToggleStudent(student.id)}
-                className="h-4 w-4 rounded border-zinc-600 bg-zinc-900 text-violet-500"
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={isSelected}
+                    onChange={() => onToggleStudent(student.id)}
+                    size="small"
+                  />
+                }
+                label={
+                  <Typography variant="body2">{student.username}</Typography>
+                }
               />
-              <span className="text-sm text-zinc-200">{student.username}</span>
-            </label>
+            </Box>
           );
         })}
-    </div>
+    </Box>
   );
 }
 

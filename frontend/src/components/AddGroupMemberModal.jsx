@@ -1,4 +1,14 @@
 import { useState } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import Box from "@mui/material/Box";
 import api from "../api/api";
 
 function AddGroupMemberModal({ isOpen, onClose, onSuccess, groupId, students, groupName, loadingStudents }) {
@@ -29,63 +39,58 @@ function AddGroupMemberModal({ isOpen, onClose, onSuccess, groupId, students, gr
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-zinc-100">Add Group Member</h2>
-        <p className="mt-1 text-sm text-zinc-400">{groupName}</p>
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Add Group Member</DialogTitle>
+      <Box component="form" onSubmit={handleSubmit}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 0 }}>
+          <Typography variant="body2" color="text.secondary">
+            {groupName}
+          </Typography>
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          <div>
-            <label htmlFor="member-user" className="block text-sm font-medium text-zinc-400">
-              Available Students
-            </label>
-            <select
-              id="member-user"
-              value={selectedUserId}
-              onChange={(event) => setSelectedUserId(event.target.value)}
-              disabled={loadingStudents || students.length === 0}
-              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
-            >
-              <option value="">Select a student</option>
-              {students.map((student) => (
-                <option key={student.id} value={student.id}>
-                  {student.username}
-                </option>
-              ))}
-            </select>
-            {loadingStudents && (
-              <p className="mt-2 text-sm text-zinc-400">Loading available students...</p>
-            )}
-            {!loadingStudents && students.length === 0 && (
-              <p className="mt-2 text-sm text-zinc-400">No available students to add</p>
-            )}
-          </div>
+          <TextField
+            label="Available Students"
+            select
+            value={selectedUserId}
+            onChange={(e) => setSelectedUserId(e.target.value)}
+            disabled={loadingStudents || students.length === 0}
+            fullWidth
+            size="small"
+          >
+            <MenuItem value="">Select a student</MenuItem>
+            {students.map((student) => (
+              <MenuItem key={student.id} value={student.id}>
+                {student.username}
+              </MenuItem>
+            ))}
+          </TextField>
+          {loadingStudents && (
+            <Typography variant="body2" color="text.secondary">
+              Loading available students...
+            </Typography>
+          )}
+          {!loadingStudents && students.length === 0 && (
+            <Typography variant="body2" color="text.secondary">
+              No available students to add
+            </Typography>
+          )}
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
-
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading || loadingStudents || students.length === 0 || !selectedUserId}
-              className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? "Adding..." : "Add"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          {error && <Alert severity="error">{error}</Alert>}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            variant="contained"
+            disabled={loading || loadingStudents || students.length === 0 || !selectedUserId}
+          >
+            {loading ? "Adding..." : "Add"}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
   );
 }
 

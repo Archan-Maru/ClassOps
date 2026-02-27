@@ -1,4 +1,15 @@
 import { useState, useRef } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
+import IconButton from "@mui/material/IconButton";
+import CloseIcon from "@mui/icons-material/Close";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import api from "../api/api";
 
 function CreateClassworkModal({ isOpen, onClose, onSuccess, classId }) {
@@ -47,165 +58,107 @@ function CreateClassworkModal({ isOpen, onClose, onSuccess, classId }) {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
-      <div className="w-full max-w-md rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-lg">
-        {/* Header */}
-        <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700 px-6 py-4">
-          <h2 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
-            New Announcement
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="rounded-lg p-1 text-zinc-400 dark:text-zinc-500 hover:bg-zinc-100 dark:hover:bg-zinc-700 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 20 20"
-              fill="currentColor"
-              className="h-5 w-5"
-            >
-              <path d="M6.28 5.22a.75.75 0 00-1.06 1.06L8.94 10l-3.72 3.72a.75.75 0 101.06 1.06L10 11.06l3.72 3.72a.75.75 0 101.06-1.06L11.06 10l3.72-3.72a.75.75 0 00-1.06-1.06L10 8.94 6.28 5.22z" />
-            </svg>
-          </button>
-        </div>
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+      {/* Header */}
+      <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 3, py: 2, borderBottom: 1, borderColor: "divider" }}>
+        <Typography variant="subtitle1" fontWeight={600}>
+          New Announcement
+        </Typography>
+        <IconButton size="small" onClick={onClose}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
 
-        <form onSubmit={handleSubmit} className="px-6 py-5 space-y-4">
-          <div>
-            <label
-              htmlFor="classwork-title"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Title
-            </label>
+      <Box component="form" onSubmit={handleSubmit}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+          <TextField
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Enter a title"
+            fullWidth
+            size="small"
+          />
+          <TextField
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Add a description (optional)"
+            fullWidth
+            size="small"
+            multiline
+            rows={3}
+          />
+
+          {/* Attachment */}
+          <Box>
+            <Typography variant="body2" color="text.secondary" fontWeight={500} sx={{ mb: 0.75 }}>
+              Attachment <Typography component="span" variant="body2" color="text.disabled">(optional)</Typography>
+            </Typography>
             <input
-              id="classwork-title"
-              type="text"
-              value={title}
-              onChange={(event) => setTitle(event.target.value)}
-              placeholder="Enter a title"
-              className="mt-1.5 w-full rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 shadow-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500"
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="classwork-description"
-              className="block text-sm font-medium text-zinc-700 dark:text-zinc-300"
-            >
-              Description
-            </label>
-            <textarea
-              id="classwork-description"
-              value={description}
-              onChange={(event) => setDescription(event.target.value)}
-              rows="3"
-              placeholder="Add a description (optional)"
-              className="mt-1.5 w-full rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-900 dark:text-zinc-100 placeholder-zinc-400 dark:placeholder-zinc-500 shadow-sm focus:border-violet-500 focus:outline-none focus:ring-1 focus:ring-violet-500 resize-none"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Attachment{" "}
-              <span className="text-zinc-400 dark:text-zinc-500 font-normal">
-                (optional)
-              </span>
-            </label>
-            <input
-              id="classwork-file"
               ref={fileInputRef}
               type="file"
               onChange={(e) => setAttachedFile(e.target.files?.[0] || null)}
-              className="hidden"
+              style={{ display: "none" }}
             />
             {attachedFile ? (
-              <div className="mt-1.5 flex items-center gap-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-4 w-4 shrink-0 text-zinc-400 dark:text-zinc-500"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <span className="flex-1 truncate text-sm text-zinc-700 dark:text-zinc-300">
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1, border: 1, borderColor: "divider", borderRadius: 2, px: 1.5, py: 1 }}>
+                <AttachFileIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                <Typography variant="body2" noWrap sx={{ flex: 1 }}>
                   {attachedFile.name}
-                </span>
-                <button
-                  type="button"
-                  onClick={() => setAttachedFile(null)}
-                  className="text-xs text-red-500 hover:text-red-600"
-                >
+                </Typography>
+                <Button size="small" color="error" onClick={() => setAttachedFile(null)} sx={{ minWidth: 0 }}>
                   Remove
-                </button>
-              </div>
+                </Button>
+              </Box>
             ) : (
-              <div
+              <Box
                 role="button"
                 tabIndex={0}
                 onClick={() => fileInputRef.current?.click()}
-                onKeyDown={(e) =>
-                  e.key === "Enter" && fileInputRef.current?.click()
-                }
+                onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={(e) => {
                   e.preventDefault();
                   const f = e.dataTransfer?.files?.[0];
                   if (f) setAttachedFile(f);
                 }}
-                className="mt-1.5 flex cursor-pointer items-center justify-center gap-2 rounded-lg border border-dashed border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 px-4 py-4 text-sm text-zinc-500 dark:text-zinc-400 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 1,
+                  border: 2,
+                  borderStyle: "dashed",
+                  borderColor: "divider",
+                  borderRadius: 2,
+                  px: 2,
+                  py: 2,
+                  cursor: "pointer",
+                  "&:hover": { borderColor: "primary.main" },
+                }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-4 w-4 text-zinc-400 dark:text-zinc-500"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                Click to attach or drag a file here
-              </div>
+                <AttachFileIcon sx={{ fontSize: 16, color: "text.secondary" }} />
+                <Typography variant="body2" color="text.secondary">
+                  Click to attach or drag a file here
+                </Typography>
+              </Box>
             )}
-          </div>
+          </Box>
 
-          {error && (
-            <p className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">
-              {error}
-            </p>
-          )}
-
-          <div className="flex gap-3 pt-1">
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={loading}
-              className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="flex-1 rounded-lg bg-violet-600 dark:bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600 transition-colors disabled:opacity-50"
-            >
-              {loading ? "Savingâ€¦" : "Post"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          {error && <Alert severity="error">{error}</Alert>}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={onClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" disabled={loading}>
+            {loading ? "Saving..." : "Post"}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
   );
 }
 

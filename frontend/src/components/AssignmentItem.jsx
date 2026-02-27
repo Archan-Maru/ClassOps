@@ -1,4 +1,6 @@
 import PropTypes from "prop-types";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { formatDate, relativeDeadline } from "../utils/formatDate";
 
 function AssignmentItem({ title, className, due }) {
@@ -6,32 +8,45 @@ function AssignmentItem({ title, className, due }) {
   const isOverdue = relative === "Overdue";
 
   return (
-    <div
-      className={`flex items-start gap-3 rounded-lg border-l-4 bg-white dark:bg-zinc-800 px-3 py-2.5 shadow-[0_1px_2px_rgba(0,0,0,0.04)] transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700 ${
-        isOverdue
-          ? "border-red-500"
-          : "border-violet-600 dark:border-violet-500"
-      }`}
+    <Box
+      sx={{
+        display: "flex",
+        alignItems: "flex-start",
+        gap: 1.5,
+        borderLeft: 4,
+        borderColor: isOverdue ? "error.main" : "primary.main",
+        bgcolor: "background.paper",
+        px: 1.5,
+        py: 1.25,
+        borderRadius: 2,
+        boxShadow: 1,
+        transition: "background-color 0.15s",
+        "&:hover": { bgcolor: "action.hover" },
+      }}
     >
-      <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-medium text-zinc-900 dark:text-zinc-100">
+      <Box sx={{ minWidth: 0, flex: 1 }}>
+        <Typography variant="body2" fontWeight={500} noWrap>
           {title}
-        </p>
+        </Typography>
         {className && (
-          <p className="mt-0.5 truncate text-xs text-zinc-500 dark:text-zinc-400">
+          <Typography variant="caption" color="text.secondary" noWrap sx={{ mt: 0.25, display: "block" }}>
             {className}
-          </p>
+          </Typography>
         )}
-        <div className="mt-1 flex items-center gap-1.5">
-          <span
-            className={`text-xs ${isOverdue ? "font-semibold text-red-600" : "text-zinc-400"}`}
+        <Box sx={{ mt: 0.5, display: "flex", alignItems: "center", gap: 0.75 }}>
+          <Typography
+            variant="caption"
+            sx={{
+              color: isOverdue ? "error.main" : "text.disabled",
+              fontWeight: isOverdue ? 600 : 400,
+            }}
           >
-            {isOverdue ? "Overdue Â· " : ""}
+            {isOverdue ? "Overdue \u00B7 " : ""}
             {formatDate(due)}
-          </span>
-        </div>
-      </div>
-    </div>
+          </Typography>
+        </Box>
+      </Box>
+    </Box>
   );
 }
 

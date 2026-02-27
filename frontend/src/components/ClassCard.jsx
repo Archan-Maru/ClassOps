@@ -1,5 +1,10 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Avatar from "@mui/material/Avatar";
 
 function ClassCard({ id, title, teacher, meta, userRole, onUnenroll }) {
   const initial = (title || "?")[0].toUpperCase();
@@ -15,44 +20,113 @@ function ClassCard({ id, title, teacher, meta, userRole, onUnenroll }) {
   };
 
   return (
-    <Link
+    <Paper
+      component={Link}
       to={`/classes/${id}`}
-      className="group flex flex-col overflow-hidden rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-[0_1px_3px_rgba(0,0,0,0.06)] transition-shadow hover:shadow-[0_4px_16px_rgba(0,0,0,0.10)]"
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
+        textDecoration: "none",
+        color: "inherit",
+        transition: "box-shadow 0.2s",
+        "&:hover": { boxShadow: 6 },
+      }}
     >
-      {/* â”€â”€ Header band â”€â”€ */}
-      <div className="relative flex h-28 flex-col justify-end bg-violet-600 dark:bg-violet-500 p-4">
-        {/* Class title */}
-        <h3 className="w-full truncate text-lg font-bold leading-tight text-white">
+      {/* Header band */}
+      <Box
+        sx={{
+          position: "relative",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          height: 112,
+          bgcolor: "primary.main",
+          p: 2,
+        }}
+      >
+        <Typography
+          variant="subtitle1"
+          fontWeight={700}
+          noWrap
+          sx={{ color: "#fff", lineHeight: 1.3 }}
+        >
           {title}
-        </h3>
-        {/* Teacher name â€“ just below title */}
+        </Typography>
         {teacher && (
-          <p className="mt-0.5 truncate text-sm text-violet-200">{teacher}</p>
+          <Typography
+            variant="body2"
+            noWrap
+            sx={{ mt: 0.25, color: "rgba(255,255,255,0.7)" }}
+          >
+            {teacher}
+          </Typography>
         )}
-        {/* Initial avatar â€“ bottom-right, overlapping body */}
-        <div className="absolute bottom-0 right-4 tranzinc-y-1/2 flex h-10 w-10 items-center justify-center rounded-full border-2 border-white dark:border-zinc-800 bg-white dark:bg-zinc-800 shadow-sm">
-          <span className="text-base font-bold text-violet-600 dark:text-violet-400">
-            {initial}
-          </span>
-        </div>
-      </div>
+        <Avatar
+          sx={{
+            position: "absolute",
+            bottom: 0,
+            right: 16,
+            transform: "translateY(50%)",
+            width: 40,
+            height: 40,
+            bgcolor: "background.paper",
+            color: "primary.main",
+            fontWeight: 700,
+            fontSize: 16,
+            border: 2,
+            borderColor: "background.paper",
+            boxShadow: 1,
+          }}
+        >
+          {initial}
+        </Avatar>
+      </Box>
 
-      {/* â”€â”€ Body â”€â”€ */}
-      <div className="flex flex-1 items-end justify-between px-4 pb-3 pt-6">
+      {/* Body */}
+      <Box
+        sx={{
+          display: "flex",
+          flex: 1,
+          alignItems: "flex-end",
+          justifyContent: "space-between",
+          px: 2,
+          pb: 1.5,
+          pt: 3,
+        }}
+      >
         {userRole === "STUDENT" ? (
-          <button
-            type="button"
+          <Button
+            size="small"
             onClick={handleUnenroll}
-            className="shrink-0 rounded-lg border border-zinc-200 dark:border-zinc-600 px-2.5 py-1.5 text-xs font-medium text-zinc-500 dark:text-zinc-400 transition hover:border-red-200 dark:hover:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+            sx={{
+              fontSize: "0.75rem",
+              color: "text.secondary",
+              borderColor: "divider",
+              "&:hover": {
+                borderColor: "error.main",
+                color: "error.main",
+              },
+            }}
+            variant="outlined"
           >
             Leave
-          </button>
+          </Button>
         ) : (
           <span />
         )}
-        {meta && <p className="ml-2 truncate text-xs text-zinc-400">{meta}</p>}
-      </div>
-    </Link>
+        {meta && (
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            noWrap
+            sx={{ ml: 1 }}
+          >
+            {meta}
+          </Typography>
+        )}
+      </Box>
+    </Paper>
   );
 }
 

@@ -1,5 +1,13 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Paper from "@mui/material/Paper";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chip from "@mui/material/Chip";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SubmissionBox from "../components/SubmissionBox";
 import SubmissionsList from "../components/SubmissionsList";
 import EvaluationCard from "../components/EvaluationCard";
@@ -119,128 +127,132 @@ function AssignmentDetails() {
     });
   };
 
+  const AssignmentHeader = () => (
+    <Paper sx={{ overflow: "hidden" }}>
+      <Box sx={{ display: "flex", alignItems: "flex-start", gap: 2.5, px: 3, py: 3 }}>
+        <Box sx={{ width: 4, alignSelf: "stretch", borderRadius: 1, bgcolor: "primary.main", flexShrink: 0 }} />
+        <Box sx={{ flex: 1, minWidth: 0 }}>
+          <Typography variant="h5" fontWeight={600} sx={{ lineHeight: 1.3 }}>
+            {assignment.title}
+          </Typography>
+          <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
+            {classData.teacher_name || "Teacher"}
+          </Typography>
+        </Box>
+      </Box>
+    </Paper>
+  );
+
+  const DetailsCard = ({ colsClass }) => (
+    <Paper sx={{ px: 3, py: 2.5 }}>
+      <Typography variant="overline" color="text.disabled" fontWeight={600}>
+        Details
+      </Typography>
+      <Box
+        component="dl"
+        sx={{
+          mt: 1.5,
+          display: "grid",
+          gridTemplateColumns: colsClass || { xs: "1fr 1fr", sm: "1fr 1fr 1fr" },
+          columnGap: 4,
+          rowGap: 1.5,
+        }}
+      >
+        <Box>
+          <Typography component="dt" variant="caption" color="text.secondary" fontWeight={500}>
+            Due date
+          </Typography>
+          <Typography component="dd" variant="body2" sx={{ mt: 0.25 }}>
+            {formatDate(assignment.deadline)}
+          </Typography>
+        </Box>
+        <Box>
+          <Typography component="dt" variant="caption" color="text.secondary" fontWeight={500}>
+            Type
+          </Typography>
+          <Typography component="dd" variant="body2" sx={{ mt: 0.25 }}>
+            {assignment.submission_type || "Individual"}
+          </Typography>
+        </Box>
+        {assignment.description && (
+          <Box sx={{ gridColumn: colsClass ? "span 2" : { xs: "span 2", sm: "span 3" } }}>
+            <Typography component="dt" variant="caption" color="text.secondary" fontWeight={500}>
+              Description
+            </Typography>
+            <Typography component="dd" variant="body2" sx={{ mt: 0.25 }}>
+              {assignment.description}
+            </Typography>
+          </Box>
+        )}
+        {assignment.file_url && (
+          <Box>
+            <Typography component="dt" variant="caption" color="text.secondary" fontWeight={500}>
+              Attachment
+            </Typography>
+            <Typography component="dd" sx={{ mt: 0.25 }}>
+              <Button
+                component={Link}
+                to={`/documents/assignment-${assignment.id}`}
+                size="small"
+                sx={{ p: 0, minWidth: 0, color: "primary.main" }}
+              >
+                View Document
+              </Button>
+            </Typography>
+          </Box>
+        )}
+      </Box>
+    </Paper>
+  );
+
   return (
     <>
       <AppHeader />
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
         {loading && (
-          <div className="flex items-center justify-center py-16">
-            <p className="text-zinc-500 dark:text-zinc-400">
-              Loading assignmentâ€¦
-            </p>
-          </div>
+          <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 8 }}>
+            <CircularProgress size={24} />
+            <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+              Loading assignment...
+            </Typography>
+          </Box>
         )}
         {error && (
-          <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6">
-            <p className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+          <Box sx={{ maxWidth: 896, mx: "auto", px: { xs: 2, sm: 3 }, py: 4 }}>
+            <Alert severity="error" sx={{ borderRadius: 2 }}>
               {error}
-            </p>
-            <button
-              type="button"
+            </Alert>
+            <Button
+              variant="contained"
               onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
-              className="mt-4 rounded-lg bg-violet-600 dark:bg-violet-500 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600"
+              sx={{ mt: 2 }}
             >
               Back to Class
-            </button>
-          </div>
+            </Button>
+          </Box>
         )}
         {!loading && assignment && classData && (
-          <div className="mx-auto max-w-4xl px-4 py-6 sm:px-6">
+          <Box sx={{ maxWidth: 896, mx: "auto", px: { xs: 2, sm: 3 }, py: 3 }}>
             {/* Back link */}
-            <div className="mb-6">
-              <button
-                type="button"
+            <Box sx={{ mb: 3 }}>
+              <Button
+                startIcon={<ArrowBackIcon sx={{ fontSize: 16 }} />}
                 onClick={() => navigate(`/classes/${classId}?tab=assignments`)}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
+                sx={{ color: "primary.main" }}
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                  className="h-4 w-4"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M17 10a.75.75 0 01-.75.75H5.612l4.158 3.96a.75.75 0 11-1.04 1.08l-5.5-5.25a.75.75 0 010-1.08l5.5-5.25a.75.75 0 111.04 1.08L5.612 9.25H16.25A.75.75 0 0117 10z"
-                    clipRule="evenodd"
-                  />
-                </svg>
                 Back to {classData.title}
-              </button>
-            </div>
+              </Button>
+            </Box>
 
             {isTeacher ? (
-              <div className="space-y-5">
-                {/* Assignment header */}
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden">
-                  <div className="flex items-start gap-5 px-6 py-6">
-                    <div className="w-1 self-stretch rounded-full bg-violet-500 shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
-                        {assignment.title}
-                      </h1>
-                      <div className="mt-1.5 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-                        <span>{classData.teacher_name || "Teacher"}</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                <AssignmentHeader />
+                <DetailsCard colsClass={{ xs: "1fr 1fr", sm: "1fr 1fr 1fr" }} />
 
-                {/* Details card â€” 2-col grid */}
-                <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-5 shadow-sm">
-                  <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
-                    Details
-                  </h2>
-                  <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3 sm:grid-cols-3">
-                    <div>
-                      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                        Due date
-                      </dt>
-                      <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
-                        {formatDate(assignment.deadline)}
-                      </dd>
-                    </div>
-                    <div>
-                      <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                        Type
-                      </dt>
-                      <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
-                        {assignment.submission_type || "Individual"}
-                      </dd>
-                    </div>
-                    {assignment.description && (
-                      <div className="col-span-2 sm:col-span-3">
-                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                          Description
-                        </dt>
-                        <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
-                          {assignment.description}
-                        </dd>
-                      </div>
-                    )}
-                    {assignment.file_url && (
-                      <div>
-                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                          Attachment
-                        </dt>
-                        <dd className="mt-0.5">
-                          <Link
-                            to={`/documents/assignment-${assignment.id}`}
-                            className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
-                          >
-                            View Document
-                          </Link>
-                        </dd>
-                      </div>
-                    )}
-                  </dl>
-                </div>
-
-                {/* Submissions */}
                 {submissionsLoading ? (
-                  <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                    Loading submissionsâ€¦
-                  </p>
+                  <Typography variant="body2" color="text.secondary">
+                    Loading submissions...
+                  </Typography>
                 ) : (
                   <SubmissionsList
                     assignmentId={assignment.id}
@@ -248,76 +260,12 @@ function AssignmentDetails() {
                     onSubmissionsUpdate={fetchSubmissions}
                   />
                 )}
-              </div>
+              </Box>
             ) : (
-              <div className="grid gap-5 lg:grid-cols-3">
-                <div className="space-y-5 lg:col-span-2">
-                  {/* Assignment header */}
-                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm overflow-hidden">
-                    <div className="flex items-start gap-5 px-6 py-6">
-                      <div className="w-1 self-stretch rounded-full bg-violet-500 shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <h1 className="text-2xl font-semibold text-zinc-900 dark:text-zinc-100 leading-snug">
-                          {assignment.title}
-                        </h1>
-                        <div className="mt-1.5 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400">
-                          <span>{classData.teacher_name || "Teacher"}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Details card â€” 2-col grid */}
-                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-5 shadow-sm">
-                    <h2 className="text-sm font-semibold uppercase tracking-wide text-zinc-400">
-                      Details
-                    </h2>
-                    <dl className="mt-3 grid grid-cols-2 gap-x-8 gap-y-3">
-                      <div>
-                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                          Due date
-                        </dt>
-                        <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
-                          {formatDate(assignment.deadline)}
-                        </dd>
-                      </div>
-                      <div>
-                        <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                          Type
-                        </dt>
-                        <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
-                          {assignment.submission_type || "Individual"}
-                        </dd>
-                      </div>
-                      {assignment.description && (
-                        <div className="col-span-2">
-                          <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                            Description
-                          </dt>
-                          <dd className="mt-0.5 text-sm text-zinc-800 dark:text-zinc-200">
-                            {assignment.description}
-                          </dd>
-                        </div>
-                      )}
-                      {assignment.file_url && (
-                        <div>
-                          <dt className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-                            Attachment
-                          </dt>
-                          <dd className="mt-0.5">
-                            <Link
-                              to={`/documents/assignment-${assignment.id}`}
-                              className="text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
-                            >
-                              View Document
-                            </Link>
-                          </dd>
-                        </div>
-                      )}
-                    </dl>
-                  </div>
-
-                  {/* Submission box */}
+              <Box sx={{ display: "grid", gap: 2.5, gridTemplateColumns: { lg: "2fr 1fr" } }}>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}>
+                  <AssignmentHeader />
+                  <DetailsCard colsClass="1fr 1fr" />
                   <SubmissionBox
                     assignmentId={assignment.id}
                     hasSubmission={submission?.exists}
@@ -326,54 +274,50 @@ function AssignmentDetails() {
                     submissionId={submission?.id}
                     onSubmissionSuccess={refreshAssignmentData}
                   />
-                </div>
+                </Box>
 
                 {/* Right sidebar */}
-                <div className="space-y-4">
-                  {/* Your work status */}
-                  <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-5 py-5 shadow-sm">
-                    <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-                      Your work
-                    </h3>
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+                  <Paper sx={{ px: 2.5, py: 2.5 }}>
+                    <Typography variant="subtitle2">Your work</Typography>
                     {submission?.exists ? (
-                      <div className="mt-3">
-                        <div className="flex items-center gap-2 rounded-lg bg-green-50 dark:bg-green-900/20 px-3 py-2">
-                          <div className="h-2 w-2 rounded-full bg-green-500"></div>
-                          <span className="text-sm font-medium text-green-700 dark:text-green-400">
-                            Submitted
-                          </span>
-                        </div>
+                      <Box sx={{ mt: 1.5 }}>
+                        <Chip
+                          label="Submitted"
+                          size="small"
+                          color="success"
+                          icon={<Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "success.main" }} />}
+                        />
                         {submission.submitted_at && (
-                          <p className="mt-2 text-xs text-zinc-500 dark:text-zinc-400">
+                          <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
                             {new Date(submission.submitted_at).toLocaleString()}
-                          </p>
+                          </Typography>
                         )}
-                      </div>
+                      </Box>
                     ) : (
-                      <div className="mt-3">
-                        <div className="flex items-center gap-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 px-3 py-2">
-                          <div className="h-2 w-2 rounded-full bg-amber-400"></div>
-                          <span className="text-sm font-medium text-amber-700 dark:text-amber-400">
-                            Not submitted
-                          </span>
-                        </div>
-                      </div>
+                      <Box sx={{ mt: 1.5 }}>
+                        <Chip
+                          label="Not submitted"
+                          size="small"
+                          color="warning"
+                          icon={<Box sx={{ width: 8, height: 8, borderRadius: "50%", bgcolor: "warning.main" }} />}
+                        />
+                      </Box>
                     )}
-                  </div>
+                  </Paper>
 
-                  {/* Evaluation */}
                   {evaluation && (
                     <EvaluationCard
                       score={evaluation?.score}
                       feedback={evaluation?.feedback}
                     />
                   )}
-                </div>
-              </div>
+                </Box>
+              </Box>
             )}
-          </div>
+          </Box>
         )}
-      </div>
+      </Box>
     </>
   );
 }

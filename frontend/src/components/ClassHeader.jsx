@@ -1,5 +1,12 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
+import Chip from "@mui/material/Chip";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import CheckIcon from "@mui/icons-material/Check";
 
 function ClassHeader({ title, teacher, semester, classCode }) {
   const [copied, setCopied] = useState(false);
@@ -12,60 +19,78 @@ function ClassHeader({ title, teacher, semester, classCode }) {
   };
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 px-6 py-6 shadow-sm">
-      <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100">
+    <Paper variant="outlined" sx={{ px: 3, py: 3, borderRadius: 3 }}>
+      <Typography variant="h5" sx={{ fontWeight: 700, color: "text.primary" }}>
         {title}
-      </h1>
-      <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+      </Typography>
+      <Typography variant="body2" sx={{ mt: 0.5, color: "text.secondary" }}>
         {teacher}
-      </p>
+      </Typography>
       {semester && (
-        <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+        <Typography
+          variant="caption"
+          sx={{ mt: 0.25, display: "block", color: "text.disabled" }}
+        >
           {semester}
-        </p>
+        </Typography>
       )}
       {classCode && (
-        <div className="mt-4 inline-flex items-center gap-2 rounded-lg border border-violet-100 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/30 px-3 py-1.5">
-          <span className="text-[11px] font-semibold uppercase tracking-wide text-violet-500 dark:text-violet-400">
+        <Box
+          sx={{
+            mt: 2,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 1,
+            borderRadius: 2,
+            border: 1,
+            borderColor: "primary.light",
+            bgcolor: (t) =>
+              t.palette.mode === "dark"
+                ? "rgba(124,58,237,0.12)"
+                : "rgba(124,58,237,0.06)",
+            px: 1.5,
+            py: 0.75,
+          }}
+        >
+          <Typography
+            sx={{
+              fontSize: "0.6875rem",
+              fontWeight: 600,
+              textTransform: "uppercase",
+              letterSpacing: "0.05em",
+              color: "primary.main",
+            }}
+          >
             Class Code
-          </span>
-          <span className="rounded-md bg-white dark:bg-zinc-700 px-2 py-0.5 text-sm font-bold tracking-wider text-violet-700 dark:text-violet-300 shadow-sm ring-1 ring-violet-100 dark:ring-violet-700">
-            {classCode}
-          </span>
-          <button
-            type="button"
+          </Typography>
+          <Chip
+            label={classCode}
+            size="small"
+            sx={{
+              fontWeight: 700,
+              letterSpacing: "0.05em",
+              fontSize: "0.875rem",
+              bgcolor: "background.paper",
+              color: "primary.dark",
+              border: 1,
+              borderColor: "primary.light",
+            }}
+          />
+          <IconButton
+            size="small"
             onClick={handleCopy}
             title="Copy class code"
-            className="ml-1 rounded-md p-1 text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-800 hover:text-violet-600 dark:hover:text-violet-300 transition-colors"
+            sx={{ color: "primary.main", ml: 0.5 }}
           >
             {copied ? (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-3.5 w-3.5 text-green-500"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M16.704 4.153a.75.75 0 01.143 1.052l-8 10.5a.75.75 0 01-1.127.075l-4.5-4.5a.75.75 0 011.06-1.06l3.894 3.893 7.48-9.817a.75.75 0 011.05-.143z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <CheckIcon sx={{ fontSize: 14, color: "success.main" }} />
             ) : (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-3.5 w-3.5"
-              >
-                <path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.12A1.5 1.5 0 0117 6.622V12.5a1.5 1.5 0 01-1.5 1.5h-1v-3.379a3 3 0 00-.879-2.121L10.5 5.379A3 3 0 008.379 4.5H7v-1z" />
-                <path d="M4.5 6A1.5 1.5 0 003 7.5v9A1.5 1.5 0 004.5 18h7a1.5 1.5 0 001.5-1.5v-5.879a1.5 1.5 0 00-.44-1.06L9.44 6.439A1.5 1.5 0 008.378 6H4.5z" />
-              </svg>
+              <ContentCopyIcon sx={{ fontSize: 14 }} />
             )}
-          </button>
-        </div>
+          </IconButton>
+        </Box>
       )}
-    </div>
+    </Paper>
   );
 }
 

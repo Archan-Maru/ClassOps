@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import CircularProgress from "@mui/material/CircularProgress";
+import EditIcon from "@mui/icons-material/Edit";
+import EmailIcon from "@mui/icons-material/Email";
 import ClassHeader from "../components/ClassHeader";
 import ClassworkCard from "../components/ClassworkCard";
 import AssignmentCard from "../components/AssignmentCard";
@@ -250,18 +259,29 @@ function ClassPage() {
     { key: "groups", label: "Groups" },
   ];
 
+  const tabIndex = TABS.findIndex((t) => t.key === activeTab);
+
   return (
     <>
       <AppHeader breadcrumb={classData?.title || ""} />
-      <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-        <div className="mx-auto max-w-6xl px-4 py-6 sm:px-6 lg:px-8">
+      <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
+        <Box
+          sx={{
+            maxWidth: "72rem",
+            mx: "auto",
+            px: { xs: 2, sm: 3, lg: 4 },
+            py: 3,
+          }}
+        >
           {loading && (
-            <p className="text-zinc-500 dark:text-zinc-400">Loading classâ€¦</p>
+            <Box sx={{ display: "flex", justifyContent: "center", py: 8 }}>
+              <CircularProgress size={28} />
+            </Box>
           )}
           {error && (
-            <p className="rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-4 py-3 text-sm text-red-600 dark:text-red-400">
+            <Alert severity="error" sx={{ borderRadius: 2 }}>
               {error}
-            </p>
+            </Alert>
           )}
           {!loading && classData && (
             <>
@@ -274,47 +294,55 @@ function ClassPage() {
               />
 
               {/* Tabs */}
-              <div className="mt-6 border-b border-zinc-200 dark:border-zinc-700">
-                <nav className="-mb-px flex justify-center gap-0">
+              <Box sx={{ mt: 3, borderBottom: 1, borderColor: "divider" }}>
+                <Tabs
+                  value={tabIndex >= 0 ? tabIndex : 0}
+                  onChange={(_, v) => setActiveTab(TABS[v].key)}
+                  centered
+                  textColor="primary"
+                  indicatorColor="primary"
+                >
                   {TABS.map((tab) => (
-                    <button
+                    <Tab
                       key={tab.key}
-                      type="button"
-                      onClick={() => setActiveTab(tab.key)}
-                      className={`px-5 py-3 text-sm font-medium transition-colors ${
-                        activeTab === tab.key
-                          ? "border-b-2 border-violet-600 dark:border-violet-400 text-violet-600 dark:text-violet-400"
-                          : "border-b-2 border-transparent text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                      }`}
-                    >
-                      {tab.label}
-                    </button>
+                      label={tab.label}
+                      disableRipple
+                      sx={{ textTransform: "none", fontWeight: 500 }}
+                    />
                   ))}
-                </nav>
-              </div>
+                </Tabs>
+              </Box>
 
               {/* Classwork tab */}
               {activeTab === "classwork" && (
-                <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                  <div className="space-y-4 lg:col-span-2">
+                <Box
+                  sx={{
+                    mt: 3,
+                    display: "grid",
+                    gap: 3,
+                    gridTemplateColumns: { lg: "1fr 1fr 1fr" },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      gridColumn: { lg: "span 2" },
+                    }}
+                  >
                     {isTeacher && (
-                      <div className="flex justify-start">
-                        <button
-                          type="button"
+                      <Box
+                        sx={{ display: "flex", justifyContent: "flex-start" }}
+                      >
+                        <Button
+                          variant="contained"
+                          startIcon={<EditIcon />}
                           onClick={() => setIsCreateClassworkOpen(true)}
-                          className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700"
                         >
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 20 20"
-                            fill="currentColor"
-                            className="h-4 w-4"
-                          >
-                            <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z" />
-                          </svg>
                           New Announcement
-                        </button>
-                      </div>
+                        </Button>
+                      </Box>
                     )}
                     {classwork.length > 0 ? (
                       classwork.map((item) => (
@@ -330,31 +358,49 @@ function ClassPage() {
                         />
                       ))
                     ) : (
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary" }}
+                      >
                         No classwork materials yet
-                      </p>
+                      </Typography>
                     )}
-                  </div>
-                  <div>
+                  </Box>
+                  <Box>
                     <UpcomingPanel assignments={upcomingAssignments} />
-                  </div>
-                </div>
+                  </Box>
+                </Box>
               )}
 
               {/* Assignments tab */}
               {activeTab === "assignments" && (
-                <div className="mt-6 grid gap-6 lg:grid-cols-3">
-                  <div className="space-y-4 lg:col-span-2">
+                <Box
+                  sx={{
+                    mt: 3,
+                    display: "grid",
+                    gap: 3,
+                    gridTemplateColumns: { lg: "1fr 1fr 1fr" },
+                  }}
+                >
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 2,
+                      gridColumn: { lg: "span 2" },
+                    }}
+                  >
                     {isTeacher && (
-                      <div className="flex justify-start">
-                        <button
-                          type="button"
+                      <Box
+                        sx={{ display: "flex", justifyContent: "flex-start" }}
+                      >
+                        <Button
+                          variant="contained"
                           onClick={() => setIsCreateAssignmentOpen(true)}
-                          className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700"
                         >
                           + Create Assignment
-                        </button>
-                      </div>
+                        </Button>
+                      </Box>
                     )}
                     {assignments.length > 0 ? (
                       assignments.map((assignment) => (
@@ -371,51 +417,63 @@ function ClassPage() {
                         />
                       ))
                     ) : (
-                      <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                      <Typography
+                        variant="body2"
+                        sx={{ color: "text.secondary" }}
+                      >
                         No assignments yet
-                      </p>
+                      </Typography>
                     )}
-                  </div>
-                  <div>
+                  </Box>
+                  <Box>
                     <UpcomingPanel assignments={upcomingAssignments} />
-                  </div>
-                </div>
+                  </Box>
+                </Box>
               )}
 
               {/* People tab */}
               {activeTab === "people" && (
-                <div className="mt-6">
+                <Box sx={{ mt: 3 }}>
                   {isTeacher && (
-                    <div className="mb-4 flex justify-end">
-                      <button
-                        type="button"
+                    <Box
+                      sx={{
+                        mb: 2,
+                        display: "flex",
+                        justifyContent: "flex-start",
+                      }}
+                    >
+                      <Button
+                        variant="contained"
+                        startIcon={<EmailIcon />}
                         onClick={() => setIsInviteOpen(true)}
-                        className="inline-flex items-center gap-2 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-500"
                       >
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                        </svg>
                         Invite Students
-                      </button>
-                    </div>
+                      </Button>
+                    </Box>
                   )}
                   <PeopleList people={people} />
-                </div>
+                </Box>
               )}
 
               {/* Groups tab */}
               {activeTab === "groups" && (
-                <div className="mt-6 space-y-4">
+                <Box
+                  sx={{
+                    mt: 3,
+                    display: "flex",
+                    flexDirection: "column",
+                    gap: 2,
+                  }}
+                >
                   {isTeacher && (
-                    <div className="flex justify-start">
-                      <button
-                        type="button"
+                    <Box sx={{ display: "flex", justifyContent: "flex-start" }}>
+                      <Button
+                        variant="contained"
                         onClick={() => setIsCreateGroupOpen(true)}
-                        className="rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white shadow-sm hover:bg-violet-700"
                       >
                         + Create Group
-                      </button>
-                    </div>
+                      </Button>
+                    </Box>
                   )}
                   {visibleGroups.length > 0 ? (
                     visibleGroups.map((group) => (
@@ -429,18 +487,21 @@ function ClassPage() {
                       />
                     ))
                   ) : (
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
                       {isTeacher
                         ? "No groups yet"
                         : "You are not assigned to a group yet"}
-                    </p>
+                    </Typography>
                   )}
-                </div>
+                </Box>
               )}
             </>
           )}
-        </div>
-      </div>
+        </Box>
+      </Box>
       <CreateAssignmentModal
         isOpen={isCreateAssignmentOpen}
         onClose={() => setIsCreateAssignmentOpen(false)}

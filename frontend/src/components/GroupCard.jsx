@@ -1,5 +1,12 @@
 import PropTypes from "prop-types";
 import { useMemo, useState } from "react";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import MenuItem from "@mui/material/MenuItem";
+import TextField from "@mui/material/TextField";
 
 function GroupCard({
   group,
@@ -39,191 +46,163 @@ function GroupCard({
   };
 
   const handleRemoveSubmit = () => {
-    if (!selectedMemberId) {
-      return;
-    }
+    if (!selectedMemberId) return;
     onRemoveMember(group.id, Number(selectedMemberId));
     setShowRemovePicker(false);
     setSelectedMemberId("");
   };
 
   const handleAssignLeaderSubmit = () => {
-    if (!selectedLeaderId) {
-      return;
-    }
+    if (!selectedLeaderId) return;
     onAssignLeader(group.id, Number(selectedLeaderId));
     setShowLeaderPicker(false);
     setSelectedLeaderId("");
   };
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm">
-      <button type="button" onClick={toggleCard} className="w-full text-left">
-        <div className="flex items-start justify-between gap-3">
-          <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+    <Paper sx={{ p: 2.5 }}>
+      <Box
+        component="button"
+        type="button"
+        onClick={toggleCard}
+        sx={{ width: "100%", textAlign: "left", background: "none", border: "none", p: 0, cursor: "pointer", color: "inherit" }}
+      >
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1.5 }}>
+          <Typography variant="subtitle1" fontWeight={600}>
             {group.name}
-          </h3>
+          </Typography>
           {isTeacher && (
-            <div className="flex flex-wrap items-center justify-end gap-2">
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onAddMember(group);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    onAddMember(group);
-                  }
-                }}
-                className="rounded-lg bg-violet-600 dark:bg-violet-500 px-3 py-1.5 text-xs font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600"
+            <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 1 }}>
+              <Button
+                size="small"
+                variant="contained"
+                onClick={(e) => { e.stopPropagation(); onAddMember(group); }}
+                sx={{ fontSize: "0.75rem" }}
               >
                 Add Member
-              </span>
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setShowRemovePicker((prev) => !prev);
-                  setShowLeaderPicker(false);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setShowRemovePicker((prev) => !prev);
-                    setShowLeaderPicker(false);
-                  }
-                }}
-                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-zinc-50 dark:hover:bg-zinc-600"
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => { e.stopPropagation(); setShowRemovePicker((p) => !p); setShowLeaderPicker(false); }}
+                sx={{ fontSize: "0.75rem" }}
               >
                 Remove Member
-              </span>
-              <span
-                role="button"
-                tabIndex={0}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  setShowLeaderPicker((prev) => !prev);
-                  setShowRemovePicker(false);
-                }}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setShowLeaderPicker((prev) => !prev);
-                    setShowRemovePicker(false);
-                  }
-                }}
-                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-zinc-50 dark:hover:bg-zinc-600"
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
+                onClick={(e) => { e.stopPropagation(); setShowLeaderPicker((p) => !p); setShowRemovePicker(false); }}
+                sx={{ fontSize: "0.75rem" }}
               >
                 Assign Leader
-              </span>
-            </div>
+              </Button>
+            </Box>
           )}
-        </div>
-        <p className="mt-1.5 text-sm text-zinc-500 dark:text-zinc-400">
+        </Box>
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 0.75 }}>
           Leader:{" "}
-          <span className="font-medium text-zinc-700 dark:text-zinc-300">
+          <Box component="span" sx={{ fontWeight: 500, color: "text.primary" }}>
             {leader?.username || "Not assigned"}
-          </span>
-        </p>
-      </button>
+          </Box>
+        </Typography>
+      </Box>
 
       {isTeacher && showRemovePicker && (
-        <div className="mt-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-3">
-          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-            Remove a member
-          </p>
-          <div className="mt-2 flex gap-2">
-            <select
+        <Box sx={{ mt: 1.5, borderRadius: 2, border: 1, borderColor: "divider", bgcolor: "action.hover", p: 1.5 }}>
+          <Typography variant="caption" fontWeight={500}>Remove a member</Typography>
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <TextField
+              select
+              size="small"
               value={selectedMemberId}
-              onChange={(event) => setSelectedMemberId(event.target.value)}
-              className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              onChange={(e) => setSelectedMemberId(e.target.value)}
+              sx={{ flex: 1 }}
+              placeholder="Select member"
             >
-              <option value="">Select member</option>
+              <MenuItem value="">Select member</MenuItem>
               {removableMembers.map((member) => (
-                <option key={member.id} value={member.id}>
+                <MenuItem key={member.id} value={member.id}>
                   {member.username}
-                </option>
+                </MenuItem>
               ))}
-            </select>
-            <button
-              type="button"
+            </TextField>
+            <Button
+              size="small"
+              variant="contained"
+              color="error"
               onClick={handleRemoveSubmit}
               disabled={!selectedMemberId}
-              className="rounded-lg bg-red-600 px-3 py-2 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-40 transition-colors"
             >
               Remove
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Box>
+        </Box>
       )}
 
       {isTeacher && showLeaderPicker && (
-        <div className="mt-3 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-3">
-          <p className="text-xs font-medium text-zinc-700 dark:text-zinc-300">
-            Assign leader
-          </p>
-          <div className="mt-2 flex gap-2">
-            <select
+        <Box sx={{ mt: 1.5, borderRadius: 2, border: 1, borderColor: "divider", bgcolor: "action.hover", p: 1.5 }}>
+          <Typography variant="caption" fontWeight={500}>Assign leader</Typography>
+          <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
+            <TextField
+              select
+              size="small"
               value={selectedLeaderId}
-              onChange={(event) => setSelectedLeaderId(event.target.value)}
-              className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 focus:outline-none focus:ring-2 focus:ring-violet-500"
+              onChange={(e) => setSelectedLeaderId(e.target.value)}
+              sx={{ flex: 1 }}
+              placeholder="Select member"
             >
-              <option value="">Select member</option>
+              <MenuItem value="">Select member</MenuItem>
               {normalizedMembers.map((member) => (
-                <option key={member.id} value={member.id}>
+                <MenuItem key={member.id} value={member.id}>
                   {member.username}
-                </option>
+                </MenuItem>
               ))}
-            </select>
-            <button
-              type="button"
+            </TextField>
+            <Button
+              size="small"
+              variant="contained"
               onClick={handleAssignLeaderSubmit}
               disabled={!selectedLeaderId}
-              className="rounded-lg bg-violet-600 px-3 py-2 text-xs font-medium text-white hover:bg-violet-700 disabled:opacity-40 transition-colors"
             >
               Assign
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Box>
+        </Box>
       )}
 
       {isExpanded && normalizedMembers.length > 0 ? (
-        <div className="mt-4 space-y-1.5">
+        <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.75 }}>
           {normalizedMembers.map((member) => (
-            <div
+            <Box
               key={member.id}
-              className="flex items-center justify-between rounded-lg bg-zinc-50 dark:bg-zinc-900 px-3 py-2"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                borderRadius: 2,
+                bgcolor: "action.hover",
+                px: 1.5,
+                py: 1,
+              }}
             >
-              <span className="text-sm text-zinc-700 dark:text-zinc-300">
-                {member.username}
-              </span>
+              <Typography variant="body2">{member.username}</Typography>
               {member.normalizedRole === "LEADER" ? (
-                <span className="rounded-full bg-amber-50 dark:bg-amber-900/20 px-2.5 py-0.5 text-xs font-semibold text-amber-600 dark:text-amber-400 ring-1 ring-inset ring-amber-100 dark:ring-amber-800">
-                  Leader
-                </span>
+                <Chip label="Leader" size="small" color="warning" sx={{ fontSize: "0.75rem" }} />
               ) : (
-                <span className="text-xs font-medium text-zinc-400 dark:text-zinc-500">
-                  Member
-                </span>
+                <Typography variant="caption" color="text.disabled">Member</Typography>
               )}
-            </div>
+            </Box>
           ))}
-        </div>
+        </Box>
       ) : null}
 
       {isExpanded && normalizedMembers.length === 0 ? (
-        <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+        <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
           No members yet
-        </p>
+        </Typography>
       ) : null}
-    </div>
+    </Paper>
   );
 }
 

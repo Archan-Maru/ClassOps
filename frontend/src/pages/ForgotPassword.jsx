@@ -1,5 +1,10 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
 import api from "../api/api";
 import AuthLayout from "../components/AuthLayout";
 
@@ -28,37 +33,61 @@ function ForgotPassword() {
   return (
     <AuthLayout
       title="Forgot your password?"
-      subtitle="Enter your account email and we’ll send a secure reset link."
+      subtitle="Enter your account email and we'll send a secure reset link."
       footer={
-        <p>
+        <Typography variant="body2">
           Remembered it?{" "}
-          <Link className="link-inline" to="/login">
+          <Link
+            to="/login"
+            style={{
+              color: "inherit",
+              fontWeight: 500,
+              textDecoration: "underline",
+            }}
+          >
             Back to login
           </Link>
-        </p>
+        </Typography>
       }
     >
-      {message && <div className="alert alert--success">{message}</div>}
-      {error && <div className="alert alert--error">{error}</div>}
+      {message && (
+        <Alert severity="success" sx={{ mb: 2.5, borderRadius: 2 }}>
+          {message}
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="reset-email">Email address</label>
-          <input
-            id="reset-email"
-            type="email"
-            placeholder="you@example.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input"
-            required
-          />
-        </div>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+      >
+        <TextField
+          id="reset-email"
+          type="email"
+          label="Email address"
+          placeholder="you@example.com"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          fullWidth
+          size="small"
+        />
 
-        <button className="primary-btn" type="submit" disabled={loading}>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          disabled={loading}
+          sx={{ py: 1.25 }}
+        >
           {loading ? "Sending link..." : "Send reset link"}
-        </button>
-      </form>
+        </Button>
+      </Box>
     </AuthLayout>
   );
 }

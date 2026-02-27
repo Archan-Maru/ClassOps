@@ -1,4 +1,7 @@
 import PropTypes from "prop-types";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
 import { formatDate, relativeDeadline } from "../utils/formatDate";
 
 function UpcomingPanel({ assignments }) {
@@ -20,90 +23,86 @@ function UpcomingPanel({ assignments }) {
   const hasNothing = overdueList.length === 0 && upcomingList.length === 0;
 
   return (
-    <div className="space-y-4">
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
       {/* Upcoming section */}
-      <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
-        <div className="border-b border-zinc-100 dark:border-zinc-700 px-4 py-3">
-          <h3 className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">
-            Upcoming
-          </h3>
-        </div>
-        <div className="max-h-52 overflow-y-auto p-3 space-y-2 scrollbar-thin">
+      <Paper>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2, py: 1.5 }}>
+          <Typography variant="subtitle2">Upcoming</Typography>
+        </Box>
+        <Box sx={{ maxHeight: 208, overflowY: "auto", p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
           {upcomingList.length > 0 ? (
             upcomingList.map((assignment) => {
               const deadlineRaw = assignment.deadline || assignment.due;
               const relative = relativeDeadline(deadlineRaw);
               return (
-                <div
+                <Box
                   key={assignment.id}
-                  className="border-l-2 border-violet-400 dark:border-violet-500 pl-3 py-1.5"
+                  sx={{ borderLeft: 2, borderColor: "primary.main", pl: 1.5, py: 0.75 }}
                 >
-                  <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                  <Typography variant="body2" fontWeight={500} noWrap>
                     {assignment.title}
-                  </p>
+                  </Typography>
                   {assignment.className && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                    <Typography variant="caption" color="text.secondary" noWrap>
                       {assignment.className}
-                    </p>
+                    </Typography>
                   )}
-                  <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                  <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, display: "block" }}>
                     {formatDate(deadlineRaw)}
-                  </p>
-                  <p className="text-xs font-medium text-violet-600 dark:text-violet-400">
+                  </Typography>
+                  <Typography variant="caption" fontWeight={500} color="primary.main">
                     {relative}
-                  </p>
-                </div>
+                  </Typography>
+                </Box>
               );
             })
           ) : (
-            <p className="py-3 text-center text-xs text-zinc-400 dark:text-zinc-500">
+            <Typography variant="caption" color="text.disabled" sx={{ py: 1.5, textAlign: "center" }}>
               No upcoming assignments
-            </p>
+            </Typography>
           )}
-        </div>
-      </div>
+        </Box>
+      </Paper>
 
       {/* Overdue section */}
-      <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
-        <div className="border-b border-zinc-100 dark:border-zinc-700 px-4 py-3">
-          <h3 className="text-sm font-semibold text-red-600 dark:text-red-400">
-            Overdue
-          </h3>
-        </div>
-        <div className="max-h-52 overflow-y-auto p-3 space-y-2 scrollbar-thin">
+      <Paper>
+        <Box sx={{ borderBottom: 1, borderColor: "divider", px: 2, py: 1.5 }}>
+          <Typography variant="subtitle2" color="error.main">Overdue</Typography>
+        </Box>
+        <Box sx={{ maxHeight: 208, overflowY: "auto", p: 1.5, display: "flex", flexDirection: "column", gap: 1 }}>
           {overdueList.length > 0 ? (
             overdueList.map((assignment) => {
               const deadlineRaw = assignment.deadline || assignment.due;
               return (
-                <div
+                <Box
                   key={assignment.id}
-                  className="border-l-2 border-red-400 dark:border-red-500 pl-3 py-1.5"
+                  sx={{ borderLeft: 2, borderColor: "error.main", pl: 1.5, py: 0.75 }}
                 >
-                  <p className="text-sm font-medium text-zinc-800 dark:text-zinc-200 truncate">
+                  <Typography variant="body2" fontWeight={500} noWrap>
                     {assignment.title}
-                  </p>
+                  </Typography>
                   {assignment.className && (
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 truncate">
+                    <Typography variant="caption" color="text.secondary" noWrap>
                       {assignment.className}
-                    </p>
+                    </Typography>
                   )}
-                  <p className="mt-0.5 text-xs text-red-500 dark:text-red-400">
+                  <Typography variant="caption" color="error.main" sx={{ mt: 0.25, display: "block" }}>
                     {formatDate(deadlineRaw)}
-                  </p>
-                  <p className="text-xs font-semibold text-red-600 dark:text-red-400">
+                  </Typography>
+                  <Typography variant="caption" fontWeight={600} color="error.main">
                     Overdue
-                  </p>
-                </div>
+                  </Typography>
+                </Box>
               );
             })
           ) : (
-            <p className="py-3 text-center text-xs text-zinc-400 dark:text-zinc-500">
+            <Typography variant="caption" color="text.disabled" sx={{ py: 1.5, textAlign: "center" }}>
               No overdue assignments
-            </p>
+            </Typography>
           )}
-        </div>
-      </div>
-    </div>
+        </Box>
+      </Paper>
+    </Box>
   );
 }
 

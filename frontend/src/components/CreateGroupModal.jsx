@@ -1,4 +1,14 @@
 import { useEffect, useState } from "react";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Alert from "@mui/material/Alert";
 import api from "../api/api";
 import StudentSelector from "./StudentSelector";
 
@@ -32,18 +42,13 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
   };
 
   const handleClose = () => {
-    if (loading) {
-      return;
-    }
+    if (loading) return;
     onClose();
   };
 
   const selectedStudents = students.filter((student) => selectedStudentIds.includes(student.id));
   const isSubmitDisabled =
-    loading ||
-    !groupName.trim() ||
-    selectedStudentIds.length === 0 ||
-    !leaderId;
+    loading || !groupName.trim() || selectedStudentIds.length === 0 || !leaderId;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -51,12 +56,10 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
       setError("Group name is required");
       return;
     }
-
     if (selectedStudentIds.length === 0) {
       setError("Select at least one student");
       return;
     }
-
     if (!leaderId) {
       setError("Select a group leader");
       return;
@@ -71,9 +74,7 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
       });
 
       const groupId = createRes.data?.group?.id;
-      if (!groupId) {
-        throw new Error("Failed to create group");
-      }
+      if (!groupId) throw new Error("Failed to create group");
 
       for (const studentId of selectedStudentIds) {
         await api.post(`/groups/${groupId}/members`, {
@@ -95,29 +96,23 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-zinc-100">Create Group</h2>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Create Group</DialogTitle>
+      <Box component="form" onSubmit={handleSubmit}>
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 1 }}>
+          <TextField
+            label="Group Name"
+            value={groupName}
+            onChange={(e) => setGroupName(e.target.value)}
+            fullWidth
+            size="small"
+          />
 
-        <form onSubmit={handleSubmit} className="mt-4 space-y-4">
-          <div>
-            <label htmlFor="group-name" className="block text-sm font-medium text-zinc-400">
-              Group Name
-            </label>
-            <input
-              id="group-name"
-              type="text"
-              value={groupName}
-              onChange={(event) => setGroupName(event.target.value)}
-              className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
-            />
-          </div>
-
-          <div>
-            <p className="block text-sm font-medium text-zinc-400">Students not in any group</p>
+          <Box>
+            <Typography variant="body2" color="text.secondary" fontWeight={500} sx={{ mb: 0.75 }}>
+              Students not in any group
+            </Typography>
             <StudentSelector
               students={students}
               selectedStudentIds={selectedStudentIds}
@@ -125,55 +120,42 @@ function CreateGroupModal({ isOpen, onClose, onSuccess, classId, students, loadi
               loading={loadingStudents}
             />
             {!loadingStudents && students.length > 0 && (
-              <p className="mt-2 text-xs text-zinc-400">
+              <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: "block" }}>
                 Selected: {selectedStudentIds.length}
-              </p>
+              </Typography>
             )}
-          </div>
+          </Box>
 
           {selectedStudents.length > 0 && (
-            <div>
-              <label htmlFor="group-leader" className="block text-sm font-medium text-zinc-400">
-                Group Leader
-              </label>
-              <select
-                id="group-leader"
-                value={leaderId}
-                onChange={(event) => setLeaderId(event.target.value)}
-                className="mt-1 w-full rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-zinc-100"
-              >
-                <option value="">Select leader</option>
-                {selectedStudents.map((student) => (
-                  <option key={student.id} value={student.id}>
-                    {student.username}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <TextField
+              label="Group Leader"
+              select
+              value={leaderId}
+              onChange={(e) => setLeaderId(e.target.value)}
+              fullWidth
+              size="small"
+            >
+              <MenuItem value="">Select leader</MenuItem>
+              {selectedStudents.map((student) => (
+                <MenuItem key={student.id} value={student.id}>
+                  {student.username}
+                </MenuItem>
+              ))}
+            </TextField>
           )}
 
-          {error && <p className="text-sm text-red-400">{error}</p>}
-
-          <div className="flex gap-3 pt-2">
-            <button
-              type="button"
-              onClick={handleClose}
-              disabled={loading}
-              className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={isSubmitDisabled}
-              className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              {loading ? "Creating..." : "Create"}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+          {error && <Alert severity="error">{error}</Alert>}
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2 }}>
+          <Button onClick={handleClose} disabled={loading}>
+            Cancel
+          </Button>
+          <Button type="submit" variant="contained" disabled={isSubmitDisabled}>
+            {loading ? "Creating..." : "Create"}
+          </Button>
+        </DialogActions>
+      </Box>
+    </Dialog>
   );
 }
 

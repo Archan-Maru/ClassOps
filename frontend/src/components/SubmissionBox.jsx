@@ -1,6 +1,13 @@
 import { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import PropTypes from "prop-types";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import InsertDriveFileIcon from "@mui/icons-material/InsertDriveFile";
+import VisibilityIcon from "@mui/icons-material/Visibility";
 import api from "../api/api";
 
 function SubmissionBox({
@@ -66,7 +73,6 @@ function SubmissionBox({
       setIsEditing(false);
       if (onSubmissionSuccess) onSubmissionSuccess();
     } catch (err) {
-      // handle duplicate submission: fetch existing and try updating
       if (err.response?.status === 409 && !submissionId) {
         try {
           const submissionRes = await api.get(
@@ -128,90 +134,79 @@ function SubmissionBox({
 
   if (!isEditing && localHasSubmission) {
     return (
-      <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm">
-        <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+      <Paper sx={{ p: 2.5 }}>
+        <Typography variant="subtitle1" fontWeight={600}>
           Your Submission
-        </h3>
-        <div className="mt-4 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 p-4">
-          <div className="flex items-center gap-3">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="h-8 w-8 shrink-0 text-violet-400 dark:text-violet-500"
-            >
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-              <path d="M14 2v6h6" />
-            </svg>
-            <span
-              className="truncate text-sm font-medium text-zinc-700 dark:text-zinc-300"
-              title={displayName}
-            >
+        </Typography>
+        <Box
+          sx={{
+            mt: 2,
+            borderRadius: 2,
+            border: 1,
+            borderColor: "divider",
+            bgcolor: "action.hover",
+            p: 2,
+          }}
+        >
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+            <InsertDriveFileIcon sx={{ fontSize: 32, color: "primary.main" }} />
+            <Typography variant="body2" fontWeight={500} noWrap title={displayName}>
               {displayName}
-            </span>
-          </div>
+            </Typography>
+          </Box>
           {submissionId && (
-            <Link
+            <Button
+              component={Link}
               to={`/documents/submission-${submissionId}`}
-              className="mt-3 inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
+              size="small"
+              startIcon={<VisibilityIcon />}
+              sx={{ mt: 1.5, color: "primary.main" }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                <path
-                  fillRule="evenodd"
-                  d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                  clipRule="evenodd"
-                />
-              </svg>
               View Submission
-            </Link>
+            </Button>
           )}
-        </div>
-        <div className="mt-4 flex gap-3">
-          <button
-            type="button"
+        </Box>
+        <Box sx={{ display: "flex", gap: 1.5, mt: 2 }}>
+          <Button
+            variant="contained"
             onClick={handleEdit}
-            className="flex-1 rounded-lg bg-violet-600 dark:bg-violet-500 px-3 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600 transition-colors"
+            sx={{ flex: 1 }}
           >
             Edit Submission
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="outlined"
+            color="error"
             onClick={handleRemove}
             disabled={isRemoving}
-            className="flex-1 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm font-medium text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/40 disabled:opacity-50 transition-colors"
+            sx={{ flex: 1 }}
           >
-            {isRemoving ? "Removingâ€¦" : "Remove"}
-          </button>
-        </div>
-      </div>
+            {isRemoving ? "Removing..." : "Remove"}
+          </Button>
+        </Box>
+      </Paper>
     );
   }
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-5 shadow-sm">
-      <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+    <Paper sx={{ p: 2.5 }}>
+      <Typography variant="subtitle1" fontWeight={600}>
         Submit Your Work
-      </h3>
+      </Typography>
 
-      <div className="mt-4">
-        <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+      <Box sx={{ mt: 2 }}>
+        <Typography variant="body2" fontWeight={500} sx={{ mb: 1 }}>
           Attach file
-        </label>
+        </Typography>
 
         <input
           ref={fileInputRef}
           type="file"
           onChange={(e) => setFile(e.target.files?.[0] || null)}
-          className="hidden"
+          style={{ display: "none" }}
         />
 
-        <div
+        <Box
           role="button"
           tabIndex={0}
           onClick={() => fileInputRef.current?.click()}
@@ -222,87 +217,106 @@ function SubmissionBox({
             const f = e.dataTransfer?.files?.[0];
             if (f) setFile(f);
           }}
-          className="mt-2 flex cursor-pointer items-center justify-between rounded-lg border-2 border-dashed border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 px-4 py-3 hover:border-violet-400 dark:hover:border-violet-500 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors"
+          sx={{
+            display: "flex",
+            cursor: "pointer",
+            alignItems: "center",
+            justifyContent: "space-between",
+            borderRadius: 2,
+            border: "2px dashed",
+            borderColor: "divider",
+            bgcolor: "action.hover",
+            px: 2,
+            py: 1.5,
+            transition: "border-color 0.2s",
+            "&:hover": { borderColor: "primary.main" },
+          }}
         >
-          <span className="text-sm text-zinc-500 dark:text-zinc-400">
+          <Typography variant="body2" color="text.secondary">
             Click to attach a file or drag it here
-          </span>
-          <button
-            type="button"
+          </Typography>
+          <Button
+            size="small"
+            variant="outlined"
             onClick={(e) => {
               e.stopPropagation();
               fileInputRef.current?.click();
             }}
-            className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1 text-sm font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-zinc-600 transition-colors"
           >
             Browse
-          </button>
-        </div>
+          </Button>
+        </Box>
 
         {file && (
-          <div className="mt-2 flex items-center gap-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 px-3 py-2 text-sm">
-            <span className="max-w-xs truncate text-zinc-700 dark:text-zinc-300">
+          <Box
+            sx={{
+              mt: 1,
+              display: "flex",
+              alignItems: "center",
+              gap: 1,
+              borderRadius: 2,
+              border: 1,
+              borderColor: "divider",
+              bgcolor: "action.hover",
+              px: 1.5,
+              py: 1,
+            }}
+          >
+            <Typography variant="body2" noWrap sx={{ maxWidth: 240 }}>
               {file.name}
-            </span>
-            <button
-              type="button"
+            </Typography>
+            <Button
+              size="small"
               onClick={() => setFile(null)}
-              className="ml-auto rounded px-2 py-0.5 text-xs text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              sx={{ ml: "auto", minWidth: 0, fontSize: "0.75rem" }}
             >
               Remove
-            </button>
-          </div>
+            </Button>
+          </Box>
         )}
 
         {submission && (
-          <div className="mt-3 text-sm text-zinc-600 dark:text-zinc-400">
-            Current file:
-            <div className="mt-1">
+          <Box sx={{ mt: 1.5 }}>
+            <Typography variant="body2" color="text.secondary">
+              Current file:
+            </Typography>
+            <Box sx={{ mt: 0.5 }}>
               {(() => {
                 const url = submission;
                 const filename = url.split("/").pop().split("?")[0];
                 return (
-                  <div className="flex items-center justify-between gap-4">
-                    <Link
-                      className="inline-flex items-center gap-1.5 text-sm font-medium text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
-                      to={`/documents/submission-${submissionId}`}
-                      aria-label={`Open file ${filename}`}
-                    >
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="h-4 w-4 text-zinc-400 dark:text-zinc-500"
-                        aria-hidden="true"
-                      >
-                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
-                        <path d="M14 2v6h6" />
-                      </svg>
-                      <span className="truncate">{filename}</span>
-                    </Link>
-                  </div>
+                  <Button
+                    component={Link}
+                    to={`/documents/submission-${submissionId}`}
+                    size="small"
+                    startIcon={<InsertDriveFileIcon sx={{ fontSize: 16 }} />}
+                    sx={{ color: "primary.main" }}
+                  >
+                    {filename}
+                  </Button>
                 );
               })()}
-            </div>
-          </div>
+            </Box>
+          </Box>
         )}
-      </div>
+      </Box>
 
       {error && (
-        <div className="mt-4 rounded-lg border border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20 px-3 py-2 text-sm text-red-600 dark:text-red-400">
+        <Alert severity="error" sx={{ mt: 2, borderRadius: 2 }}>
           {error}
-        </div>
+        </Alert>
       )}
 
-      <button
-        type="button"
+      <Button
+        variant="contained"
+        fullWidth
         onClick={handleSubmit}
         disabled={!file || isLoading}
-        className="mt-4 w-full rounded-lg bg-violet-600 dark:bg-violet-500 px-3 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600 disabled:opacity-50 transition-colors"
+        sx={{ mt: 2 }}
       >
-        {isLoading ? "Submittingâ€¦" : "Submit"}
-      </button>
-    </div>
+        {isLoading ? "Submitting..." : "Submit"}
+      </Button>
+    </Paper>
   );
 }
 

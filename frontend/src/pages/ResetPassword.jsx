@@ -1,5 +1,9 @@
 import { useState } from "react";
 import { useSearchParams, useNavigate, Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
 import api from "../api/api";
 import AuthLayout from "../components/AuthLayout";
 
@@ -46,12 +50,18 @@ function ResetPassword() {
         subtitle="The link may have expired or already been used."
         footer={null}
       >
-        <div className="alert alert--warning">
+        <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 2 }}>
           Please request a new password reset link and try again.
-        </div>
-        <Link className="primary-btn" to="/forgot-password">
+        </Alert>
+        <Button
+          component={Link}
+          to="/forgot-password"
+          variant="contained"
+          fullWidth
+          sx={{ py: 1.25 }}
+        >
           Request new link
-        </Link>
+        </Button>
       </AuthLayout>
     );
   }
@@ -62,28 +72,45 @@ function ResetPassword() {
       subtitle={`Resetting account for ${email}`}
       footer={null}
     >
-      {message && <div className="alert alert--success">{message}</div>}
-      {error && <div className="alert alert--error">{error}</div>}
+      {message && (
+        <Alert severity="success" sx={{ mb: 2.5, borderRadius: 2 }}>
+          {message}
+        </Alert>
+      )}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="new-password">New password</label>
-          <input
-            id="new-password"
-            type="password"
-            placeholder="Enter a strong password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            className="input"
-            minLength={8}
-            required
-          />
-        </div>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+      >
+        <TextField
+          id="new-password"
+          type="password"
+          label="New password"
+          placeholder="Enter a strong password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          slotProps={{ htmlInput: { minLength: 8 } }}
+          required
+          fullWidth
+          size="small"
+        />
 
-        <button className="primary-btn" type="submit" disabled={loading}>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          disabled={loading}
+          sx={{ py: 1.25 }}
+        >
           {loading ? "Updating password..." : "Reset password"}
-        </button>
-      </form>
+        </Button>
+      </Box>
     </AuthLayout>
   );
 }

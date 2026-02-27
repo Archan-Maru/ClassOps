@@ -1,5 +1,16 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
+import Dialog from "@mui/material/Dialog";
+import DialogTitle from "@mui/material/DialogTitle";
+import DialogContent from "@mui/material/DialogContent";
+import DialogActions from "@mui/material/DialogActions";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Alert from "@mui/material/Alert";
+import Paper from "@mui/material/Paper";
 import api from "../api/api";
 
 function InviteStudentsModal({ isOpen, onClose, classId }) {
@@ -70,113 +81,96 @@ function InviteStudentsModal({ isOpen, onClose, classId }) {
   const statusLabel = (status) => {
     switch (status) {
       case "sent":
-        return { text: "Sent", color: "text-green-400" };
+        return { text: "Sent", color: "success" };
       case "already_enrolled":
-        return { text: "Already enrolled", color: "text-yellow-400" };
+        return { text: "Already enrolled", color: "warning" };
       case "already_invited":
-        return { text: "Already invited", color: "text-yellow-400" };
+        return { text: "Already invited", color: "warning" };
       case "email_failed":
-        return { text: "Email failed", color: "text-red-400" };
+        return { text: "Email failed", color: "error" };
       default:
-        return { text: status, color: "text-zinc-400" };
+        return { text: status, color: "default" };
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <div className="w-full max-w-md rounded-2xl border border-zinc-700/60 bg-zinc-900 p-6 shadow-lg">
-        <h2 className="text-lg font-semibold text-zinc-100">Invite Students</h2>
-        <p className="mt-1 text-sm text-zinc-400">Send email invites to join this class</p>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
+      <DialogTitle>Invite Students</DialogTitle>
 
-        {!results ? (
-          <div className="mt-4 space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-zinc-400">Email Address</label>
-              <div className="mt-1 flex gap-2">
-                <input
-                  type="email"
-                  value={emailInput}
-                  onChange={(e) => setEmailInput(e.target.value)}
-                  onKeyDown={handleKeyDown}
-                  placeholder="student@example.com"
-                  className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 focus:border-violet-500 focus:outline-none"
-                />
-                <button
-                  type="button"
-                  onClick={addEmail}
-                  className="rounded-lg bg-zinc-700 px-3 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-600"
-                >
-                  Add
-                </button>
-              </div>
-            </div>
+      {!results ? (
+        <>
+          <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2.5, pt: 0 }}>
+            <Typography variant="body2" color="text.secondary">
+              Send email invites to join this class
+            </Typography>
+
+            <Box sx={{ display: "flex", gap: 1 }}>
+              <TextField
+                label="Email Address"
+                type="email"
+                value={emailInput}
+                onChange={(e) => setEmailInput(e.target.value)}
+                onKeyDown={handleKeyDown}
+                placeholder="student@example.com"
+                fullWidth
+                size="small"
+              />
+              <Button variant="outlined" onClick={addEmail} sx={{ flexShrink: 0 }}>
+                Add
+              </Button>
+            </Box>
 
             {emails.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
                 {emails.map((email) => (
-                  <span
+                  <Chip
                     key={email}
-                    className="flex items-center gap-1.5 rounded-full bg-violet-600/20 px-3 py-1 text-xs font-medium text-violet-200"
-                  >
-                    {email}
-                    <button
-                      type="button"
-                      onClick={() => removeEmail(email)}
-                      className="text-violet-300 hover:text-white"
-                    >
-                      Ã—
-                    </button>
-                  </span>
+                    label={email}
+                    size="small"
+                    onDelete={() => removeEmail(email)}
+                    color="primary"
+                    variant="outlined"
+                  />
                 ))}
-              </div>
+              </Box>
             )}
 
-            {error && <p className="text-sm text-red-400">{error}</p>}
-
-            <div className="flex gap-3 pt-2">
-              <button
-                type="button"
-                onClick={handleClose}
-                disabled={loading}
-                className="flex-1 rounded-lg border border-zinc-600 bg-zinc-800 px-4 py-2 text-sm font-medium text-zinc-100 hover:bg-zinc-700 disabled:opacity-50"
-              >
-                Cancel
-              </button>
-              <button
-                type="button"
-                onClick={handleSend}
-                disabled={loading || emails.length === 0}
-                className="flex-1 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium text-white hover:bg-violet-700 disabled:opacity-50"
-              >
-                {loading ? "Sending..." : `Send ${emails.length > 0 ? `(${emails.length})` : ""}`}
-              </button>
-            </div>
-          </div>
-        ) : (
-          <div className="mt-4 space-y-3">
-            {results.map((r, i) => {
-              const label = statusLabel(r.status);
-              return (
-                <div key={i} className="flex items-center justify-between rounded-lg border border-zinc-700 bg-zinc-800/60 px-3 py-2">
-                  <span className="text-sm text-zinc-200">{r.email}</span>
-                  <span className={`text-xs font-medium ${label.color}`}>{label.text}</span>
-                </div>
-              );
-            })}
-
-            <button
-              type="button"
-              onClick={handleClose}
-              className="mt-2 w-full rounded-lg bg-zinc-700 px-4 py-2 text-sm font-medium text-zinc-200 hover:bg-zinc-600"
+            {error && <Alert severity="error">{error}</Alert>}
+          </DialogContent>
+          <DialogActions sx={{ px: 3, pb: 2 }}>
+            <Button onClick={handleClose} disabled={loading}>
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              onClick={handleSend}
+              disabled={loading || emails.length === 0}
             >
-              Done
-            </button>
-          </div>
-        )}
-      </div>
-    </div>
+              {loading ? "Sending..." : `Send ${emails.length > 0 ? `(${emails.length})` : ""}`}
+            </Button>
+          </DialogActions>
+        </>
+      ) : (
+        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+          {results.map((r, i) => {
+            const label = statusLabel(r.status);
+            return (
+              <Paper
+                key={i}
+                variant="outlined"
+                sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", px: 2, py: 1.5 }}
+              >
+                <Typography variant="body2">{r.email}</Typography>
+                <Chip label={label.text} size="small" color={label.color} />
+              </Paper>
+            );
+          })}
+          <Button variant="outlined" onClick={handleClose} fullWidth sx={{ mt: 1 }}>
+            Done
+          </Button>
+        </DialogContent>
+      )}
+    </Dialog>
   );
 }
 

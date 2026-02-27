@@ -1,6 +1,14 @@
 import { useState } from "react";
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Chip from "@mui/material/Chip";
+import Button from "@mui/material/Button";
+import IconButton from "@mui/material/IconButton";
+import DeleteIcon from "@mui/icons-material/Delete";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import { formatDate } from "../utils/formatDate";
 
 function AssignmentCard({
@@ -13,10 +21,6 @@ function AssignmentCard({
   isTeacher,
   onDelete,
 }) {
-  const statusColor =
-    status === "Submitted"
-      ? "text-green-600 bg-green-50"
-      : "text-amber-600 bg-amber-50";
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
 
@@ -45,91 +49,99 @@ function AssignmentCard({
   };
 
   return (
-    <div className="relative rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm transition-shadow hover:shadow-md">
-      <Link to={`/classes/${classId}/assignments/${id}`} className="block p-5">
-        <div className="flex items-start justify-between">
-          <div className="flex-1 pr-8">
-            <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+    <Paper
+      sx={{
+        position: "relative",
+        transition: "box-shadow 0.2s",
+        "&:hover": { boxShadow: 4 },
+      }}
+    >
+      <Box
+        component={Link}
+        to={`/classes/${classId}/assignments/${id}`}
+        sx={{ display: "block", p: 2.5, textDecoration: "none", color: "inherit" }}
+      >
+        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+          <Box sx={{ flex: 1, pr: 4 }}>
+            <Typography variant="subtitle1" fontWeight={600}>
               {title}
-            </h3>
-            <div className="mt-2 flex flex-wrap items-center gap-2">
-              <span className="inline-block rounded-full border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-700 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:text-zinc-300">
-                {submissionType}
-              </span>
-            </div>
-            <p className="mt-3 text-sm text-zinc-500 dark:text-zinc-400">
+            </Typography>
+            <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1 }}>
+              <Chip
+                label={submissionType}
+                size="small"
+                variant="outlined"
+                sx={{ fontSize: "0.75rem" }}
+              />
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1.5 }}>
               Due: {formatDate(deadline)}
-            </p>
-          </div>
+            </Typography>
+          </Box>
           {!isTeacher && status && (
-            <span
-              className={`shrink-0 self-start rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColor}`}
-            >
-              {status}
-            </span>
-          )}
-        </div>
-        <div className="mt-4 inline-flex items-center gap-1 text-sm font-medium text-violet-600 dark:text-violet-400">
-          View Assignment
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            className="h-4 w-4"
-          >
-            <path
-              fillRule="evenodd"
-              d="M3 10a.75.75 0 01.75-.75h10.638L10.23 5.29a.75.75 0 111.04-1.08l5.5 5.25a.75.75 0 010 1.08l-5.5 5.25a.75.75 0 11-1.04-1.08l4.158-3.96H3.75A.75.75 0 013 10z"
-              clipRule="evenodd"
+            <Chip
+              label={status}
+              size="small"
+              color={status === "Submitted" ? "success" : "warning"}
+              sx={{ flexShrink: 0 }}
             />
-          </svg>
-        </div>
-      </Link>
+          )}
+        </Box>
+        <Box
+          sx={{
+            mt: 2,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 0.5,
+            color: "primary.main",
+            fontWeight: 500,
+            fontSize: "0.875rem",
+          }}
+        >
+          View Assignment
+          <ArrowForwardIcon sx={{ fontSize: 16 }} />
+        </Box>
+      </Box>
 
       {isTeacher && onDelete && (
-        <div className="absolute right-3 top-3 flex items-center gap-1">
+        <Box sx={{ position: "absolute", right: 12, top: 12, display: "flex", alignItems: "center", gap: 0.5 }}>
           {confirming ? (
             <>
-              <button
-                type="button"
+              <Button
+                size="small"
+                variant="contained"
+                color="error"
                 onClick={handleDelete}
                 disabled={deleting}
-                className="rounded-lg bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
+                sx={{ fontSize: "0.75rem", py: 0.25, px: 1.25, minWidth: 0 }}
               >
-                {deleting ? "Deletingâ€¦" : "Confirm"}
-              </button>
-              <button
-                type="button"
+                {deleting ? "Deleting..." : "Confirm"}
+              </Button>
+              <Button
+                size="small"
+                variant="outlined"
                 onClick={handleCancelDelete}
-                className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-2.5 py-1 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
+                sx={{ fontSize: "0.75rem", py: 0.25, px: 1.25, minWidth: 0 }}
               >
                 Cancel
-              </button>
+              </Button>
             </>
           ) : (
-            <button
-              type="button"
+            <IconButton
+              size="small"
               onClick={handleDelete}
               title="Delete assignment"
-              className="rounded-lg p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-500 transition-colors"
+              sx={{
+                color: "text.secondary",
+                "&:hover": { color: "error.main", bgcolor: "error.lighter" },
+              }}
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                className="h-4 w-4"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M8.75 1A2.75 2.75 0 006 3.75v.443c-.795.077-1.584.176-2.365.298a.75.75 0 10.23 1.482l.149-.022.841 10.518A2.75 2.75 0 007.596 19h4.807a2.75 2.75 0 002.742-2.53l.841-10.52.149.023a.75.75 0 00.23-1.482A41.03 41.03 0 0014 4.193V3.75A2.75 2.75 0 0011.25 1h-2.5zM10 4c.84 0 1.673.025 2.5.075V3.75c0-.69-.56-1.25-1.25-1.25h-2.5c-.69 0-1.25.56-1.25 1.25v.325C8.327 4.025 9.16 4 10 4zM8.58 7.72a.75.75 0 00-1.5.06l.3 7.5a.75.75 0 101.5-.06l-.3-7.5zm4.34.06a.75.75 0 10-1.5-.06l-.3 7.5a.75.75 0 101.5.06l.3-7.5z"
-                  clipRule="evenodd"
-                />
-              </svg>
-            </button>
+              <DeleteIcon fontSize="small" />
+            </IconButton>
           )}
-        </div>
+        </Box>
       )}
-    </div>
+    </Paper>
   );
 }
 

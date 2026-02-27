@@ -1,6 +1,17 @@
 import { useState, useMemo, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import PropTypes from "prop-types";
+import Paper from "@mui/material/Paper";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Button from "@mui/material/Button";
+import Chip from "@mui/material/Chip";
+import TextField from "@mui/material/TextField";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+import EditIcon from "@mui/icons-material/Edit";
+import AttachFileIcon from "@mui/icons-material/AttachFile";
 import api from "../api/api";
 
 function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
@@ -89,51 +100,48 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
   };
 
   return (
-    <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 shadow-sm">
+    <Paper>
       {/* Header row */}
-      <div className="flex items-center justify-between border-b border-zinc-100 dark:border-zinc-700 px-6 py-4">
-        <h3 className="text-base font-semibold text-zinc-900 dark:text-zinc-100">
+      <Box
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          borderBottom: 1,
+          borderColor: "divider",
+          px: 3,
+          py: 2,
+        }}
+      >
+        <Typography variant="subtitle1" fontWeight={600}>
           All Submissions
-        </h3>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5">
-            <label className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
-              Sort by
-            </label>
-            <div className="flex overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-600 bg-zinc-50 dark:bg-zinc-900 p-0.5">
-              <button
-                type="button"
-                onClick={() => setSortBy("latest")}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                  sortBy === "latest"
-                    ? "bg-white dark:bg-zinc-700 text-violet-600 dark:text-violet-400 shadow-sm"
-                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                }`}
-              >
-                Latest
-              </button>
-              <button
-                type="button"
-                onClick={() => setSortBy("earliest")}
-                className={`rounded-md px-3 py-1 text-xs font-medium transition-colors ${
-                  sortBy === "earliest"
-                    ? "bg-white dark:bg-zinc-700 text-violet-600 dark:text-violet-400 shadow-sm"
-                    : "text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300"
-                }`}
-              >
-                Earliest
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+        </Typography>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+          <Typography variant="caption" color="text.secondary" fontWeight={500}>
+            Sort by
+          </Typography>
+          <ToggleButtonGroup
+            value={sortBy}
+            exclusive
+            onChange={(e, val) => val && setSortBy(val)}
+            size="small"
+          >
+            <ToggleButton value="latest" sx={{ fontSize: "0.75rem", py: 0.25, px: 1.5 }}>
+              Latest
+            </ToggleButton>
+            <ToggleButton value="earliest" sx={{ fontSize: "0.75rem", py: 0.25, px: 1.5 }}>
+              Earliest
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Box>
+      </Box>
 
       {/* Submission rows */}
-      <div className="divide-y divide-zinc-100 dark:divide-zinc-700">
+      <Box sx={{ "& > *:not(:last-child)": { borderBottom: 1, borderColor: "divider" } }}>
         {sortedSubmissions.length === 0 ? (
-          <p className="px-6 py-6 text-sm text-zinc-500 dark:text-zinc-400">
+          <Typography variant="body2" color="text.secondary" sx={{ px: 3, py: 3 }}>
             No submissions yet
-          </p>
+          </Typography>
         ) : (
           sortedSubmissions.map((submission) => {
             const isGrading = gradingSubmissionId === submission.id;
@@ -148,89 +156,93 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
               : null;
 
             return (
-              <div
+              <Box
                 key={submission.id}
-                className="group px-6 py-3.5 hover:bg-zinc-50 dark:hover:bg-zinc-700/50 transition-colors"
+                sx={{
+                  px: 3,
+                  py: 1.75,
+                  transition: "background-color 0.15s",
+                  "&:hover": { bgcolor: "action.hover" },
+                }}
               >
                 {/* 3-column row: name+time | file | action */}
-                <div className="grid grid-cols-[1fr_auto_auto] items-center gap-4">
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: "1fr auto auto",
+                    alignItems: "center",
+                    gap: 2,
+                  }}
+                >
                   {/* Col 1: student name + submitted time */}
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-zinc-900 dark:text-zinc-100 truncate">
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography variant="body2" fontWeight={500} noWrap>
                       {displayName}
-                    </p>
+                    </Typography>
                     {submission.submitted_at ? (
-                      <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                      <Typography variant="caption" color="text.secondary" sx={{ mt: 0.25, display: "block" }}>
                         {new Date(submission.submitted_at).toLocaleString()}
-                      </p>
+                      </Typography>
                     ) : (
-                      <p className="mt-0.5 text-xs text-zinc-400 dark:text-zinc-500">
+                      <Typography variant="caption" color="text.disabled" sx={{ mt: 0.25, display: "block" }}>
                         Not submitted
-                      </p>
+                      </Typography>
                     )}
-                  </div>
+                  </Box>
 
                   {/* Col 2: file name */}
-                  <div className="hidden sm:flex min-w-0 max-w-55 items-center gap-1.5">
+                  <Box
+                    sx={{
+                      display: { xs: "none", sm: "flex" },
+                      minWidth: 0,
+                      maxWidth: 220,
+                      alignItems: "center",
+                      gap: 0.75,
+                    }}
+                  >
                     {filename ? (
                       <>
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="h-3.5 w-3.5 shrink-0 text-zinc-400 dark:text-zinc-500"
-                        >
-                          <path
-                            fillRule="evenodd"
-                            d="M15.621 4.379a3 3 0 00-4.242 0l-7 7a3 3 0 004.241 4.243h.001l.497-.5a.75.75 0 011.064 1.057l-.498.501-.002.002a4.5 4.5 0 01-6.364-6.364l7-7a4.5 4.5 0 016.368 6.36l-3.455 3.553A2.625 2.625 0 119.52 9.52l3.45-3.451a.75.75 0 111.061 1.06l-3.45 3.451a1.125 1.125 0 001.587 1.595l3.454-3.553a3 3 0 000-4.242z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
-                        <span className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                        <AttachFileIcon sx={{ fontSize: 14, color: "text.disabled" }} />
+                        <Typography variant="caption" color="text.secondary" noWrap>
                           {filename}
-                        </span>
+                        </Typography>
                       </>
                     ) : (
-                      <span className="text-xs text-zinc-400 dark:text-zinc-500">
+                      <Typography variant="caption" color="text.disabled">
                         No file
-                      </span>
+                      </Typography>
                     )}
-                  </div>
+                  </Box>
 
                   {/* Col 3: grade badge + action button */}
-                  <div className="flex shrink-0 items-center gap-2">
+                  <Box sx={{ display: "flex", flexShrink: 0, alignItems: "center", gap: 1 }}>
                     {submission.evaluation_id && (
-                      <span className="rounded-full bg-green-50 dark:bg-green-900/20 px-2 py-0.5 text-xs font-medium text-green-700 dark:text-green-400 ring-1 ring-inset ring-green-100 dark:ring-green-800">
-                        {submission.score ?? "Graded"}
-                      </span>
+                      <Chip
+                        label={submission.score ?? "Graded"}
+                        size="small"
+                        color="success"
+                        variant="outlined"
+                        sx={{ fontSize: "0.75rem" }}
+                      />
                     )}
                     {filename && (
-                      <button
-                        type="button"
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<VisibilityIcon sx={{ fontSize: 14 }} />}
                         onClick={() =>
                           navigate(`/documents/submission-${submission.id}`)
                         }
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
+                        sx={{ fontSize: "0.75rem", py: 0.25, px: 1.25, minWidth: 0 }}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="h-3.5 w-3.5"
-                        >
-                          <path d="M10 12.5a2.5 2.5 0 100-5 2.5 2.5 0 000 5z" />
-                          <path
-                            fillRule="evenodd"
-                            d="M.664 10.59a1.651 1.651 0 010-1.186A10.004 10.004 0 0110 3c4.257 0 7.893 2.66 9.336 6.41.147.381.146.804 0 1.186A10.004 10.004 0 0110 17c-4.257 0-7.893-2.66-9.336-6.41zM14 10a4 4 0 11-8 0 4 4 0 018 0z"
-                            clipRule="evenodd"
-                          />
-                        </svg>
                         View
-                      </button>
+                      </Button>
                     )}
                     {submission.submitted_at && (
-                      <button
-                        type="button"
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<EditIcon sx={{ fontSize: 14 }} />}
                         onClick={() => {
                           if (isGrading) {
                             setGradingSubmissionId(null);
@@ -243,46 +255,39 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             });
                           }
                         }}
-                        className="inline-flex items-center gap-1.5 rounded-lg border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-900/30 px-3 py-1.5 text-xs font-medium text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
+                        sx={{ fontSize: "0.75rem", py: 0.25, px: 1.25, minWidth: 0 }}
                       >
-                        <svg
-                          xmlns="http://www.w3.org/2000/svg"
-                          viewBox="0 0 20 20"
-                          fill="currentColor"
-                          className="h-3.5 w-3.5"
-                        >
-                          <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-                        </svg>
                         {isGrading
                           ? "Cancel"
                           : submission.evaluation_id
                             ? "Edit Grade"
                             : "Grade"}
-                      </button>
+                      </Button>
                     )}
-                  </div>
-                </div>
+                  </Box>
+                </Box>
 
                 {/* Feedback display */}
                 {submission.evaluation_id &&
                   submission.feedback &&
                   !isGrading && (
-                    <div className="mt-2 ml-0 rounded-lg bg-zinc-50 dark:bg-zinc-900 px-3 py-2">
-                      <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    <Box sx={{ mt: 1, borderRadius: 2, bgcolor: "action.hover", px: 1.5, py: 1 }}>
+                      <Typography variant="caption" color="text.secondary">
                         Feedback:{" "}
-                        <span className="text-zinc-700 dark:text-zinc-300">
+                        <Box component="span" sx={{ color: "text.primary" }}>
                           {submission.feedback}
-                        </span>
-                      </p>
-                    </div>
+                        </Box>
+                      </Typography>
+                    </Box>
                   )}
 
-                {/* Grading form (inline, expands below the row) */}
+                {/* Grading form */}
                 {isGrading && (
-                  <div className="mt-3 space-y-3 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 p-4">
-                    <div className="grid grid-cols-2 gap-3">
-                      <input
+                  <Paper variant="outlined" sx={{ mt: 1.5, p: 2 }}>
+                    <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 1.5 }}>
+                      <TextField
                         type="number"
+                        size="small"
                         placeholder="Score (e.g. 85)"
                         value={gradingData.score}
                         onChange={(e) =>
@@ -291,30 +296,31 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                             score: e.target.value,
                           })
                         }
-                        className="rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
                       />
-                      <div className="flex gap-2">
-                        <button
-                          type="button"
+                      <Box sx={{ display: "flex", gap: 1 }}>
+                        <Button
+                          variant="contained"
+                          size="small"
                           onClick={() => handleGradeSubmission(submission)}
                           disabled={submitting}
-                          className="flex-1 rounded-lg bg-violet-600 dark:bg-violet-500 px-3 py-2 text-sm font-medium text-white hover:bg-violet-700 dark:hover:bg-violet-600 disabled:opacity-50 transition-colors"
+                          sx={{ flex: 1 }}
                         >
-                          {submitting ? "Savingâ€¦" : "Save Grade"}
-                        </button>
-                        <button
-                          type="button"
+                          {submitting ? "Saving..." : "Save Grade"}
+                        </Button>
+                        <Button
+                          variant="outlined"
+                          size="small"
                           onClick={() => {
                             setGradingSubmissionId(null);
                             setGradingData({ score: "", feedback: "" });
                           }}
-                          className="flex-1 rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-600 transition-colors"
+                          sx={{ flex: 1 }}
                         >
                           Cancel
-                        </button>
-                      </div>
-                    </div>
-                    <textarea
+                        </Button>
+                      </Box>
+                    </Box>
+                    <TextField
                       placeholder="Feedback (optional)"
                       value={gradingData.feedback}
                       onChange={(e) =>
@@ -323,17 +329,20 @@ function SubmissionsList({ assignmentId, submissions, onSubmissionsUpdate }) {
                           feedback: e.target.value,
                         })
                       }
+                      multiline
                       rows={2}
-                      className="w-full rounded-lg border border-zinc-200 dark:border-zinc-600 bg-white dark:bg-zinc-700 px-3 py-2 text-sm text-zinc-800 dark:text-zinc-200 placeholder-zinc-400 dark:placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      size="small"
+                      fullWidth
+                      sx={{ mt: 1.5 }}
                     />
-                  </div>
+                  </Paper>
                 )}
-              </div>
+              </Box>
             );
           })
         )}
-      </div>
-    </div>
+      </Box>
+    </Paper>
   );
 }
 

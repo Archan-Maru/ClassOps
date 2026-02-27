@@ -1,5 +1,10 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
 import api from "../api/api";
 import AuthLayout from "../components/AuthLayout";
 
@@ -21,7 +26,9 @@ function VerifyEmail() {
 
     try {
       await api.post("/auth/verify-email", { email, otp });
-      navigate(redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login");
+      navigate(
+        redirect ? `/login?redirect=${encodeURIComponent(redirect)}` : "/login",
+      );
     } catch (err) {
       setError(err.response?.data?.message || "Verification failed");
     } finally {
@@ -36,13 +43,19 @@ function VerifyEmail() {
         subtitle="We need your email to verify the OTP."
         footer={null}
       >
-        <div className="alert alert--warning">
+        <Alert severity="warning" sx={{ mb: 2.5, borderRadius: 2 }}>
           No email detected in the verification flow. Please start again by
           completing the signup form.
-        </div>
-        <Link className="primary-btn" to="/signup">
+        </Alert>
+        <Button
+          component={Link}
+          to="/signup"
+          variant="contained"
+          fullWidth
+          sx={{ py: 1.25 }}
+        >
           Go to signup
-        </Link>
+        </Button>
       </AuthLayout>
     );
   }
@@ -52,35 +65,54 @@ function VerifyEmail() {
       title="Verify your email"
       subtitle={`Enter the 6-digit code we sent to ${email}`}
       footer={
-        <p>
-          Didn’t receive anything?{" "}
-          <Link className="link-inline" to="/signup">
+        <Typography variant="body2">
+          Didn't receive anything?{" "}
+          <Link
+            to="/signup"
+            style={{
+              color: "inherit",
+              fontWeight: 500,
+              textDecoration: "underline",
+            }}
+          >
             Try signing up again
           </Link>
-        </p>
+        </Typography>
       }
     >
-      {error && <div className="alert alert--error">{error}</div>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-group">
-          <label htmlFor="otp">One-time passcode</label>
-          <input
-            id="otp"
-            placeholder="••••••"
-            value={otp}
-            onChange={(e) => setOtp(e.target.value)}
-            className="input"
-            inputMode="numeric"
-            maxLength={6}
-            required
-          />
-        </div>
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+      >
+        <TextField
+          id="otp"
+          label="One-time passcode"
+          placeholder="------"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+          slotProps={{ htmlInput: { inputMode: "numeric", maxLength: 6 } }}
+          required
+          fullWidth
+          size="small"
+        />
 
-        <button className="primary-btn" type="submit" disabled={loading}>
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          disabled={loading}
+          sx={{ py: 1.25 }}
+        >
           {loading ? "Verifying..." : "Verify email"}
-        </button>
-      </form>
+        </Button>
+      </Box>
     </AuthLayout>
   );
 }

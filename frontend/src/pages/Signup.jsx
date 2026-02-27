@@ -1,5 +1,11 @@
 import { useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import Box from "@mui/material/Box";
+import TextField from "@mui/material/TextField";
+import MenuItem from "@mui/material/MenuItem";
+import Button from "@mui/material/Button";
+import Alert from "@mui/material/Alert";
+import Typography from "@mui/material/Typography";
 import api from "../api/api";
 import AuthLayout from "../components/AuthLayout";
 
@@ -40,81 +46,98 @@ function Signup() {
       title="Create your ClassOps account"
       subtitle="Invite students, publish assignments, and keep every submission organized."
       footer={
-        <p>
+        <Typography variant="body2">
           Already registered?{" "}
-          <Link className="link-inline" to="/login">
+          <Link
+            to="/login"
+            style={{
+              color: "inherit",
+              fontWeight: 500,
+              textDecoration: "underline",
+            }}
+          >
             Sign in
           </Link>
-        </p>
+        </Typography>
       }
     >
-      {error && <div className="alert alert--error">{error}</div>}
+      {error && (
+        <Alert severity="error" sx={{ mb: 2.5, borderRadius: 2 }}>
+          {error}
+        </Alert>
+      )}
 
-      <form className="auth-form" onSubmit={handleSubmit}>
-        <div className="form-grid">
-          <div className="form-group">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              placeholder="you@example.com"
-              value={form.email}
-              onChange={handleChange}
-              className="input"
-              autoComplete="email"
-              required
-            />
-          </div>
-
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              id="username"
-              name="username"
-              placeholder="Choose a username"
-              value={form.username}
-              onChange={handleChange}
-              className="input"
-              autoComplete="username"
-              required
-            />
-          </div>
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password">Password</label>
-          <input
-            id="password"
-            type="password"
-            name="password"
-            placeholder="Create a strong password"
-            value={form.password}
+      <Box
+        component="form"
+        onSubmit={handleSubmit}
+        sx={{ display: "flex", flexDirection: "column", gap: 2.5 }}
+      >
+        <Box sx={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 2 }}>
+          <TextField
+            id="email"
+            name="email"
+            type="email"
+            label="Email"
+            placeholder="you@example.com"
+            value={form.email}
             onChange={handleChange}
-            className="input"
-            autoComplete="new-password"
+            autoComplete="email"
             required
+            fullWidth
+            size="small"
           />
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="role">Role</label>
-          <select
-            id="role"
-            name="role"
-            value={form.role}
+          <TextField
+            id="username"
+            name="username"
+            label="Username"
+            placeholder="Choose a username"
+            value={form.username}
             onChange={handleChange}
-            className="input select"
-          >
-            <option value="STUDENT">Student</option>
-            <option value="TEACHER">Teacher</option>
-          </select>
-        </div>
+            autoComplete="username"
+            required
+            fullWidth
+            size="small"
+          />
+        </Box>
 
-        <button className="primary-btn" type="submit" disabled={loading}>
+        <TextField
+          id="password"
+          type="password"
+          name="password"
+          label="Password"
+          placeholder="Create a strong password"
+          value={form.password}
+          onChange={handleChange}
+          autoComplete="new-password"
+          required
+          fullWidth
+          size="small"
+        />
+
+        <TextField
+          id="role"
+          name="role"
+          select
+          label="Role"
+          value={form.role}
+          onChange={handleChange}
+          fullWidth
+          size="small"
+        >
+          <MenuItem value="STUDENT">Student</MenuItem>
+          <MenuItem value="TEACHER">Teacher</MenuItem>
+        </TextField>
+
+        <Button
+          type="submit"
+          variant="contained"
+          fullWidth
+          disabled={loading}
+          sx={{ py: 1.25 }}
+        >
           {loading ? "Creating account..." : "Create account"}
-        </button>
-      </form>
+        </Button>
+      </Box>
     </AuthLayout>
   );
 }

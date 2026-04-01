@@ -14,6 +14,7 @@ import SendIcon from "@mui/icons-material/Send";
 import CloseIcon from "@mui/icons-material/Close";
 import AttachFileIcon from "@mui/icons-material/AttachFile";
 import { useTheme } from "@mui/material/styles";
+import ReactMarkdown from "react-markdown";
 
 function AIChat({ open, onClose }) {
   const theme = useTheme();
@@ -104,8 +105,8 @@ function AIChat({ open, onClose }) {
             .map((m) => ({
               role: m.type === "user" ? "user" : "assistant",
               content: m.content,
-            }))
-        )
+            })),
+        ),
       );
 
       // Call backend API which uses Groq
@@ -117,7 +118,7 @@ function AIChat({ open, onClose }) {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           body: formData,
-        }
+        },
       );
 
       if (!response.ok) {
@@ -188,7 +189,10 @@ function AIChat({ open, onClose }) {
             <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1rem" }}>
               🤖 AI Learning Assistant
             </Typography>
-            <Typography variant="caption" sx={{ opacity: 0.85, fontSize: "0.75rem" }}>
+            <Typography
+              variant="caption"
+              sx={{ opacity: 0.85, fontSize: "0.75rem" }}
+            >
               Powered by Groq • Upload docs & ask questions
             </Typography>
           </Box>
@@ -251,9 +255,39 @@ function AIChat({ open, onClose }) {
                 }}
                 elevation={0}
               >
-                <Typography variant="body2" sx={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}>
-                  {message.content}
-                </Typography>
+                {message.type === "bot" ? (
+                  <Box
+                    sx={{
+                      "& p": { m: 0, mb: 1, "&:last-child": { mb: 0 } },
+                      "& strong": { fontWeight: 600 },
+                      "& ul, & ol": { m: 0, pl: 2.5 },
+                      "& li": { mb: 0.5 },
+                      "& code": {
+                        backgroundColor: theme.palette.mode === "dark" ? "#333" : "#e3e3e3",
+                        px: 0.5,
+                        borderRadius: 0.5,
+                        fontSize: "0.85em",
+                      },
+                      "& pre": {
+                        backgroundColor: theme.palette.mode === "dark" ? "#333" : "#e3e3e3",
+                        p: 1,
+                        borderRadius: 1,
+                        overflow: "auto",
+                      },
+                      fontSize: "0.875rem",
+                      lineHeight: 1.5,
+                    }}
+                  >
+                    <ReactMarkdown>{message.content}</ReactMarkdown>
+                  </Box>
+                ) : (
+                  <Typography
+                    variant="body2"
+                    sx={{ whiteSpace: "pre-wrap", lineHeight: 1.5 }}
+                  >
+                    {message.content}
+                  </Typography>
+                )}
               </Paper>
             </Box>
           ))}

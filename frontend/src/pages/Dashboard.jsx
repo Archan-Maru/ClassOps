@@ -241,7 +241,7 @@ function Dashboard() {
                 flexShrink: 0,
               }}
             >
-              <UpcomingPanel assignments={upcomingAssignments} />
+              <UpcomingPanel assignments={upcomingAssignments} userRole={userRole} />
             </Box>
           </Box>
         </Box>

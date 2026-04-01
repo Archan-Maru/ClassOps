@@ -367,7 +367,7 @@ function ClassPage() {
                     )}
                   </Box>
                   <Box>
-                    <UpcomingPanel assignments={upcomingAssignments} />
+                    <UpcomingPanel assignments={upcomingAssignments} userRole={userRole} />
                   </Box>
                 </Box>
               )}
@@ -424,9 +424,6 @@ function ClassPage() {
                         No assignments yet
                       </Typography>
                     )}
-                  </Box>
-                  <Box>
-                    <UpcomingPanel assignments={upcomingAssignments} />
                   </Box>
                 </Box>
               )}

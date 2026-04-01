@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { ThemeProvider } from "./context/ThemeContext";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -10,12 +11,37 @@ import ClassPage from "./pages/ClassPage";
 import AssignmentDetails from "./pages/AssignmentDetails";
 import DocumentViewer from "./pages/DocumentViewer";
 import AcceptInvite from "./pages/AcceptInvite";
+import ChatBubble from "./components/ChatBubble";
+import AIChat from "./components/AIChat";
 import "./App.css";
+
+// Routes where chatbot should not appear
+const AUTH_ROUTES = ["/login", "/signup", "/verify-email", "/forgot-password", "/reset-password"];
+
+function ChatContainer() {
+  const location = useLocation();
+  const [chatOpen, setChatOpen] = useState(false);
+
+  // Hide chat on auth pages
+  const showChat = !AUTH_ROUTES.some((route) => location.pathname.startsWith(route));
+
+  return (
+    <>
+      {showChat && (
+        <>
+          <ChatBubble onClick={() => setChatOpen(!chatOpen)} open={chatOpen} />
+          <AIChat open={chatOpen} onClose={() => setChatOpen(false)} />
+        </>
+      )}
+    </>
+  );
+}
 
 function App() {
   return (
     <ThemeProvider>
       <BrowserRouter>
+        <ChatContainer />
         <Routes>
           <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/login" element={<Login />} />

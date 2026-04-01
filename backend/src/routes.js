@@ -7,6 +7,7 @@ import submissionsRoutes from "./submissions/submissions.routes.js";
 import evaluationsRoutes from "./evaluations/evaluations.routes.js";
 import documentsRoutes from "./documents/documents.routes.js";
 import inviteRoutes from "./invites/invites.routes.js";
+import aiRoutes from "./ai/ai.routes.js";
 
 const router = Router();
 
@@ -22,5 +23,6 @@ router.use("/evaluations", evaluationsRoutes);
 router.use("/documents", documentsRoutes);
 router.use("/classes", inviteRoutes);
 router.use("/", inviteRoutes);
+router.use("/ai", aiRoutes);
 
 export default router;

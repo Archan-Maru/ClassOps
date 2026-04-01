@@ -84,19 +84,44 @@ function AppHeader({ breadcrumb }) {
           {breadcrumb && (
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               <ChevronRightIcon sx={{ fontSize: 16, color: "text.disabled" }} />
-              <Typography
-                sx={{
-                  fontSize: "1.125rem",
-                  fontWeight: 500,
-                  color: "text.secondary",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                  maxWidth: { xs: 200, sm: 320 },
-                }}
-              >
-                {breadcrumb}
-              </Typography>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                {Array.isArray(breadcrumb) ? (
+                  breadcrumb.map((item, idx) => (
+                    <Box key={idx} sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                      <Typography
+                        sx={{
+                          fontSize: "1.125rem",
+                          fontWeight: 500,
+                          color: "text.secondary",
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                          maxWidth: { xs: 150, sm: 200 },
+                        }}
+                      >
+                        {item}
+                      </Typography>
+                      {idx < breadcrumb.length - 1 && (
+                        <ChevronRightIcon sx={{ fontSize: 14, color: "text.disabled" }} />
+                      )}
+                    </Box>
+                  ))
+                ) : (
+                  <Typography
+                    sx={{
+                      fontSize: "1.125rem",
+                      fontWeight: 500,
+                      color: "text.secondary",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "nowrap",
+                      maxWidth: { xs: 200, sm: 320 },
+                    }}
+                  >
+                    {breadcrumb}
+                  </Typography>
+                )}
+              </Box>
             </Box>
           )}
         </Box>

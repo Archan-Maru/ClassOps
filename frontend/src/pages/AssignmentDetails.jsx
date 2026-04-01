@@ -207,7 +207,7 @@ function AssignmentDetails() {
 
   return (
     <>
-      <AppHeader />
+      <AppHeader breadcrumb={classData && assignment ? [classData.title, assignment.title] : ""} />
       <Box sx={{ minHeight: "100vh", bgcolor: "background.default" }}>
         {loading && (
           <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", py: 8 }}>

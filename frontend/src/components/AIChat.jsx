@@ -263,13 +263,15 @@ function AIChat({ open, onClose }) {
                       "& ul, & ol": { m: 0, pl: 2.5 },
                       "& li": { mb: 0.5 },
                       "& code": {
-                        backgroundColor: theme.palette.mode === "dark" ? "#333" : "#e3e3e3",
+                        backgroundColor:
+                          theme.palette.mode === "dark" ? "#333" : "#e3e3e3",
                         px: 0.5,
                         borderRadius: 0.5,
                         fontSize: "0.85em",
                       },
                       "& pre": {
-                        backgroundColor: theme.palette.mode === "dark" ? "#333" : "#e3e3e3",
+                        backgroundColor:
+                          theme.palette.mode === "dark" ? "#333" : "#e3e3e3",
                         p: 1,
                         borderRadius: 1,
                         overflow: "auto",

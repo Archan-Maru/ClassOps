@@ -2,6 +2,8 @@ import { Pool } from "pg";
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
+  ss1:
+process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
 
 pool.on("connect", () => {

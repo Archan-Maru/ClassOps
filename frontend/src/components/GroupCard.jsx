@@ -60,23 +60,59 @@ function GroupCard({
   };
 
   return (
-    <Paper sx={{ p: 2.5 }}>
+    <Paper
+      variant="outlined"
+      sx={{
+        p: 2.5,
+        borderRadius: 3,
+        transition: "all 0.15s ease",
+        "&:hover": {
+          borderColor: "primary.main",
+        },
+      }}
+    >
       <Box
         component="button"
         type="button"
         onClick={toggleCard}
-        sx={{ width: "100%", textAlign: "left", background: "none", border: "none", p: 0, cursor: "pointer", color: "inherit" }}
+        sx={{
+          width: "100%",
+          textAlign: "left",
+          background: "none",
+          border: "none",
+          p: 0,
+          cursor: "pointer",
+          color: "inherit",
+        }}
       >
-        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1.5 }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+            gap: 1.5,
+          }}
+        >
           <Typography variant="subtitle1" fontWeight={600}>
             {group.name}
           </Typography>
           {isTeacher && (
-            <Box sx={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "flex-end", gap: 1 }}>
+            <Box
+              sx={{
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                gap: 1,
+              }}
+            >
               <Button
                 size="small"
                 variant="contained"
-                onClick={(e) => { e.stopPropagation(); onAddMember(group); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAddMember(group);
+                }}
                 sx={{ fontSize: "0.75rem" }}
               >
                 Add Member
@@ -84,7 +120,11 @@ function GroupCard({
               <Button
                 size="small"
                 variant="outlined"
-                onClick={(e) => { e.stopPropagation(); setShowRemovePicker((p) => !p); setShowLeaderPicker(false); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowRemovePicker((p) => !p);
+                  setShowLeaderPicker(false);
+                }}
                 sx={{ fontSize: "0.75rem" }}
               >
                 Remove Member
@@ -92,7 +132,11 @@ function GroupCard({
               <Button
                 size="small"
                 variant="outlined"
-                onClick={(e) => { e.stopPropagation(); setShowLeaderPicker((p) => !p); setShowRemovePicker(false); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setShowLeaderPicker((p) => !p);
+                  setShowRemovePicker(false);
+                }}
                 sx={{ fontSize: "0.75rem" }}
               >
                 Assign Leader
@@ -109,8 +153,19 @@ function GroupCard({
       </Box>
 
       {isTeacher && showRemovePicker && (
-        <Box sx={{ mt: 1.5, borderRadius: 2, border: 1, borderColor: "divider", bgcolor: "action.hover", p: 1.5 }}>
-          <Typography variant="caption" fontWeight={500}>Remove a member</Typography>
+        <Box
+          sx={{
+            mt: 1.5,
+            borderRadius: 2,
+            border: 1,
+            borderColor: "divider",
+            bgcolor: "action.hover",
+            p: 1.5,
+          }}
+        >
+          <Typography variant="caption" fontWeight={500}>
+            Remove a member
+          </Typography>
           <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
             <TextField
               select
@@ -141,8 +196,19 @@ function GroupCard({
       )}
 
       {isTeacher && showLeaderPicker && (
-        <Box sx={{ mt: 1.5, borderRadius: 2, border: 1, borderColor: "divider", bgcolor: "action.hover", p: 1.5 }}>
-          <Typography variant="caption" fontWeight={500}>Assign leader</Typography>
+        <Box
+          sx={{
+            mt: 1.5,
+            borderRadius: 2,
+            border: 1,
+            borderColor: "divider",
+            bgcolor: "action.hover",
+            p: 1.5,
+          }}
+        >
+          <Typography variant="caption" fontWeight={500}>
+            Assign leader
+          </Typography>
           <Box sx={{ display: "flex", gap: 1, mt: 1 }}>
             <TextField
               select
@@ -172,7 +238,9 @@ function GroupCard({
       )}
 
       {isExpanded && normalizedMembers.length > 0 ? (
-        <Box sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.75 }}>
+        <Box
+          sx={{ mt: 2, display: "flex", flexDirection: "column", gap: 0.75 }}
+        >
           {normalizedMembers.map((member) => (
             <Box
               key={member.id}
@@ -188,9 +256,16 @@ function GroupCard({
             >
               <Typography variant="body2">{member.username}</Typography>
               {member.normalizedRole === "LEADER" ? (
-                <Chip label="Leader" size="small" color="warning" sx={{ fontSize: "0.75rem" }} />
+                <Chip
+                  label="Leader"
+                  size="small"
+                  color="warning"
+                  sx={{ fontSize: "0.75rem" }}
+                />
               ) : (
-                <Typography variant="caption" color="text.disabled">Member</Typography>
+                <Typography variant="caption" color="text.disabled">
+                  Member
+                </Typography>
               )}
             </Box>
           ))}

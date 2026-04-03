@@ -16,8 +16,7 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: Array.from(new Set(allowedOrigins.filter(Boolean))),
-    credentials: true,
+    origin: "https://classops-frontend.onrender.com"
   }),
 );
 

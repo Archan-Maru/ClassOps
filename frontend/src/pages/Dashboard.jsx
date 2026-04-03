@@ -226,7 +226,7 @@ function Dashboard() {
                       title={classItem.title}
                       teacher={classItem.teacher_name}
                       meta={classItem.meta}
-                      userRole={userRole}
+                      isOwner={Boolean(classItem.is_owner)}
                       onUnenroll={handleUnenroll}
                     />
                   ))}
@@ -241,7 +241,10 @@ function Dashboard() {
                 flexShrink: 0,
               }}
             >
-              <UpcomingPanel assignments={upcomingAssignments} userRole={userRole} />
+              <UpcomingPanel
+                assignments={upcomingAssignments}
+                userRole={userRole}
+              />
             </Box>
           </Box>
         </Box>

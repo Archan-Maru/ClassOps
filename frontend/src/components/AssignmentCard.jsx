@@ -50,23 +50,46 @@ function AssignmentCard({
 
   return (
     <Paper
+      variant="outlined"
       sx={{
         position: "relative",
-        transition: "box-shadow 0.2s",
-        "&:hover": { boxShadow: 4 },
+        borderRadius: 3,
+        transition: "all 0.15s ease",
+        "&:hover": {
+          borderColor: "primary.main",
+        },
       }}
     >
       <Box
         component={Link}
         to={`/classes/${classId}/assignments/${id}`}
-        sx={{ display: "block", p: 2.5, textDecoration: "none", color: "inherit" }}
+        sx={{
+          display: "block",
+          p: 2.5,
+          textDecoration: "none",
+          color: "inherit",
+        }}
       >
-        <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between" }}>
+        <Box
+          sx={{
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
           <Box sx={{ flex: 1, pr: 4 }}>
             <Typography variant="subtitle1" fontWeight={600}>
               {title}
             </Typography>
-            <Box sx={{ mt: 1, display: "flex", flexWrap: "wrap", alignItems: "center", gap: 1 }}>
+            <Box
+              sx={{
+                mt: 1,
+                display: "flex",
+                flexWrap: "wrap",
+                alignItems: "center",
+                gap: 1,
+              }}
+            >
               <Chip
                 label={submissionType}
                 size="small"
@@ -104,7 +127,16 @@ function AssignmentCard({
       </Box>
 
       {isTeacher && onDelete && (
-        <Box sx={{ position: "absolute", right: 12, top: 12, display: "flex", alignItems: "center", gap: 0.5 }}>
+        <Box
+          sx={{
+            position: "absolute",
+            right: 12,
+            top: 12,
+            display: "flex",
+            alignItems: "center",
+            gap: 0.5,
+          }}
+        >
           {confirming ? (
             <>
               <Button

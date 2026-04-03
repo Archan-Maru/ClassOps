@@ -39,11 +39,15 @@ function ClassworkCard({
 
   return (
     <Paper
+      variant="outlined"
       sx={{
         position: "relative",
         p: 2.5,
-        transition: "box-shadow 0.2s",
-        "&:hover": { boxShadow: 4 },
+        borderRadius: 3,
+        transition: "all 0.15s ease",
+        "&:hover": {
+          borderColor: "primary.main",
+        },
       }}
     >
       <Box

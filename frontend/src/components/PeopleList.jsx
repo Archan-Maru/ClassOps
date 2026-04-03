@@ -18,12 +18,18 @@ function PeopleList({ people }) {
       {people.map((person) => (
         <Paper
           key={person.id}
+          variant="outlined"
           sx={{
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
             px: 2,
             py: 1.5,
+            borderRadius: 2,
+            transition: "all 0.15s ease",
+            "&:hover": {
+              borderColor: "primary.main",
+            },
           }}
         >
           <Box>
@@ -35,7 +41,12 @@ function PeopleList({ people }) {
             </Typography>
           </Box>
           {person.role === "TEACHER" && (
-            <Chip label="Teacher" size="small" color="primary" variant="outlined" />
+            <Chip
+              label="Teacher"
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
           )}
         </Paper>
       ))}

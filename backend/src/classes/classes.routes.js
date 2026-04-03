@@ -60,7 +60,10 @@ router.get("/me", requireAuth, async (req, res, next) => {
         c.id,
         c.title,
         c.description,
-        u.username AS teacher_name
+        c.teacher_id,
+        u.username AS teacher_name,
+        e.role AS enrollment_role,
+        CASE WHEN c.teacher_id = $1 THEN true ELSE false END AS is_owner
       FROM enrollments e
       JOIN classes c ON c.id = e.class_id
       JOIN users u ON u.id = c.teacher_id

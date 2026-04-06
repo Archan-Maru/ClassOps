@@ -29,6 +29,16 @@ async function start() {
       )
     `);
 
+    // ✅ SERVER HEALTH CHECK API
+    app.get("/api/health", (req, res) => {
+      res.status(200).json({
+        status: "ok",
+        server: "running",
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+      });
+    });
+
     startReminderScheduler();
 
     app.listen(PORT, () => {

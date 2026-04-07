@@ -27,12 +27,18 @@ router.post("/signup", async (req, res, next) => {
       return res.status(400).json({ message: "Invalid role" });
     }
 
+    // DEBUG: Log signup attempt
+    console.log("Signup attempt:", { email, username, role: normalizedRole });
+
     const existing = await db.query(
-      "SELECT id FROM users WHERE email = $1 OR username = $2",
+      "SELECT id FROM users WHERE LOWER(email) = LOWER($1) OR LOWER(username) = LOWER($2)",
       [email, username]
     );
 
+    console.log("User check result:", { rowCount: existing.rowCount, rows: existing.rows });
+
     if (existing.rowCount > 0) {
+      console.log("User already exists:", existing.rows[0]);
       return res.status(409).json({ message: "User already exists" });
     }
 
@@ -47,6 +53,7 @@ router.post("/signup", async (req, res, next) => {
     );
 
     const user = result.rows[0];
+    console.log("New user created:", user.id);
 
     try {
       await sendVerificationEmail(email, username, otpCode);

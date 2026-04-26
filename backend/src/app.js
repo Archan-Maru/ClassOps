@@ -12,14 +12,22 @@ const allowedOrigins = [
   ...(process.env.FRONTEND_URL ? [process.env.FRONTEND_URL.trim()] : []),
   "http://localhost:3000",
   "http://localhost:5173",
+  "https://classops-frontend.onrender.com",
 ];
+
+const uniqueAllowedOrigins = [...new Set(allowedOrigins.filter(Boolean))];
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:3000",
-      "https://classops-frontend.onrender.com",
-    ],
+    origin(origin, callback) {
+      // Allow non-browser clients (curl/Postman) and known frontend origins.
+      if (!origin || uniqueAllowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error(`CORS blocked for origin: ${origin}`));
+    },
     credentials: true,
   })
 );

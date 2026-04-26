@@ -16,10 +16,13 @@ const allowedOrigins = [
 
 app.use(
   cors({
-    origin: "https://classops-frontend.onrender.com"
-  }),
+    origin: [
+      "http://localhost:3000",
+      "https://classops-frontend.onrender.com",
+    ],
+    credentials: true,
+  })
 );
-
 app.use(json());
 
 app.use("/api", routes);

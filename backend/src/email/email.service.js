@@ -1,12 +1,40 @@
-import nodemailer from "nodemailer";
+import { Resend } from "resend";
 
-const transporter = nodemailer.createTransport({
-  service: process.env.EMAIL_SERVICE || "gmail",
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASSWORD,
-  },
-});
+const resendApiKey = (process.env.RESEND_API_KEY || "").trim();
+const resendClient = resendApiKey ? new Resend(resendApiKey) : null;
+
+function ensureResendReady() {
+  if (!resendClient) {
+    throw new Error("Resend is not configured. Set RESEND_API_KEY.");
+  }
+}
+
+function getFromAddress() {
+  return (
+    process.env.EMAIL_FROM?.trim() ||
+    process.env.RESEND_FROM?.trim() ||
+    "onboarding@resend.dev"
+  );
+}
+
+async function sendEmail({ to, subject, html }) {
+  ensureResendReady();
+
+  const { data, error } = await resendClient.emails.send({
+    from: getFromAddress(),
+    to,
+    subject,
+    html,
+  });
+
+  if (error) {
+    throw new Error(`Resend send failed: ${error.message || "unknown error"}`);
+  }
+
+  if (process.env.NODE_ENV !== "production") {
+    console.log("Email queued via Resend:", data?.id || "no-id");
+  }
+}
 
 
 export function generateOtp() {
@@ -16,8 +44,7 @@ export function generateOtp() {
 
 export async function sendVerificationEmail(email, username, otpCode) {
   try {
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await sendEmail({
       to: email,
       subject: "Email Verification Code - ClassOps",
       html: `
@@ -42,13 +69,7 @@ export async function sendVerificationEmail(email, username, otpCode) {
           </div>
         </div>
       `,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Verification email sent:", info.response);
-    }
+    });
 
     return true;
   } catch (error) {
@@ -67,8 +88,7 @@ export async function sendPasswordResetEmail(
     const resetBaseUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, "");
     const resetUrl = `${resetBaseUrl}/reset-password?token=${resetToken}&email=${encodeURIComponent(email)}`;
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await sendEmail({
       to: email,
       subject: "Password Reset - ClassOps",
       html: `
@@ -94,13 +114,7 @@ export async function sendPasswordResetEmail(
           </div>
         </div>
       `,
-    };
-
-    const info = await transporter.sendMail(mailOptions);
-
-    if (process.env.NODE_ENV !== "production") {
-      console.log("Password reset email sent:", info.response);
-    }
+    });
 
     return true;
   } catch (error) {
@@ -126,8 +140,7 @@ export async function sendDeadlineReminder(email, username, assignmentTitle, cla
 
     const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, "");
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await sendEmail({
       to: email,
       subject: `Deadline Reminder: ${assignmentTitle} — ${className}`,
       html: `
@@ -155,9 +168,7 @@ export async function sendDeadlineReminder(email, username, assignmentTitle, cla
           </div>
         </div>
       `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
     return true;
   } catch (error) {
     console.error(`Failed to send reminder to ${email}:`, error.message);
@@ -171,8 +182,7 @@ export async function sendClassInviteEmail(email, inviterName, className, invite
     const frontendUrl = (process.env.FRONTEND_URL || "http://localhost:3000").replace(/\/$/, "");
     const joinUrl = `${frontendUrl}/invite/${inviteToken}`;
 
-    const mailOptions = {
-      from: process.env.EMAIL_USER,
+    await sendEmail({
       to: email,
       subject: `You're invited to join ${className} — ClassOps`,
       html: `
@@ -197,9 +207,7 @@ export async function sendClassInviteEmail(email, inviterName, className, invite
           </div>
         </div>
       `,
-    };
-
-    await transporter.sendMail(mailOptions);
+    });
     return true;
   } catch (error) {
     console.error(`Failed to send invite to ${email}:`, error.message);

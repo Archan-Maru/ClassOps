@@ -55,14 +55,20 @@ router.post("/signup", async (req, res, next) => {
     const user = result.rows[0];
     console.log("New user created:", user.id);
 
+    let verificationEmailSent = true;
+
     try {
       await sendVerificationEmail(email, username, otpCode);
     } catch (emailError) {
+      verificationEmailSent = false;
       console.error("Failed to send verification email:", emailError);
     }
 
     res.status(201).json({
-      message: "Verification OTP sent",
+      message: verificationEmailSent
+        ? "Verification OTP sent"
+        : "Account created, but verification email could not be sent. Please try resend verification.",
+      verificationEmailSent,
       user: {
         id: user.id,
         email: user.email,

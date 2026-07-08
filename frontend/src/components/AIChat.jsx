@@ -176,8 +176,9 @@ function AIChat({ open, onClose }) {
         {/* Header */}
         <Box
           sx={{
-            background: "linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)",
-            color: "white",
+            backgroundColor: theme.palette.mode === "dark" ? "rgba(129, 140, 248, 0.1)" : "rgba(79, 70, 229, 0.05)",
+            borderBottom: `1px solid ${theme.palette.divider}`,
+            color: theme.palette.text.primary,
             p: 2,
             display: "flex",
             justifyContent: "space-between",
@@ -186,12 +187,12 @@ function AIChat({ open, onClose }) {
           }}
         >
           <Box>
-            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1rem" }}>
+            <Typography variant="h6" sx={{ fontWeight: 700, fontSize: "1rem", color: theme.palette.primary.main }}>
               🤖 AI Learning Assistant
             </Typography>
             <Typography
               variant="caption"
-              sx={{ opacity: 0.85, fontSize: "0.75rem" }}
+              sx={{ opacity: 0.85, fontSize: "0.75rem", color: theme.palette.text.secondary }}
             >
               Powered by Groq • Upload docs & ask questions
             </Typography>
@@ -200,8 +201,8 @@ function AIChat({ open, onClose }) {
             size="small"
             onClick={onClose}
             sx={{
-              color: "white",
-              "&:hover": { backgroundColor: "rgba(255,255,255,0.2)" },
+              color: theme.palette.text.secondary,
+              "&:hover": { backgroundColor: "rgba(128,128,128,0.1)" },
             }}
           >
             <CloseIcon fontSize="small" />
@@ -237,17 +238,11 @@ function AIChat({ open, onClose }) {
                   p: 1.5,
                   backgroundColor:
                     message.type === "user"
-                      ? "#00BCD4"
-                      : theme.palette.mode === "dark"
-                        ? "#1f1f1f"
-                        : "#e0f7fa",
-                  color: message.type === "user" ? "white" : "inherit",
+                      ? theme.palette.primary.main
+                      : theme.palette.background.paper,
+                  color: message.type === "user" ? theme.palette.primary.contrastText : "inherit",
                   borderRadius: 2,
                   wordWrap: "break-word",
-                  boxShadow:
-                    message.type === "user"
-                      ? "0 2px 8px rgba(0, 188, 212, 0.3)"
-                      : "0 1px 3px rgba(0,0,0,0.1)",
                   border:
                     message.type === "user"
                       ? "none"
@@ -298,20 +293,16 @@ function AIChat({ open, onClose }) {
               <Paper
                 sx={{
                   p: 1.5,
-                  backgroundColor:
-                    theme.palette.mode === "dark" ? "#1f1f1f" : "#e0f7fa",
+                  backgroundColor: theme.palette.background.paper,
                   borderRadius: 2,
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
-                  border:
-                    theme.palette.mode === "dark"
-                      ? "1px solid #333"
-                      : "1px solid #b3e5fc",
+                  border: `1px solid ${theme.palette.divider}`,
                 }}
                 elevation={0}
               >
-                <CircularProgress size={20} sx={{ color: "#00BCD4" }} />
+                <CircularProgress size={20} sx={{ color: theme.palette.primary.main }} />
                 <Typography variant="body2">Analyzing...</Typography>
               </Paper>
             </Box>
@@ -339,9 +330,9 @@ function AIChat({ open, onClose }) {
               onDelete={() => setUploadedFile(null)}
               size="small"
               sx={{
-                backgroundColor: "rgba(0, 188, 212, 0.1)",
-                color: "#00BCD4",
-                border: "1px solid #00BCD4",
+                backgroundColor: theme.palette.mode === "dark" ? "rgba(129, 140, 248, 0.1)" : "rgba(79, 70, 229, 0.05)",
+                color: theme.palette.primary.main,
+                border: `1px solid ${theme.palette.primary.main}`,
               }}
             />
           </Box>
@@ -376,11 +367,14 @@ function AIChat({ open, onClose }) {
                   borderRadius: 2,
                   backgroundColor:
                     theme.palette.mode === "dark" ? "#1a1a1a" : "#f5f5f5",
-                  border: uploadedFile ? "2px solid #00BCD4" : "1px solid",
+                  border: uploadedFile ? `1px solid ${theme.palette.primary.main}` : "1px solid transparent",
                   transition: "all 0.2s",
                   "&:hover": {
-                    borderColor: "#00BCD4",
+                    borderColor: theme.palette.primary.main,
                   },
+                  "&.Mui-focused": {
+                    borderColor: theme.palette.primary.main,
+                  }
                 },
               }}
             />
@@ -396,13 +390,13 @@ function AIChat({ open, onClose }) {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={loading}
                 sx={{
-                  color: uploadedFile ? "#00BCD4" : "inherit",
-                  border: uploadedFile ? "2px solid #00BCD4" : "1px solid",
+                  color: uploadedFile ? theme.palette.primary.main : theme.palette.text.secondary,
+                  border: uploadedFile ? `1px solid ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
                   borderRadius: 2,
                   "&:hover": {
-                    backgroundColor: "rgba(0, 188, 212, 0.1)",
-                    borderColor: "#00BCD4",
-                    color: "#00BCD4",
+                    backgroundColor: theme.palette.mode === "dark" ? "rgba(129, 140, 248, 0.1)" : "rgba(79, 70, 229, 0.05)",
+                    borderColor: theme.palette.primary.main,
+                    color: theme.palette.primary.main,
                   },
                 }}
                 title="Upload PDF, PowerPoint or text file"
@@ -413,19 +407,19 @@ function AIChat({ open, onClose }) {
                 type="submit"
                 disabled={loading || (!input.trim() && !uploadedFile)}
                 sx={{
-                  backgroundColor: "#00BCD4",
-                  color: "white",
+                  backgroundColor: theme.palette.primary.main,
+                  color: theme.palette.primary.contrastText,
                   borderRadius: 2,
                   "&:hover": {
-                    backgroundColor: "#0097A7",
+                    backgroundColor: theme.palette.primary.dark,
                     transform: "scale(1.05)",
                   },
                   "&:active": {
                     transform: "scale(0.95)",
                   },
                   "&:disabled": {
-                    backgroundColor: theme.palette.action.disabled,
-                    color: theme.palette.text.disabled,
+                    backgroundColor: theme.palette.action?.disabledBackground || "rgba(0, 0, 0, 0.12)",
+                    color: theme.palette.action?.disabled || "rgba(0, 0, 0, 0.26)",
                   },
                   transition: "all 0.2s",
                 }}
